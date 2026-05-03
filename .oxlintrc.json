@@ -17,5 +17,14 @@
 		"typescript/no-non-null-assertion": "error"
 	},
 	"env": { "node": true, "es2024": true },
-	"plugins": ["typescript", "unicorn", "import"]
+	"plugins": ["typescript", "unicorn", "import"],
+	"overrides": [
+		{
+			"files": ["apps/*/tests/**", "apps/*/test/**", "**/*.test.ts", "**/*.spec.ts"],
+			"rules": {
+				"typescript/consistent-type-assertions": "off",
+				"typescript/no-non-null-assertion": "off"
+			}
+		}
+	]
 }
