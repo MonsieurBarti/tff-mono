@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalDependencies": ["tsconfig.base.json"],
+  "globalEnv": ["CI", "NODE_ENV"],
+  "tasks": {
+    "build":        { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
+    "test":         { "outputs": ["coverage/**"] },
+    "lint":         { "outputs": [] },
+    "format":       { "cache": false },
+    "format:check": { "outputs": [] },
+    "typecheck":    { "outputs": [] },
+    "dev":          { "cache": false, "persistent": true }
+  }
+}
