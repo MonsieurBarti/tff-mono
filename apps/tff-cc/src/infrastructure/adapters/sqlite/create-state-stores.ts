@@ -1,0 +1,133 @@
+import path from "node:path";
+import type { DatabaseInit } from "../../../domain/ports/database-init.port.js";
+import type { DependencyStore } from "../../../domain/ports/dependency-store.port.js";
+import type { JournalRepository } from "../../../domain/ports/journal-repository.port.js";
+import type { MilestoneAuditStore } from "../../../domain/ports/milestone-audit-store.port.js";
+import type { MilestoneStore } from "../../../domain/ports/milestone-store.port.js";
+import type { PendingJudgmentStore } from "../../../domain/ports/pending-judgment-store.port.js";
+import type { ProjectStore } from "../../../domain/ports/project-store.port.js";
+import type { ReviewStore } from "../../../domain/ports/review-store.port.js";
+import type { SessionStore } from "../../../domain/ports/session-store.port.js";
+import type { SliceDependencyStore } from "../../../domain/ports/slice-dependency-store.port.js";
+import type { SliceStore } from "../../../domain/ports/slice-store.port.js";
+import type { TaskStore } from "../../../domain/ports/task-store.port.js";
+import type { TransactionRunner } from "../../../domain/ports/transaction-runner.port.js";
+import {
+	createTffCcSymlink,
+	getProjectHome,
+	getProjectId,
+	resolveProjectRoot,
+	resolveRepoRoot,
+	warnOnStrayTffFiles,
+} from "../../home-directory.js";
+import { JsonlJournalAdapter } from "../journal/jsonl-journal.adapter.js";
+import { SQLiteStateAdapter } from "./sqlite-state.adapter.js";
+
+export interface StateStores {
+	db: DatabaseInit & TransactionRunner;
+	projectStore: ProjectStore;
+	milestoneStore: MilestoneStore;
+	sliceStore: SliceStore;
+	taskStore: TaskStore;
+	dependencyStore: DependencyStore;
+	sliceDependencyStore: SliceDependencyStore;
+	sessionStore: SessionStore;
+	reviewStore: ReviewStore;
+	milestoneAuditStore: MilestoneAuditStore;
+	pendingJudgmentStore: PendingJudgmentStore;
+	journalRepository: JournalRepository;
+}
+
+function getDerivedPaths(): { dbPath: string; journalPath: string; projectId: string } {
+	const cwd = process.cwd();
+	const repoRoot = resolveRepoRoot(cwd);
+	warnOnStrayTffFiles(cwd, repoRoot);
+	// State files (`.tff-project-id`, `.tff-cc` symlink) live at TFF_CC_HOME
+	// when set, otherwise at the repo toplevel. Routing through
+	// resolveProjectRoot keeps tests with TFF_CC_HOME=<tmp> from leaking the
+	// symlink and id-file into the surrounding worktree.
+	const projectRoot = resolveProjectRoot(cwd);
+	const projectId = getProjectId(projectRoot);
+	const home = getProjectHome(projectId);
+
+	createTffCcSymlink(projectRoot, projectId);
+
+	return {
+		dbPath: path.join(home, "state.db"),
+		journalPath: path.join(home, "journal"),
+		projectId,
+	};
+}
+
+/**
+ * Create state stores with optional explicit dbPath (for tests).
+ * If dbPath not provided, derives from home directory.
+ */
+export function createStateStoresUnchecked(dbPath?: string): StateStores {
+	const { dbPath: resolvedPath, journalPath } = dbPath
+		? { dbPath, journalPath: path.join(path.dirname(dbPath), "journal") }
+		: getDerivedPaths();
+
+	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath);
+	const initResult = adapter.init();
+	if (!initResult.ok) throw new Error(`DB init failed: ${initResult.error.message}`);
+	const journalRepository = new JsonlJournalAdapter(journalPath);
+	return {
+		db: adapter,
+		projectStore: adapter,
+		milestoneStore: adapter,
+		sliceStore: adapter,
+		taskStore: adapter,
+		dependencyStore: adapter,
+		sliceDependencyStore: adapter,
+		sessionStore: adapter,
+		reviewStore: adapter,
+		milestoneAuditStore: adapter, // adapter implements MilestoneAuditStore
+		pendingJudgmentStore: adapter, // adapter implements PendingJudgmentStore
+		journalRepository,
+	};
+}
+
+export function createStateStores(dbPath?: string): StateStores {
+	return createStateStoresUnchecked(dbPath);
+}
+
+export interface ClosableStateStores extends StateStores {
+	close(): void;
+	checkpoint(): void;
+}
+
+/**
+ * Create closable state stores with optional explicit dbPath (for tests).
+ * If dbPath not provided, derives from home directory.
+ */
+export function createClosableStateStoresUnchecked(dbPath?: string): ClosableStateStores {
+	const { dbPath: resolvedPath, journalPath } = dbPath
+		? { dbPath, journalPath: path.join(path.dirname(dbPath), "journal") }
+		: getDerivedPaths();
+
+	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath);
+	const initResult = adapter.init();
+	if (!initResult.ok) throw new Error(`DB init failed: ${initResult.error.message}`);
+	const journalRepository = new JsonlJournalAdapter(journalPath);
+	return {
+		db: adapter,
+		projectStore: adapter,
+		milestoneStore: adapter,
+		sliceStore: adapter,
+		taskStore: adapter,
+		dependencyStore: adapter,
+		sliceDependencyStore: adapter,
+		sessionStore: adapter,
+		reviewStore: adapter,
+		milestoneAuditStore: adapter, // adapter implements MilestoneAuditStore
+		pendingJudgmentStore: adapter, // adapter implements PendingJudgmentStore
+		journalRepository,
+		close: () => adapter.close(),
+		checkpoint: () => adapter.checkpoint(),
+	};
+}
+
+export function createClosableStateStores(dbPath?: string): ClosableStateStores {
+	return createClosableStateStoresUnchecked(dbPath);
+}
