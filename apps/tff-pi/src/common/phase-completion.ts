@@ -1,0 +1,161 @@
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type Database from "better-sqlite3";
+import { determineNextPhase, verifyPhaseArtifacts } from "../orchestrator.js";
+import { getLatestPhaseRun, getMilestone, getNextOpenSliceInMilestone, getSlice } from "./db.js";
+import { makeBaseEvent } from "./events.js";
+import { logWarning } from "./logger.js";
+import { type Phase, type Slice, sliceLabel } from "./types.js";
+
+/**
+ * After a writer tool (tff_write_plan, tff_write_spec, ...) succeeds,
+ * check whether the target phase's artifacts are now all present. If so,
+ * emit `phase_complete` so phase_run.status is accurately marked 'completed'.
+ *
+ * Mirrors GSD-2's pattern of deriving phase completion from on-disk artifacts
+ * rather than trusting the LLM to self-report.
+ *
+ * We take `verifyPhaseArtifacts` as a parameter to avoid a circular import
+ * with orchestrator.ts (which imports common/* modules).
+ */
+/**
+ * Implicit-completion helper — called at the top of each phase's `run()`.
+ *
+ * When phase X starts, the predecessor phase Y must have been done
+ * (its artifacts are a precondition to enter X, checked separately by
+ * the phase guard). But phases without a dedicated writer tool (execute)
+ * or phases where the writer tool is optional (research on non-SSS tier)
+ * never emit `phase_complete` for Y, leaving `phase_run.Y` forever
+ * `'started'` and tripping `/tff doctor` stall detection.
+ *
+ * This helper scans `phase_run` for the predecessor of `currentPhase`. If
+ * the most-recent run is still `'started'` AND the predecessor's artifacts
+ * are present (per `verifyPhaseArtifacts`), emit `phase_complete` for it
+ * so the DB reflects truth. Safe to call multiple times — the event-logger
+ * no-ops if the run is already completed.
+ *
+ * `predecessorPhase` is injected to avoid a circular import.
+ */
+export function closePredecessorIfReady(
+	pi: ExtensionAPI,
+	db: Database.Database,
+	root: string,
+	slice: Slice,
+	currentPhase: Phase,
+	predecessorPhase: (p: Phase, tier?: Slice["tier"]) => Phase | null,
+	verifyPhaseArtifacts: (
+		db: Database.Database,
+		root: string,
+		slice: Slice,
+		milestoneNumber: number,
+		phase: Phase,
+	) => { ok: boolean; missing: string[] },
+): void {
+	const predecessor = predecessorPhase(currentPhase, slice.tier);
+	if (!predecessor) return;
+
+	const priorRun = getLatestPhaseRun(db, slice.id, predecessor);
+	if (!priorRun || priorRun.status !== "started") return;
+
+	const milestone = getMilestone(db, slice.milestoneId);
+	if (!milestone) return;
+
+	const check = verifyPhaseArtifacts(db, root, slice, milestone.number, predecessor);
+	if (!check.ok) {
+		logMissingArtifacts(slice.id, "closePredecessorIfReady", check.missing);
+		return;
+	}
+
+	const sLabel = sliceLabel(milestone.number, slice.number);
+	pi.events.emit("tff:phase", {
+		...makeBaseEvent(slice.id, sLabel, milestone.number),
+		type: "phase_complete",
+		phase: predecessor,
+	});
+}
+
+export function computeNextHint(
+	db: Database.Database,
+	slice: Slice,
+	milestoneNumber: number,
+): string | null {
+	const nextPhase = determineNextPhase(slice.status, slice.tier);
+	const label = sliceLabel(milestoneNumber, slice.number);
+	if (nextPhase) {
+		return `→ Next: /tff ${nextPhase} ${label}`;
+	}
+	// Slice has no next phase (i.e., it's shipped/closed). Find the next open
+	// slice in the same milestone and point at its next phase.
+	const nextOpen = getNextOpenSliceInMilestone(db, slice.milestoneId, slice.id);
+	if (nextOpen) {
+		const nextOpenPhase = determineNextPhase(nextOpen.status, nextOpen.tier) ?? "discuss";
+		const nextOpenLabel = sliceLabel(milestoneNumber, nextOpen.number);
+		return `→ Next: /tff ${nextOpenPhase} ${nextOpenLabel}`;
+	}
+	return "→ Next: /tff complete-milestone";
+}
+
+// After a discuss-phase writer tool (tff_write_spec / tff_write_requirements /
+// tff_classify) succeeds, check whether the full discuss artifact set is now
+// present. If yes, emit phase_complete and return a completion suffix +
+// next-phase hint. If no, return a progress line listing what's still needed.
+//
+// Prior to this helper, tff_write_spec unconditionally told the agent
+// "Discuss phase complete. Stop here" after a successful spec write, even
+// though REQUIREMENTS.md and tier classification were still required. Agents
+// trusted the message, stopped early, and the user tripped the `/tff research`
+// predecessor-artifact check.
+export interface DiscussCompletionSuffix {
+	text: string;
+	isComplete: boolean;
+}
+
+export function buildDiscussCompletionSuffix(
+	pi: ExtensionAPI,
+	db: Database.Database,
+	root: string,
+	slice: Slice,
+	milestoneNumber: number,
+): DiscussCompletionSuffix {
+	const check = verifyPhaseArtifacts(db, root, slice, milestoneNumber, "discuss");
+	if (!check.ok) {
+		return {
+			text: ` Discuss is not yet complete — still needed: ${check.missing.join(", ")}. Continue with the discuss protocol.`,
+			isComplete: false,
+		};
+	}
+
+	const label = sliceLabel(milestoneNumber, slice.number);
+	// Idempotency guard: discuss has three independent writer tools
+	// (write-spec, write-requirements, classify) that each call this helper on
+	// success. Without this guard, every subsequent write after discuss is
+	// first completed re-emits phase_complete, creating duplicate events that
+	// trip `/tff doctor`'s projection-drift check.
+	const priorRun = getLatestPhaseRun(db, slice.id, "discuss");
+	if (priorRun?.status !== "completed") {
+		pi.events.emit("tff:phase", {
+			...makeBaseEvent(slice.id, label, milestoneNumber),
+			type: "phase_complete",
+			phase: "discuss",
+		});
+	}
+	// Reload the slice: tff_classify commits the tier via commitCommand and
+	// this helper is invoked from the same tool, but the caller's `slice`
+	// snapshot was taken BEFORE the commit — it still has tier=null. A stale
+	// tier makes `determineNextPhase("discussing", null)` fall through to
+	// "research" and an S-tier slice would be told to run `/tff research`
+	// instead of `/tff plan`.
+	const fresh = getSlice(db, slice.id) ?? slice;
+	const hint = computeNextHint(db, fresh, milestoneNumber);
+	return {
+		text: ` Discuss phase complete. Stop here; the user will advance.${hint ? `\n\n${hint}` : ""}`,
+		isComplete: true,
+	};
+}
+
+function logMissingArtifacts(sliceId: string, component: string, missing: string[]): void {
+	logWarning("completion", "phase_complete_skipped", {
+		sid: sliceId,
+		fn: component,
+		error: missing.join(","),
+	});
+}
