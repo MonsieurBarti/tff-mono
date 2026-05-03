@@ -9,9 +9,7 @@ pre-commit:
 commit-msg:
   jobs:
     - name: conventional-commit
-      run: |
-        grep -qE '^(feat|fix|refactor|test|docs|chore|revert)(\([^)]+\))?: .+' {1} \
-          || { echo "✗ commit message must follow conventional-commits: <type>(<scope>?): <summary>"; exit 1; }
+      run: pnpm exec commitlint --edit {1}
 
 pre-push:
   jobs:
