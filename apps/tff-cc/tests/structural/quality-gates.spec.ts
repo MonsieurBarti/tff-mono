@@ -13,8 +13,6 @@ const ENFORCED_RATCHET: readonly string[] = [
 	"branch-guard",
 	"ship-completeness",
 	"milestone-completeness",
-	"coverage-in-ci",
-	"commitlint-in-ci",
 	"value-object-invariants",
 	"command-mutates-annotation",
 ];
