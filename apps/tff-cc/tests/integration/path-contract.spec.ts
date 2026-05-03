@@ -1,0 +1,87 @@
+import { execSync } from "node:child_process";
+import { existsSync, lstatSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+describe("path contract: artifacts under .tff-cc/ only", () => {
+	let tmpRepo: string;
+	let tffCcHome: string;
+	const CLI = `${process.cwd()}/dist/cli/index.js`;
+
+	beforeAll(() => {
+		// Ensure the CLI has been built before running any execSync; failing here
+		// produces a clear error instead of a cryptic ENOENT from node.
+		if (!existsSync(CLI)) {
+			throw new Error(
+				`Missing built CLI at ${CLI}. Run \`bun run build\` before the integration tests.`,
+			);
+		}
+	});
+
+	beforeEach(() => {
+		tmpRepo = mkdtempSync(join(tmpdir(), "tff-path-contract-"));
+		tffCcHome = mkdtempSync(join(tmpdir(), "tff-cc-home-"));
+		execSync("git init -q -b main", { cwd: tmpRepo });
+		execSync("git config user.email t@t", { cwd: tmpRepo });
+		execSync("git config user.name t", { cwd: tmpRepo });
+		execSync("git commit --allow-empty -m init -q", { cwd: tmpRepo });
+		// Writer commands (milestone:create, slice:create, sync:state) refuse to run on the
+		// default branch. Checkout a feature branch so the path-contract test can exercise them.
+		execSync("git checkout -b feature/path-contract-test -q", { cwd: tmpRepo });
+	});
+
+	afterEach(() => {
+		rmSync(tmpRepo, { recursive: true, force: true });
+		rmSync(tffCcHome, { recursive: true, force: true });
+	});
+
+	const cli = (cmd: string) => {
+		try {
+			const result = execSync(`node ${CLI} ${cmd}`, {
+				cwd: tmpRepo,
+				env: { ...process.env, TFF_CC_HOME: tffCcHome },
+				stdio: ["ignore", "pipe", "pipe"],
+				encoding: "utf8",
+			});
+			return result;
+		} catch (err) {
+			// execSync swallows stdout/stderr into the error. Surface both so test
+			// output shows the actual CLI failure payload, not just "Command failed".
+			const e = err as { stdout?: string; stderr?: string; message: string };
+			throw new Error(
+				`CLI command failed: ${cmd}\n  tmpRepo: ${tmpRepo}\n  tffCcHome: ${tffCcHome}\n  stdout: ${e.stdout ?? "(empty)"}\n  stderr: ${e.stderr ?? "(empty)"}\n  ${e.message}`,
+			);
+		}
+	};
+
+	it("project:init creates .tff-cc/ symlink under TFF_CC_HOME (not in cwd)", () => {
+		cli('project:init --name "TestProject"');
+
+		// When TFF_CC_HOME is set, the symlink lives under TFF_CC_HOME — never
+		// in the surrounding worktree (issue #172).
+		const symlinkPath = join(tffCcHome, ".tff-cc");
+		expect(existsSync(symlinkPath)).toBe(true);
+		expect(lstatSync(symlinkPath).isSymbolicLink()).toBe(true);
+
+		// And cwd stays untouched.
+		expect(existsSync(join(tmpRepo, ".tff-cc"))).toBe(false);
+		expect(existsSync(join(tmpRepo, ".tff-project-id"))).toBe(false);
+	});
+
+	it("after milestone + slice + sync, state lands under .tff-cc/", () => {
+		cli('project:init --name "TestProject"');
+
+		const miRaw = cli('milestone:create --name "M1"');
+		const miJson = JSON.parse(miRaw.trim().split("\n").pop()!);
+		const milestoneNumber: number = miJson.data.milestone.number;
+		const milestoneShortId = `M${String(milestoneNumber).padStart(2, "0")}`;
+
+		cli('slice:create --title "S1"');
+		cli(`sync:state --milestone-id ${milestoneShortId}`);
+
+		const symlinkPath = join(tffCcHome, ".tff-cc");
+		expect(existsSync(symlinkPath)).toBe(true);
+		expect(lstatSync(symlinkPath).isSymbolicLink()).toBe(true);
+	});
+});
