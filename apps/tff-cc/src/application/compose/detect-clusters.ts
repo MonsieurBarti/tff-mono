@@ -29,8 +29,12 @@ export function detectClusters(observations: Observation[], opts: ClusterOpts = 
 
 	const sessionTools = new Map<string, Set<string>>();
 	for (const obs of observations) {
-		if (!sessionTools.has(obs.session)) sessionTools.set(obs.session, new Set());
-		sessionTools.get(obs.session)!.add(obs.tool);
+		let tools = sessionTools.get(obs.session);
+		if (!tools) {
+			tools = new Set();
+			sessionTools.set(obs.session, tools);
+		}
+		tools.add(obs.tool);
 	}
 
 	if (sessionTools.size < minSessions) return [];
@@ -40,8 +44,12 @@ export function detectClusters(observations: Observation[], opts: ClusterOpts = 
 	const toolSessionSets = new Map<string, Set<string>>();
 	for (const [session, tools] of sessionTools) {
 		for (const tool of tools) {
-			if (!toolSessionSets.has(tool)) toolSessionSets.set(tool, new Set());
-			toolSessionSets.get(tool)!.add(session);
+			let sessions = toolSessionSets.get(tool);
+			if (!sessions) {
+				sessions = new Set();
+				toolSessionSets.set(tool, sessions);
+			}
+			sessions.add(session);
 		}
 	}
 
@@ -66,9 +74,13 @@ export function detectClusters(observations: Observation[], opts: ClusterOpts = 
 		const cluster = new Set([tool]);
 		visited.add(tool);
 
+		const toolSessions = toolSessionSets.get(tool);
+		if (!toolSessions) continue;
 		for (const other of allTools) {
 			if (visited.has(other)) continue;
-			const dist = jaccardDistance(toolSessionSets.get(tool)!, toolSessionSets.get(other)!);
+			const otherSessions = toolSessionSets.get(other);
+			if (!otherSessions) continue;
+			const dist = jaccardDistance(toolSessions, otherSessions);
 			if (dist < maxDist) {
 				cluster.add(other);
 				visited.add(other);
@@ -78,7 +90,9 @@ export function detectClusters(observations: Observation[], opts: ClusterOpts = 
 		if (cluster.size >= minPatterns) {
 			const clusterSessions = new Set<string>();
 			for (const t of cluster) {
-				for (const s of toolSessionSets.get(t)!) clusterSessions.add(s);
+				const sessions = toolSessionSets.get(t);
+				if (!sessions) continue;
+				for (const s of sessions) clusterSessions.add(s);
 			}
 			if (clusterSessions.size >= minSessions) {
 				clusters.push({

@@ -21,7 +21,7 @@ export function commitCommand(
 	}
 
 	const pending = fsOps?.() ?? [];
-	const renamed = new Array<boolean>(pending.length).fill(false);
+	const renamed: boolean[] = Array.from({ length: pending.length }, () => false);
 
 	try {
 		db.transaction(() => {

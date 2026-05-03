@@ -109,9 +109,8 @@ describe("withMutatingCommand", () => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const git = makeGit("main", "main");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true, data: "called" }));
 
@@ -131,9 +130,8 @@ describe("withMutatingCommand", () => {
 		const git = makeGit(`milestone/${prefix}`, "main");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true, data: "called" }));
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const wrapped = withMutatingCommand(handler, { gitFactory: () => git });
 		const result = JSON.parse(await wrapped([]));
 
@@ -152,9 +150,8 @@ describe("withMutatingCommand", () => {
 		const git = makeGit(`milestone/${prefix}`, "main");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true, data: "bypassed" }));
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const wrapped = withMutatingCommand(handler, { gitFactory: () => git });
 		const result = JSON.parse(await wrapped(["--arg"]));
 
@@ -171,9 +168,8 @@ describe("withMutatingCommand", () => {
 		const git = makeGit("feature/my-branch", "main");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true, data: "ok" }));
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const wrapped = withMutatingCommand(handler, { gitFactory: () => git });
 		const result = JSON.parse(await wrapped(["--flag"]));
 
@@ -190,12 +186,10 @@ describe("withMutatingCommand", () => {
 		const git = makeGit(`milestone/${prefix}`, "main");
 		const handler = vi.fn();
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 		closeStub.mockClear();
 
@@ -213,12 +207,10 @@ describe("withMutatingCommand", () => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
 		const git = makeGit("main", "main");
@@ -238,12 +230,10 @@ describe("withMutatingCommand", () => {
 		const git = makeGit("feature/abc", "main");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true }));
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
 		const wrapped = withMutatingCommand(handler, { gitFactory: () => git });
@@ -258,9 +248,8 @@ describe("withMutatingCommand", () => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
 
-		const { withMutatingCommand } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const handler = vi.fn().mockResolvedValue(JSON.stringify({ ok: true, data: "no-deps" }));
 
 		// No `deps` argument — real GitCliAdapter is used
@@ -278,9 +267,8 @@ describe("isWrappedMutating", () => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
 
-		const { withMutatingCommand, isWrappedMutating } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand, isWrappedMutating } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const handler = vi.fn();
 		const wrapped = withMutatingCommand(handler);
 
@@ -288,18 +276,16 @@ describe("isWrappedMutating", () => {
 	});
 
 	it("returns false for a plain function", async () => {
-		const { isWrappedMutating } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { isWrappedMutating } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 		const plain = async (_args: string[]) => "result";
 
 		expect(isWrappedMutating(plain)).toBe(false);
 	});
 
 	it("returns false for non-function inputs", async () => {
-		const { isWrappedMutating } = await import(
-			"../../../../src/cli/utils/with-mutating-command.js"
-		);
+		const { isWrappedMutating } =
+			await import("../../../../src/cli/utils/with-mutating-command.js");
 
 		expect(isWrappedMutating(null)).toBe(false);
 		expect(isWrappedMutating(undefined)).toBe(false);

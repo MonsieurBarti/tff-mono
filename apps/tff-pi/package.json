@@ -22,9 +22,10 @@
 		"test": "pnpm run build && vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "pnpm run build && vitest run --coverage",
-		"lint": "biome check .",
-		"lint:fix": "biome check --write .",
-		"fmt": "biome format --write .",
+		"lint": "oxlint --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
+		"lint:fix": "oxlint --fix --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
+		"format": "prettier --write --ignore-path ../../.prettierignore .",
+		"format:check": "prettier --check --ignore-path ../../.prettierignore .",
 		"typecheck": "tsc --noEmit",
 		"clean": "rm -rf dist"
 	},
@@ -72,7 +73,6 @@
 		"pi-subagents": "^0.17.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
 		"@commitlint/cli": "^19.8.0",
 		"@commitlint/config-conventional": "^19.8.0",
 		"@mariozechner/pi-ai": "^0.66.1",

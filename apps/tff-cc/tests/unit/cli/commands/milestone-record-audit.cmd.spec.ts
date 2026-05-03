@@ -50,9 +50,8 @@ beforeEach(() => {
 describe("milestone:record-audit — notes validation", () => {
 	it("rejects notes longer than 1000 characters with VALIDATION_ERROR", async () => {
 		setMockStores(makeStores());
-		const { milestoneRecordAuditCmd } = await import(
-			"../../../../src/cli/commands/milestone-record-audit.cmd.js"
-		);
+		const { milestoneRecordAuditCmd } =
+			await import("../../../../src/cli/commands/milestone-record-audit.cmd.js");
 		const longNotes = "a".repeat(1001);
 		const result = JSON.parse(
 			await milestoneRecordAuditCmd([
@@ -70,9 +69,8 @@ describe("milestone:record-audit — notes validation", () => {
 
 	it("rejects notes containing ASCII control characters with VALIDATION_ERROR", async () => {
 		setMockStores(makeStores());
-		const { milestoneRecordAuditCmd } = await import(
-			"../../../../src/cli/commands/milestone-record-audit.cmd.js"
-		);
+		const { milestoneRecordAuditCmd } =
+			await import("../../../../src/cli/commands/milestone-record-audit.cmd.js");
 		const notesWithControl = "clean\x01malicious";
 		const result = JSON.parse(
 			await milestoneRecordAuditCmd([
@@ -90,9 +88,8 @@ describe("milestone:record-audit — notes validation", () => {
 
 	it("accepts notes exactly 1000 characters", async () => {
 		setMockStores(makeStores());
-		const { milestoneRecordAuditCmd } = await import(
-			"../../../../src/cli/commands/milestone-record-audit.cmd.js"
-		);
+		const { milestoneRecordAuditCmd } =
+			await import("../../../../src/cli/commands/milestone-record-audit.cmd.js");
 		const maxNotes = "a".repeat(1000);
 		const result = JSON.parse(
 			await milestoneRecordAuditCmd([
@@ -109,9 +106,8 @@ describe("milestone:record-audit — notes validation", () => {
 
 	it("accepts notes with newlines and tabs", async () => {
 		setMockStores(makeStores());
-		const { milestoneRecordAuditCmd } = await import(
-			"../../../../src/cli/commands/milestone-record-audit.cmd.js"
-		);
+		const { milestoneRecordAuditCmd } =
+			await import("../../../../src/cli/commands/milestone-record-audit.cmd.js");
 		const result = JSON.parse(
 			await milestoneRecordAuditCmd([
 				"--milestone-id",

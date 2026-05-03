@@ -62,9 +62,8 @@ describe("milestone:audit-status", () => {
 	it("returns NOT_FOUND when milestone label does not resolve", async () => {
 		setMockStores(makeStores({ ok: true, data: null }, { ok: true, data: null }));
 
-		const { milestoneAuditStatusCmd } = await import(
-			"../../../../src/cli/commands/milestone-audit-status.cmd.js"
-		);
+		const { milestoneAuditStatusCmd } =
+			await import("../../../../src/cli/commands/milestone-audit-status.cmd.js");
 
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M99"]));
 
@@ -80,9 +79,8 @@ describe("milestone:audit-status", () => {
 			}),
 		);
 
-		const { milestoneAuditStatusCmd } = await import(
-			"../../../../src/cli/commands/milestone-audit-status.cmd.js"
-		);
+		const { milestoneAuditStatusCmd } =
+			await import("../../../../src/cli/commands/milestone-audit-status.cmd.js");
 
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M01"]));
 
@@ -98,9 +96,8 @@ describe("milestone:audit-status", () => {
 			}),
 		);
 
-		const { milestoneAuditStatusCmd } = await import(
-			"../../../../src/cli/commands/milestone-audit-status.cmd.js"
-		);
+		const { milestoneAuditStatusCmd } =
+			await import("../../../../src/cli/commands/milestone-audit-status.cmd.js");
 
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M01"]));
 
@@ -111,9 +108,8 @@ describe("milestone:audit-status", () => {
 	it("returns AUDIT_REQUIRED when no audit record exists", async () => {
 		setMockStores(makeStores({ ok: true, data: null }));
 
-		const { milestoneAuditStatusCmd } = await import(
-			"../../../../src/cli/commands/milestone-audit-status.cmd.js"
-		);
+		const { milestoneAuditStatusCmd } =
+			await import("../../../../src/cli/commands/milestone-audit-status.cmd.js");
 
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M01"]));
 
@@ -125,9 +121,8 @@ describe("milestone:audit-status", () => {
 		const stores = makeStores({ ok: true, data: null });
 		setMockStores(stores);
 
-		const { milestoneAuditStatusCmd } = await import(
-			"../../../../src/cli/commands/milestone-audit-status.cmd.js"
-		);
+		const { milestoneAuditStatusCmd } =
+			await import("../../../../src/cli/commands/milestone-audit-status.cmd.js");
 
 		await milestoneAuditStatusCmd(["--milestone-id", "M01"]);
 

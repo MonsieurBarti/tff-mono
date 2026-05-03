@@ -5,11 +5,13 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 **Autonomy**: check `.tff-cc/settings.yaml` → `autonomy.mode` before pausing.
 
 ## Prerequisites
+
 status = reviewing
 LOAD @skills/verification-before-completion/SKILL.md
 LOAD @skills/finishing-work/SKILL.md
 
 ## Steps
+
 1. `∀ reviewer: tff-tools review:check-fresh --slice-id <slice-id> --agent <role>`
 2. Stage 1 (spec) — SPAWN tff-spec-reviewer: {acceptance_criteria, diff}
    FAIL → SPAWN tff-fixer → re-run | loop until PASS
@@ -36,7 +38,9 @@ LOAD @skills/finishing-work/SKILL.md
 8. NEXT: @references/next-steps.md
 
 ## Auto-Transition
+
 After completing all steps above:
+
 1. READ `.tff-cc/settings.yaml` → check `autonomy.mode`
 2. IF `plan-to-pr`:
    - Non-gate steps: IMMEDIATELY invoke the next workflow — do NOT ask user
@@ -44,5 +48,6 @@ After completing all steps above:
 3. IF `guided`: suggest next step with `/tff:<command>`, wait for user
 
 ## Auto-Fix (plan-to-pr)
+
 REQUEST_CHANGES ∧ cycles < 2 → SPAWN tff-fixer, re-review, go back to merge gate
 REQUEST_CHANGES ∧ cycles ≥ 2 → escalation task, pause chain

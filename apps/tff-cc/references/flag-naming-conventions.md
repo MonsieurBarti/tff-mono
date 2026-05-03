@@ -19,12 +19,12 @@ Single source of truth for flag naming across all tff-tools CLI commands.
 
 Always use pattern `--<entity>-id`:
 
-| Entity | Flag Name | Example Value |
-|--------|-----------|---------------|
-| Project | `--project-id` | `uuid-string` |
-| Milestone | `--milestone-id` | `M01` |
-| Slice | `--slice-id` | `M01-S01` |
-| Task | `--task-id` | `T01` |
+| Entity    | Flag Name        | Example Value |
+| --------- | ---------------- | ------------- |
+| Project   | `--project-id`   | `uuid-string` |
+| Milestone | `--milestone-id` | `M01`         |
+| Slice     | `--slice-id`     | `M01-S01`     |
+| Task      | `--task-id`      | `T01`         |
 
 **Never** use generic names like `--id` or `--target-id`. Always be specific.
 
@@ -37,6 +37,7 @@ slice:transition --slice-id M01-S01 --status planning
 ```
 
 **Never** use alternatives like:
+
 - `--target-status`
 - `--new-status`
 - `--to-status`
@@ -55,10 +56,10 @@ project:get --json true
 
 Common boolean flags:
 
-| Flag | Meaning |
-|------|---------|
+| Flag     | Meaning                            |
+| -------- | ---------------------------------- |
 | `--json` | JSON output mode (for help/schema) |
-| `--help` | Show command help |
+| `--help` | Show command help                  |
 
 ### File Paths
 
@@ -72,35 +73,35 @@ direct-edit:guard --file-path src/domain/slice.ts
 
 For structured data not expressible as simple flags:
 
-| Flag | Purpose |
-|------|---------|
-| `--data` | Inline JSON string for complex input |
-| `--tasks` | JSON array of task objects |
+| Flag        | Purpose                                |
+| ----------- | -------------------------------------- |
+| `--data`    | Inline JSON string for complex input   |
+| `--tasks`   | JSON array of task objects             |
 | `--signals` | JSON object for classification signals |
 
 ### Strings
 
 Simple string values use descriptive names:
 
-| Context | Flag Name | Example |
-|---------|-----------|---------|
-| Entity name | `--name` | `--name "My Project"` |
-| Entity title | `--title` | `--title "Implement feature X"` |
-| Reason/message | `--reason` | `--reason "Completed successfully"` |
-| Vision | `--vision` | `--vision "Build the best tool"` |
-| Agent name | `--agent` | `--agent "executor"` |
-| Commit SHA | `--commit-sha` | `--commit-sha abc123` |
+| Context        | Flag Name      | Example                             |
+| -------------- | -------------- | ----------------------------------- |
+| Entity name    | `--name`       | `--name "My Project"`               |
+| Entity title   | `--title`      | `--title "Implement feature X"`     |
+| Reason/message | `--reason`     | `--reason "Completed successfully"` |
+| Vision         | `--vision`     | `--vision "Build the best tool"`    |
+| Agent name     | `--agent`      | `--agent "executor"`                |
+| Commit SHA     | `--commit-sha` | `--commit-sha abc123`               |
 
 ### Numbers
 
 Use descriptive names:
 
-| Context | Flag Name | Example |
-|---------|-----------|---------|
+| Context     | Flag Name        | Example            |
+| ----------- | ---------------- | ------------------ |
 | Wave number | `--current-wave` | `--current-wave 2` |
-| Threshold | `--threshold` | `--threshold 0.5` |
-| Count/limit | `--min-count` | `--min-count 2` |
-| TTL | `--ttl-minutes` | `--ttl-minutes 60` |
+| Threshold   | `--threshold`    | `--threshold 0.5`  |
+| Count/limit | `--min-count`    | `--min-count 2`    |
+| TTL         | `--ttl-minutes`  | `--ttl-minutes 60` |
 
 ### Arrays
 
@@ -114,9 +115,9 @@ checkpoint:save --slice-id M01-S01 --base-commit abc123 --current-wave 1 --compl
 
 These have special meaning — do not repurpose:
 
-| Flag | Purpose |
-|------|---------|
-| `--help` | Show command help/usage |
+| Flag     | Purpose                            |
+| -------- | ---------------------------------- |
+| `--help` | Show command help/usage            |
 | `--json` | JSON output mode (for help/schema) |
 
 ## Error Messages
@@ -127,13 +128,13 @@ Flag errors must include valid alternatives:
 
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "MISSING_REQUIRED_FLAG",
-    "message": "Missing required flag: --status",
-    "requiredFlags": ["--slice-id", "--status"],
-    "missingFlag": "--status"
-  }
+	"ok": false,
+	"error": {
+		"code": "MISSING_REQUIRED_FLAG",
+		"message": "Missing required flag: --status",
+		"requiredFlags": ["--slice-id", "--status"],
+		"missingFlag": "--status"
+	}
 }
 ```
 
@@ -141,12 +142,12 @@ Flag errors must include valid alternatives:
 
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "UNKNOWN_FLAG",
-    "message": "Unknown flag: --target-status",
-    "validFlags": ["--slice-id", "--status"]
-  }
+	"ok": false,
+	"error": {
+		"code": "UNKNOWN_FLAG",
+		"message": "Unknown flag: --target-status",
+		"validFlags": ["--slice-id", "--status"]
+	}
 }
 ```
 
@@ -154,14 +155,23 @@ Flag errors must include valid alternatives:
 
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "INVALID_ENUM_VALUE",
-    "message": "Invalid value for --status: 'invalid'. Must be one of: discussing, researching, planning, executing, verifying, reviewing, completing, closed",
-    "flag": "--status",
-    "provided": "invalid",
-    "validValues": ["discussing", "researching", "planning", "executing", "verifying", "reviewing", "completing", "closed"]
-  }
+	"ok": false,
+	"error": {
+		"code": "INVALID_ENUM_VALUE",
+		"message": "Invalid value for --status: 'invalid'. Must be one of: discussing, researching, planning, executing, verifying, reviewing, completing, closed",
+		"flag": "--status",
+		"provided": "invalid",
+		"validValues": [
+			"discussing",
+			"researching",
+			"planning",
+			"executing",
+			"verifying",
+			"reviewing",
+			"completing",
+			"closed"
+		]
+	}
 }
 ```
 
@@ -169,105 +179,105 @@ Flag errors must include valid alternatives:
 
 ### Entity Operations
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `project:init` | `--name` | `--vision` |
-| `project:get` | none | none |
-| `milestone:create` | `--name` | none |
-| `milestone:list` | none | `--milestone-id` |
-| `milestone:close` | `--milestone-id` | `--reason` |
-| `slice:create` | `--title`, `--milestone-id` | none |
-| `slice:list` | none | `--milestone-id` |
-| `slice:transition` | `--slice-id`, `--status` | none |
-| `slice:close` | `--slice-id` | `--reason` |
-| `slice:classify` | `--signals` | none |
-| `task:claim` | `--task-id` | `--claimed-by` |
-| `task:close` | `--task-id` | `--reason` |
-| `task:ready` | `--slice-id` | none |
+| Command            | Required Flags              | Optional Flags   |
+| ------------------ | --------------------------- | ---------------- |
+| `project:init`     | `--name`                    | `--vision`       |
+| `project:get`      | none                        | none             |
+| `milestone:create` | `--name`                    | none             |
+| `milestone:list`   | none                        | `--milestone-id` |
+| `milestone:close`  | `--milestone-id`            | `--reason`       |
+| `slice:create`     | `--title`, `--milestone-id` | none             |
+| `slice:list`       | none                        | `--milestone-id` |
+| `slice:transition` | `--slice-id`, `--status`    | none             |
+| `slice:close`      | `--slice-id`                | `--reason`       |
+| `slice:classify`   | `--signals`                 | none             |
+| `task:claim`       | `--task-id`                 | `--claimed-by`   |
+| `task:close`       | `--task-id`                 | `--reason`       |
+| `task:ready`       | `--slice-id`                | none             |
 
 ### Dependencies
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `dep:add` | `--from-id`, `--to-id` | none |
+| Command   | Required Flags         | Optional Flags |
+| --------- | ---------------------- | -------------- |
+| `dep:add` | `--from-id`, `--to-id` | none           |
 
 ### Guards
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `direct-edit:guard` | none | `--file-path` |
-| `pre-op:guard` | `--slice-id`, `--operation` | none |
-| `spec-edit:guard` | none | `--file-path` |
+| Command             | Required Flags              | Optional Flags |
+| ------------------- | --------------------------- | -------------- |
+| `direct-edit:guard` | none                        | `--file-path`  |
+| `pre-op:guard`      | `--slice-id`, `--operation` | none           |
+| `spec-edit:guard`   | none                        | `--file-path`  |
 
 ### Workflow
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `waves:detect` | `--tasks` | none |
-| `sync:state` | `--milestone-id` | none |
-| `workflow:next` | `--status` | none |
-| `workflow:should-auto` | `--status`, `--mode` | none |
+| Command                | Required Flags       | Optional Flags |
+| ---------------------- | -------------------- | -------------- |
+| `waves:detect`         | `--tasks`            | none           |
+| `sync:state`           | `--milestone-id`     | none           |
+| `workflow:next`        | `--status`           | none           |
+| `workflow:should-auto` | `--status`, `--mode` | none           |
 
 ### Worktrees
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `worktree:create` | `--slice-id` | none |
-| `worktree:delete` | `--slice-id` | none |
-| `worktree:list` | none | none |
+| Command           | Required Flags | Optional Flags |
+| ----------------- | -------------- | -------------- |
+| `worktree:create` | `--slice-id`   | none           |
+| `worktree:delete` | `--slice-id`   | none           |
+| `worktree:list`   | none           | none           |
 
 ### Review
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `review:check-fresh` | `--slice-id`, `--agent` | none |
-| `review:record` | `--slice-id`, `--agent`, `--verdict`, `--type`, `--commit-sha` | none |
+| Command              | Required Flags                                                 | Optional Flags |
+| -------------------- | -------------------------------------------------------------- | -------------- |
+| `review:check-fresh` | `--slice-id`, `--agent`                                        | none           |
+| `review:record`      | `--slice-id`, `--agent`, `--verdict`, `--type`, `--commit-sha` | none           |
 
 ### Checkpoint
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `checkpoint:save` | `--slice-id`, `--base-commit`, `--current-wave`, `--completed-waves`, `--completed-tasks`, `--executor-log` | none |
-| `checkpoint:load` | `--slice-id` | none |
+| Command           | Required Flags                                                                                              | Optional Flags |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- | -------------- |
+| `checkpoint:save` | `--slice-id`, `--base-commit`, `--current-wave`, `--completed-waves`, `--completed-tasks`, `--executor-log` | none           |
+| `checkpoint:load` | `--slice-id`                                                                                                | none           |
 
 ### Observation
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `observe:record` | `--ts`, `--session`, `--tool`, `--args`, `--project` | none |
+| Command          | Required Flags                                       | Optional Flags |
+| ---------------- | ---------------------------------------------------- | -------------- |
+| `observe:record` | `--ts`, `--session`, `--tool`, `--args`, `--project` | none           |
 
 ### Patterns
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `patterns:extract` | none | none |
-| `patterns:aggregate` | none | `--min-count` |
-| `patterns:rank` | none | `--threshold` |
+| Command              | Required Flags | Optional Flags |
+| -------------------- | -------------- | -------------- |
+| `patterns:extract`   | none           | none           |
+| `patterns:aggregate` | none           | `--min-count`  |
+| `patterns:rank`      | none           | `--threshold`  |
 
 ### Composition
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `compose:detect` | `--observations` | `--options` |
+| Command          | Required Flags   | Optional Flags |
+| ---------------- | ---------------- | -------------- |
+| `compose:detect` | `--observations` | `--options`    |
 
 ### Skills
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `skills:drift` | `--original`, `--current` | none |
-| `skills:validate` | `--skill` | none |
+| Command           | Required Flags            | Optional Flags |
+| ----------------- | ------------------------- | -------------- |
+| `skills:drift`    | `--original`, `--current` | none           |
+| `skills:validate` | `--skill`                 | none           |
 
 ### Claims
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `claim:check-stale` | none | `--ttl-minutes` |
+| Command             | Required Flags | Optional Flags  |
+| ------------------- | -------------- | --------------- |
+| `claim:check-stale` | none           | `--ttl-minutes` |
 
 ### Session
 
-| Command | Required Flags | Optional Flags |
-|---------|----------------|----------------|
-| `session:remind` | none | none |
+| Command          | Required Flags | Optional Flags |
+| ---------------- | -------------- | -------------- |
+| `session:remind` | none           | none           |
 
 ## Validation Checklist
 

@@ -48,8 +48,8 @@ export default function tffExtension(pi: ExtensionAPI): void {
 			// Every VALID_SUBCOMMANDS entry has a COMMANDS handler — enforced by
 			// tests/unit/structural/commands.spec.ts. If we reach here,
 			// `isValidSubcommand` already succeeded, so `handler` is defined.
-			// biome-ignore lint/style/noNonNullAssertion: covered by the structural test
-			await handler!(pi, ctx, uiCtx, args);
+			if (!handler) throw new Error(`Missing handler for ${args[0]}`);
+			await handler(pi, ctx, uiCtx, args);
 		},
 	});
 

@@ -5,9 +5,11 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 View ∧ modify all project settings.
 
 ## Prerequisites
+
 tff project ∃
 
 ## Steps
+
 1. READ `.tff-cc/settings.yaml` (if ∃)
    - If missing → offer to create from @references/settings-template.md
 2. DETECT missing fields: compare against template, list any absent sections

@@ -9,6 +9,7 @@ Lightweight status check — show where you are ∈ tff lifecycle ∧ suggest ne
 </objective>
 
 <execution_context>
+
 1. Read .tff-cc/STATE.md if ∃ (don't regenerate)
 2. Check for in-progress slices: `tff-tools slice:list` (no filter) → identify
    slices with status ∉ {closed}

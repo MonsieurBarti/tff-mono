@@ -1,10 +1,12 @@
 # Interactive Discuss Protocol
 
 ## 1. REFLECTION (mandatory, own message)
+
 Reflect back: slice title, milestone context, what you understand so far.
 Honest scope read. Do NOT combine with first question.
 
 ## 2. INVESTIGATION (mandatory, before questions)
+
 Read preparation brief. Scout codebase with available tools.
 Your first questions must reflect reality, not assumptions.
 
@@ -49,29 +51,36 @@ so you cannot invent alternatives on the fly.
 Lead with recommendation (C6). Explain trade-offs for each option's `description`.
 
 ## 5. READINESS CHECK
+
 Present structured summary using user's exact terminology.
 Ask: "Ready to write the spec?"
 
 ## 6. SPEC WRITING
+
 Self-review before writing (4-point check):
+
 1. Placeholder scan — no TBD/TODO/vague sections
 2. Internal consistency — design matches ACs
 3. Scope check — focused for single plan
 4. Ambiguity check — no dual-interpretation requirements
 
 Call `tff_write_spec` with SPEC.md content:
+
 - Objective, Design (selected approach + rationale)
 - Acceptance Criteria (measurable, binary)
 - Non-Goals, Error States, Risk Assessment
 - Forward Intelligence, Tier (TBD — set in next step), Notes
 
 Write REQUIREMENTS.md via `tff_write_requirements` call:
+
 - R-IDs, classes (functional/non-functional/constraint)
 - Concrete acceptance conditions with examples
 - Verification instructions
 
 ## 7. TIER CLASSIFICATION
+
 Propose tier via `tff_ask_user` with a single question (id: `tier_choice`):
+
 - S: trivial, no unknowns, skip research (still goes through review)
 - SS: standard work, some investigation
 - SSS: complex, multi-system, significant unknowns
@@ -80,9 +89,10 @@ Include your recommended tier as the first option. After the user selects →
 call `tff_classify(sliceId, tier)`. `tff_classify` requires SPEC.md to exist,
 which is why this step runs after spec writing.
 
-After each `tff_write_*` call returns successfully, STOP. Do NOT call `plannotator_submit_plan`, `plannotator_annotate`, or any plannotator_* tool. TFF handles plannotator review automatically via its event bus; you never call plannotator tools directly. If the tool returns an error with `feedback`, the user rejected the artifact in plannotator — read the feedback, revise, and call the `tff_write_*` tool again.
+After each `tff_write_*` call returns successfully, STOP. Do NOT call `plannotator_submit_plan`, `plannotator_annotate`, or any plannotator*\* tool. TFF handles plannotator review automatically via its event bus; you never call plannotator tools directly. If the tool returns an error with `feedback`, the user rejected the artifact in plannotator — read the feedback, revise, and call the `tff_write*\*` tool again.
 
 ## 8. COMPLETION
+
 Confirm artifacts written. User can request changes in conversation.
 
 ## Phase end

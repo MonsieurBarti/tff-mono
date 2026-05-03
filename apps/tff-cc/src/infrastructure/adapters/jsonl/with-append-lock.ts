@@ -69,7 +69,7 @@ export const withAppendLock = async <T>(
 	} finally {
 		try {
 			await unlink(lockPath);
-		} catch (_err) {
+		} catch {
 			// best-effort; if the lock file was removed externally, that's fine
 		}
 	}

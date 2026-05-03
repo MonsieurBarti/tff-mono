@@ -46,6 +46,7 @@ Agents spawned for independent tasks only (challenge, validate, review).
 ## Template
 
 Every workflow step should be one of:
+
 1. **Check** — read state via tff-tools ∨ file read
 2. **Spawn** — dispatch agent via Agent tool
 3. **Handle** — process agent result

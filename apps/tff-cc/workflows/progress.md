@@ -3,6 +3,7 @@
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Steps
+
 1. SYNC milestone STATE: `tff-tools sync:state --milestone-id <milestone-id>` (if milestone ∃)
 2. SYNC quick STATE (if any quick slices ∃): `tff-tools sync:state --kind quick`
    - Probe: `tff-tools slice:list --kind quick` → if data is non-empty, run sync.

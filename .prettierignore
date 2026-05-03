@@ -10,3 +10,6 @@ apps/tff-cc/assets/
 apps/tff-pi/.pi/
 apps/tff-pi/.hippo/
 apps/tff-pi/.superpowers/
+apps/tff-cc/skills/
+apps/tff-cc/scripts/backups/
+apps/tff-pi/src/resources/skills/

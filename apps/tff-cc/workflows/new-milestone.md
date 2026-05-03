@@ -3,6 +3,7 @@
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Steps
+
 1. ASK user: milestone name (e.g. "MVP", "Auth System"), goal
 2. CREATE: `tff-tools milestone:create --name "<name>"`
    - creates milestone entry + `milestone/<8hex>` branch (from main)

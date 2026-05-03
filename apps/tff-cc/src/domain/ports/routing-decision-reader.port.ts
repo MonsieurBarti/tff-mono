@@ -1,4 +1,5 @@
 import type { RoutingDecision } from "../value-objects/routing-decision.js";
+import type { Signals } from "../value-objects/signals.js";
 import type { ModelTier } from "../value-objects/tier-decision.js";
 
 /**
@@ -10,7 +11,7 @@ export interface KnownDecision {
 	slice_id: string;
 	workflow_id: string;
 	agent?: string;
-	signals?: import("../value-objects/signals.js").Signals;
+	signals?: Signals;
 	fallback_used?: boolean;
 	confidence?: number;
 	tier?: ModelTier; // populated from matching tier event via route+tier join

@@ -10,8 +10,9 @@ Load checkpoint ∧ resume execution from where it left off.
 </objective>
 
 <execution_context>
+
 1. Load checkpoint for slice
 2. Skip completed waves
 3. Continue execution from current wave
 4. Delegates to execute-slice workflow with checkpoint data
-</execution_context>
+   </execution_context>

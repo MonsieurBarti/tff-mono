@@ -3,6 +3,7 @@
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Steps
+
 1. LOAD: all slice statuses + requirement coverage
 2. VERIFY: all slices closed? all requirements covered by ≥1 closed task? deferred items?
 3. REPORT:

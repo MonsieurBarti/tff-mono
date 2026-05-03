@@ -87,8 +87,9 @@ rm -f "$EVIDENCE_PATH" "$VERDICTS_PATH"
 </workflow>
 
 <stop_conditions>
+
 - `routing:judge-prepare` returns `evidence: null` → nothing to do; report and stop.
 - `routing:judge-prepare` errors → surface and stop.
 - Sub-agent fails to produce a verdicts file → surface and stop; leave temp files for inspection.
 - `routing:judge-record` errors → surface. Temp files left for debugging.
-</stop_conditions>
+  </stop_conditions>

@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
@@ -39,15 +46,23 @@ for (const file of readdirSync(nativeDir).filter((f) => f.endsWith(".node"))) {
 // been built against a different Node ABI than the one currently running
 // (e.g. CI on Node 20 vs. local machine on Node 22). Using the locally-compiled
 // binding when available guarantees the ABI matches the current Node.
-const localBinding = resolve(rootDir, "node_modules/better-sqlite3/build/Release/better_sqlite3.node");
+const localBinding = resolve(
+	rootDir,
+	"node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+);
 if (existsSync(localBinding)) {
 	const suffix =
-		process.platform === "linux" && process.arch === "x64" ? "linux-x64" :
-		process.platform === "linux" && process.arch === "arm64" ? "linux-arm64" :
-		process.platform === "darwin" && process.arch === "arm64" ? "darwin-arm64" :
-		process.platform === "darwin" && process.arch === "x64" ? "darwin-x64" :
-		process.platform === "win32" && process.arch === "x64" ? "win32-x64" :
-		null;
+		process.platform === "linux" && process.arch === "x64"
+			? "linux-x64"
+			: process.platform === "linux" && process.arch === "arm64"
+				? "linux-arm64"
+				: process.platform === "darwin" && process.arch === "arm64"
+					? "darwin-arm64"
+					: process.platform === "darwin" && process.arch === "x64"
+						? "darwin-x64"
+						: process.platform === "win32" && process.arch === "x64"
+							? "win32-x64"
+							: null;
 	if (suffix) {
 		copyFileSync(localBinding, resolve(distCliDir, `better_sqlite3.${suffix}.node`));
 	}

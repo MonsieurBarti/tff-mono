@@ -175,9 +175,8 @@ describe("withBranchGuards", () => {
 		setAdapter(adapter);
 
 		const { withBranchGuards } = await import("../../../../src/cli/utils/with-branch-guards.js");
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
 		const git = makeGit("main", "main");
@@ -199,9 +198,8 @@ describe("withBranchGuards", () => {
 		const beforeCount = closeStub.mock.calls.length;
 
 		const { withBranchGuards } = await import("../../../../src/cli/utils/with-branch-guards.js");
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
 		const wrapped = withBranchGuards("test:cmd", handler, { gitFactory: () => git });
@@ -221,9 +219,8 @@ describe("withBranchGuards", () => {
 		const beforeCount = closeStub.mock.calls.length;
 
 		const { withBranchGuards } = await import("../../../../src/cli/utils/with-branch-guards.js");
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
 		const wrapped = withBranchGuards("test:cmd", handler, { gitFactory: () => git });

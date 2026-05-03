@@ -12,9 +12,9 @@ without spawning a real subagent process.
 1. In a scratch branch, add a one-off listener that dumps the raw event payload:
    ```ts
    pi.on("tool_result", (e) => {
-     if ((e as { toolName?: string }).toolName === "subagent") {
-       writeFileSync("dump.json", JSON.stringify(e, null, 2));
-     }
+   	if ((e as { toolName?: string }).toolName === "subagent") {
+   		writeFileSync("dump.json", JSON.stringify(e, null, 2));
+   	}
    });
    ```
 2. Run `/tff verify` on a slice whose `VERIFICATION.md` passes audit.

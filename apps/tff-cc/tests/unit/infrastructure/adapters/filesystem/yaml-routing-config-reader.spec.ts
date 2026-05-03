@@ -357,9 +357,8 @@ describe("logging.path containment", () => {
 				"routing:\n  enabled: true\n  logging:\n    path: ../../evil/routing.jsonl\n",
 				"utf8",
 			);
-			const { YamlRoutingConfigReader: R } = await import(
-				"../../../../../src/infrastructure/adapters/filesystem/yaml-routing-config-reader.js"
-			);
+			const { YamlRoutingConfigReader: R } =
+				await import("../../../../../src/infrastructure/adapters/filesystem/yaml-routing-config-reader.js");
 			const res = await new R({ projectRoot: d }).readConfig();
 			expect(res.ok).toBe(false);
 			if (res.ok) throw new Error("expected err");
@@ -381,9 +380,8 @@ describe("logging.path containment", () => {
 				"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
 				"utf8",
 			);
-			const { YamlRoutingConfigReader: R } = await import(
-				"../../../../../src/infrastructure/adapters/filesystem/yaml-routing-config-reader.js"
-			);
+			const { YamlRoutingConfigReader: R } =
+				await import("../../../../../src/infrastructure/adapters/filesystem/yaml-routing-config-reader.js");
 			const res = await new R({ projectRoot: d }).readConfig();
 			expect(res.ok).toBe(true);
 		} finally {

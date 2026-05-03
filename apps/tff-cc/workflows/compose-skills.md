@@ -5,13 +5,16 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 Detect skill co-activation clusters → propose bundles ∨ agents.
 
 ## Prerequisites
+
 observation enabled ∧ multiple skills ∈ `skills/`
 
 ## Settings
+
 Read `.tff-cc/settings.yaml` → `auto-learn.clustering`.
 Pass: `tff-tools compose:detect --min-sessions 3 --min-patterns 2 --max-distance 0.3`
 
 ## Steps
+
 1. DETECT: `tff-tools compose:detect --observations '<co-activations-json>'`
 2. DISPLAY clusters (≥70% co-activation):
    ```

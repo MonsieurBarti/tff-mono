@@ -4,7 +4,7 @@
 		"correctness": "error",
 		"suspicious": "error",
 		"perf": "error",
-		"style": "warn",
+		"style": "off",
 		"pedantic": "off",
 		"restriction": "off",
 		"nursery": "off"
@@ -14,16 +14,45 @@
 		"no-explicit-any": "error",
 		"consistent-type-imports": "error",
 		"typescript/consistent-type-assertions": ["error", { "assertionStyle": "never" }],
-		"typescript/no-non-null-assertion": "error"
+		"typescript/no-non-null-assertion": "error",
+		"no-await-in-loop": "off"
 	},
 	"env": { "node": true, "es2024": true },
 	"plugins": ["typescript", "unicorn", "import"],
 	"overrides": [
 		{
-			"files": ["apps/*/tests/**", "apps/*/test/**", "**/*.test.ts", "**/*.spec.ts"],
+			"files": [
+				"apps/*/tests/**",
+				"apps/*/test/**",
+				"tests/**",
+				"test/**",
+				"**/*.test.ts",
+				"**/*.spec.ts"
+			],
 			"rules": {
 				"typescript/consistent-type-assertions": "off",
-				"typescript/no-non-null-assertion": "off"
+				"typescript/no-non-null-assertion": "off",
+				"no-unsafe-optional-chaining": "off",
+				"consistent-type-imports": "off",
+				"no-await-in-loop": "off",
+				"no-explicit-any": "off",
+				"unicorn/consistent-function-scoping": "off",
+				"import/no-duplicates": "off"
+			}
+		},
+		{
+			"files": ["scripts/**", "**/*.config.cjs", "**/*.config.js", "**/*.config.mjs"],
+			"rules": {
+				"no-magic-numbers": "off",
+				"sort-keys": "off",
+				"sort-imports": "off",
+				"init-declarations": "off"
+			}
+		},
+		{
+			"files": ["**/sqlite-salvage.ts"],
+			"rules": {
+				"typescript/no-extraneous-class": "off"
 			}
 		}
 	]

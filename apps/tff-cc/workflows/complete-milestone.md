@@ -3,18 +3,20 @@
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Prerequisites
+
 - milestone audit passed (recorded via `tff-tools milestone:record-audit --verdict ready`)
 
 ## Steps
+
 0. AUDIT GATE:
    - Run `tff-tools milestone:audit-status --milestone-id <id>` to confirm a passing audit.
      - On `{"ok": true, "data": {"verdict": "ready"}}` → proceed to step 1.
      - On `{"ok": false, "error": {"code": "AUDIT_REQUIRED"}}` → tell the user:
        > Milestone not audited. Run `/tff:audit-milestone` first.
-       Abort this workflow.
+       > Abort this workflow.
      - On `{"ok": false, "error": {"code": "AUDIT_NOT_READY"}}` → tell the user:
        > Last audit verdict was `not_ready`. Re-run `/tff:audit-milestone` to produce a passing verdict.
-       Abort this workflow.
+       > Abort this workflow.
 1. CLOSE SLICES: `tff-tools slice:list` → filter for non-closed slices under this milestone:
    - verify its PR is merged: `gh pr list --state merged --head slice/<slice-id>` → capture PR number
    - if merged → `tff-tools slice:close --slice-id <id> --reason "Slice PR merged"`
@@ -29,15 +31,15 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
      d. `tff-tools routing:judge-record --slice <id> --verdicts-path <verdicts-path>`
      - any error → surface, leave pending row, abort milestone close (user drains later via `/tff:judge`)
    - if ¬ merged → warn user, block milestone completion
-1a. PRE-CLOSE GATE: `tff-tools judge:pending:list --milestone-id <id>` must return `count: 0`.
-    If non-zero, drain each via `/tff:judge --slice-id <slice-id>` before continuing — `milestone:close` will refuse otherwise (`PENDING_JUDGMENTS`).
+     1a. PRE-CLOSE GATE: `tff-tools judge:pending:list --milestone-id <id>` must return `count: 0`.
+     If non-zero, drain each via `/tff:judge --slice-id <slice-id>` before continuing — `milestone:close` will refuse otherwise (`PENDING_JUDGMENTS`).
 2. PR: `gh pr create --title "<type>(M<NN>): <milestone-name>"` milestone/<milestone> → main
-   Title format = squash- *or* merge-commit message → MUST be conventional-commit.
+   Title format = squash- _or_ merge-commit message → MUST be conventional-commit.
    - `<type>` = `feat` for capability-bearing milestones (the common case), else infer.
    - When merging the milestone PR into main, **squash-merge** (not merge-commit) so the
      conventional-commit title becomes the commit message on main. A merge-commit title
      (`Merge pull request #N from …`) is unparseable by release-please.
-   **ALWAYS show PR URL**
+     **ALWAYS show PR URL**
 3. SPAWN tff-security-auditor: milestone-level review
 4. HANDLE: approved → inform ready to merge | changes → fix ∧ re-review
 

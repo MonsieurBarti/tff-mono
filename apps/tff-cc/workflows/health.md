@@ -3,6 +3,7 @@
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Steps
+
 1. CHECK plannotator installed
 2. CHECK state consistency: `tff-tools slice:list` ∧ `tff-tools milestone:list`
    - verify markdown ↔ SQLite mismatches, orphans, worktree integrity
@@ -46,6 +47,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
      - rows with `error` → informational only; surface under the table as `note: drift ratio unavailable for <id>: <error>`
 
 9. REPORT:
+
    ```
    | Check | Status |
    |---|---|
@@ -61,8 +63,10 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
    | Observation dead-letter | OK/N entries |
    | Skill semantic drift | OK/N skills over 0.6 ratio |
    ```
+
    - Recovery marker present with residual `tff: orphan recovery skipped` warning → report `FAILING` and surface the marker's `timestamp` + `errorMessage` under the table; leave the marker in place for the next run.
    - Recovery marker present and stderr is clean → delete `.tff-cc/.recovery-marker` to acknowledge recovery and report `cleared`.
+
 10. stale slices found → ask user: "Close stale slices?" → yes → `tff-tools slice:close --slice-id <id> --reason "PR already merged"`
 11. other issues found → offer `/tff:sync` to reconcile
 

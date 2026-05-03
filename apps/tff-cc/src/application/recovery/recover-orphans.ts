@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, readdirSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, realpathSync, rmSync, type Dirent } from "node:fs";
 import { join } from "node:path";
 
 export interface RecoverInput {
@@ -66,7 +66,7 @@ function sweepStaleTmps(root: string, nowMs: number, thresholdMs: number): numbe
 		const current = stack.pop();
 		if (current === undefined) break;
 
-		let entries: import("node:fs").Dirent[];
+		let entries: Dirent[];
 		try {
 			entries = readdirSync(current, { withFileTypes: true });
 		} catch {

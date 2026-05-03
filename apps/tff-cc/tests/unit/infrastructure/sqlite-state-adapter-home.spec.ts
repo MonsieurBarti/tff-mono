@@ -43,12 +43,10 @@ describe("T15: SQLiteStateAdapter home directory integration", () => {
 			const projectId = "11111111-2222-4000-8000-123456789abc";
 			writeFileSync(join(projectDir, ".tff-project-id"), `${projectId}\n`);
 
-			const { SQLiteStateAdapter } = await import(
-				"../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js"
-			);
-			const { ensureProjectHomeDir } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { SQLiteStateAdapter } =
+				await import("../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js");
+			const { ensureProjectHomeDir } =
+				await import("../../../src/infrastructure/home-directory.js");
 
 			// Ensure home dir exists
 			ensureProjectHomeDir(projectId);
@@ -75,9 +73,8 @@ describe("T15: SQLiteStateAdapter home directory integration", () => {
 		});
 
 		it("should keep createInMemory() for testing", async () => {
-			const { SQLiteStateAdapter } = await import(
-				"../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js"
-			);
+			const { SQLiteStateAdapter } =
+				await import("../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js");
 
 			const adapter = SQLiteStateAdapter.createInMemory();
 			const initResult = adapter.init();
@@ -87,9 +84,8 @@ describe("T15: SQLiteStateAdapter home directory integration", () => {
 		});
 
 		it("should keep createWithPath() for backward compatibility", async () => {
-			const { SQLiteStateAdapter } = await import(
-				"../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js"
-			);
+			const { SQLiteStateAdapter } =
+				await import("../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js");
 
 			const dbPath = join(tempDir, "custom-path.db");
 			const adapter = SQLiteStateAdapter.createWithPath(dbPath);

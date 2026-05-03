@@ -24,6 +24,7 @@
 The Forge Flow (`tff-cc`) is a Claude Code plugin that orchestrates AI agents through a structured software development lifecycle. It coordinates 4 lean agents and 18 skills from project initialization to shipped code.
 
 **Key features:**
+
 - **SQLite state** — zero-dependency local state management with automatic persistence
 - **Wave-based execution** -- tasks are topologically sorted into waves, independent tasks run in parallel
 - **Fresh reviewer enforcement** -- code reviewers are never the same agent that wrote the code
@@ -86,6 +87,7 @@ Here's a complete walkthrough from empty project to shipped milestone: building 
 ```
 
 Claude asks for your project name and vision. You provide:
+
 - **Name:** my-saas-app
 - **Vision:** A multi-tenant SaaS platform with team management
 
@@ -105,6 +107,7 @@ This creates `.tff-cc/PROJECT.md` and asks you to define requirements.
 This creates the `milestone/M01` branch and prompts you to break the milestone into slices.
 
 You define 3 slices:
+
 1. **Auth flow** -- signup, login, JWT tokens
 2. **Team CRUD** -- create/read/update/delete teams
 3. **Permissions** -- role-based access control
@@ -118,6 +121,7 @@ You define 3 slices:
 ```
 
 The **brainstormer** agent (opus) challenges your assumptions:
+
 - "What OAuth providers do you need? Just email/password?"
 - "How do JWT tokens refresh? What's the expiry strategy?"
 - "Is email verification required for MVP?"
@@ -145,6 +149,7 @@ The agent investigates the technical approach: reads the existing codebase, chec
 ```
 
 The agent creates a task decomposition with dependencies:
+
 - T01: User entity + migration (no deps)
 - T02: Password hashing service (no deps)
 - T03: Signup endpoint (depends on T01, T02)
@@ -152,6 +157,7 @@ The agent creates a task decomposition with dependencies:
 - T05: JWT middleware (depends on T04)
 
 Waves detected:
+
 - Wave 0: [T01, T02] -- parallel
 - Wave 1: [T03, T04] -- parallel
 - Wave 2: [T05] -- sequential
@@ -236,15 +242,19 @@ Creates the milestone PR (`milestone/M01` -> `main`), runs a final security audi
 Found a bug while working on a later slice? Two options:
 
 **If you know the fix:**
+
 ```
 /tff:quick "Fix null pointer in user validation"
 ```
+
 Skips brainstorming and research, goes straight to plan -> execute -> ship.
 
 **If you need to investigate:**
+
 ```
 /tff:debug "Users getting 500 on login after password reset"
 ```
+
 Systematically diagnoses the issue first (no slice created), then fixes via S-tier slice once root cause is confirmed.
 
 ---
@@ -253,58 +263,58 @@ Systematically diagnoses the issue first (no slice created), then fixes via S-ti
 
 ### Project Lifecycle
 
-| Command | Description |
-|---|---|
-| `/tff:new` | Initialize a new tff project |
-| `/tff:new-milestone` | Start a new milestone |
-| `/tff:progress` | Show status dashboard |
-| `/tff:status` | Lightweight status with next step |
+| Command              | Description                       |
+| -------------------- | --------------------------------- |
+| `/tff:new`           | Initialize a new tff project      |
+| `/tff:new-milestone` | Start a new milestone             |
+| `/tff:progress`      | Show status dashboard             |
+| `/tff:status`        | Lightweight status with next step |
 
 ### Slice Lifecycle
 
-| Command | Description |
-|---|---|
-| `/tff:discuss` | Brainstorm and scope a slice |
-| `/tff:research [slice-id]` | Research phase |
-| `/tff:plan [slice-id]` | Plan and create tasks |
-| `/tff:execute [slice-id]` | Execute with wave parallelism |
-| `/tff:verify [slice-id]` | Verify acceptance criteria |
-| `/tff:ship [slice-id]` | PR review and merge slice |
-| `/tff:quick <description>` | Fast-track S-tier changes |
+| Command                         | Description                           |
+| ------------------------------- | ------------------------------------- |
+| `/tff:discuss`                  | Brainstorm and scope a slice          |
+| `/tff:research [slice-id]`      | Research phase                        |
+| `/tff:plan [slice-id]`          | Plan and create tasks                 |
+| `/tff:execute [slice-id]`       | Execute with wave parallelism         |
+| `/tff:verify [slice-id]`        | Verify acceptance criteria            |
+| `/tff:ship [slice-id]`          | PR review and merge slice             |
+| `/tff:quick <description>`      | Fast-track S-tier changes             |
 | `/tff:debug <error or symptom>` | Diagnose and fix a bug systematically |
 
 ### Milestone Lifecycle
 
-| Command | Description |
-|---|---|
-| `/tff:audit-milestone` | Audit against original intent |
-| `/tff:complete-milestone` | PR review and merge to main |
+| Command                   | Description                   |
+| ------------------------- | ----------------------------- |
+| `/tff:audit-milestone`    | Audit against original intent |
+| `/tff:complete-milestone` | PR review and merge to main   |
 
 ### Management
 
-| Command | Description |
-|---|---|
-| `/tff:add-slice` | Add slice to milestone |
-| `/tff:insert-slice` | Insert between slices |
-| `/tff:remove-slice` | Remove future slice |
-| `/tff:rollback [slice-id]` | Revert slice commits |
-| `/tff:pause` | Save checkpoint |
-| `/tff:resume` | Restore from checkpoint |
-| `/tff:sync` | Regenerate STATE.md |
-| `/tff:health` | Diagnose state consistency |
-| `/tff:settings` | View and modify all project settings |
-| `/tff:map-codebase` | Analyze codebase and generate docs |
-| `/tff:help` | Show command reference |
+| Command                    | Description                          |
+| -------------------------- | ------------------------------------ |
+| `/tff:add-slice`           | Add slice to milestone               |
+| `/tff:insert-slice`        | Insert between slices                |
+| `/tff:remove-slice`        | Remove future slice                  |
+| `/tff:rollback [slice-id]` | Revert slice commits                 |
+| `/tff:pause`               | Save checkpoint                      |
+| `/tff:resume`              | Restore from checkpoint              |
+| `/tff:sync`                | Regenerate STATE.md                  |
+| `/tff:health`              | Diagnose state consistency           |
+| `/tff:settings`            | View and modify all project settings |
+| `/tff:map-codebase`        | Analyze codebase and generate docs   |
+| `/tff:help`                | Show command reference               |
 
 ### Skill Auto-Learn
 
-| Command | Description |
-|---|---|
-| `/tff:detect-patterns` | Run pattern detection pipeline |
-| `/tff:suggest-skills` | Show ranked skill candidates |
-| `/tff:create-skill` | Draft skill from pattern or description |
-| `/tff:learn` | Detect skill divergences and propose refinements |
-| `/tff:compose` | Detect and bundle skill clusters |
+| Command                | Description                                      |
+| ---------------------- | ------------------------------------------------ |
+| `/tff:detect-patterns` | Run pattern detection pipeline                   |
+| `/tff:suggest-skills`  | Show ranked skill candidates                     |
+| `/tff:create-skill`    | Draft skill from pattern or description          |
+| `/tff:learn`           | Detect skill divergences and propose refinements |
+| `/tff:compose`         | Detect and bundle skill clusters                 |
 
 ## Architecture
 
@@ -338,37 +348,37 @@ the-forge-flow/
 
 After v0.7.0's skills architecture reform, methodology moved from agents to skills. Only 4 identity-only agents remain -- they exist for fresh-reviewer enforcement (ensuring the reviewer is never the same agent that wrote the code).
 
-| Agent | Role | Profile |
-|---|---|---|
-| code-reviewer | Code quality review (fresh reviewer) | quality (opus) |
-| spec-reviewer | Spec compliance verification | quality (opus) |
-| security-auditor | Security review on every PR | quality (opus) |
-| fixer | Apply accepted review findings | budget (sonnet) |
+| Agent            | Role                                 | Profile         |
+| ---------------- | ------------------------------------ | --------------- |
+| code-reviewer    | Code quality review (fresh reviewer) | quality (opus)  |
+| spec-reviewer    | Spec compliance verification         | quality (opus)  |
+| security-auditor | Security review on every PR          | quality (opus)  |
+| fixer            | Apply accepted review findings       | budget (sonnet) |
 
 ## Skills
 
 Skills are reusable knowledge fragments loaded via `@skills/<name>/SKILL.md`. They teach HOW to do something -- agents define WHO does it. After v0.7.0, all methodology lives in skills (decoupled from TFF-specific terminology).
 
-| Skill | Purpose |
-|---|---|
-| hexagonal-architecture | DDD + CQRS + hexagonal boundary patterns |
-| test-driven-development | TDD methodology with HARD-GATE enforcement |
-| code-review-protocol | Two-stage review (spec compliance + code quality) |
-| commit-conventions | Conventional commit format and rules |
-| plannotator-usage | Interactive plan/review UI integration |
-| brainstorming | Structured discovery and design exploration |
-| systematic-debugging | 4-phase investigation (Track A/B diagnosis) |
-| writing-plans | Break specs into bite-sized tasks (2-5 min each) |
-| executing-plans | Wave-based execution with fresh subagent per task |
-| finishing-work | Pre-PR checklist, structured merge/PR decision |
-| stress-testing-specs | Devil's advocate for assumptions and scope |
-| architecture-review | C4 model, dependency inversion review |
-| acceptance-criteria-validation | Binary verdict per criterion, evidence-based |
-| codebase-documentation | Divio framework documentation generation |
-| skill-authoring | Evidence-driven pattern analysis for new skills |
-| agent-authoring | Standardized agent template (identity-only) |
-| receiving-code-review | Technical rigor when processing review feedback |
-| verification-before-completion | Evidence before claims, always |
+| Skill                          | Purpose                                           |
+| ------------------------------ | ------------------------------------------------- |
+| hexagonal-architecture         | DDD + CQRS + hexagonal boundary patterns          |
+| test-driven-development        | TDD methodology with HARD-GATE enforcement        |
+| code-review-protocol           | Two-stage review (spec compliance + code quality) |
+| commit-conventions             | Conventional commit format and rules              |
+| plannotator-usage              | Interactive plan/review UI integration            |
+| brainstorming                  | Structured discovery and design exploration       |
+| systematic-debugging           | 4-phase investigation (Track A/B diagnosis)       |
+| writing-plans                  | Break specs into bite-sized tasks (2-5 min each)  |
+| executing-plans                | Wave-based execution with fresh subagent per task |
+| finishing-work                 | Pre-PR checklist, structured merge/PR decision    |
+| stress-testing-specs           | Devil's advocate for assumptions and scope        |
+| architecture-review            | C4 model, dependency inversion review             |
+| acceptance-criteria-validation | Binary verdict per criterion, evidence-based      |
+| codebase-documentation         | Divio framework documentation generation          |
+| skill-authoring                | Evidence-driven pattern analysis for new skills   |
+| agent-authoring                | Standardized agent template (identity-only)       |
+| receiving-code-review          | Technical rigor when processing review feedback   |
+| verification-before-completion | Evidence before claims, always                    |
 
 ## Work Hierarchy
 
@@ -392,11 +402,11 @@ main
 
 ### Complexity Tiers
 
-| Tier | Brainstormer | Research | TDD | Fresh Reviewer |
-|---|---|---|---|---|
-| S (quick fix) | Skip | Skip | Skip | Always |
-| SS (feature) | Yes | Optional | Yes | Always |
-| SSS (complex) | Yes | Required | Yes | Always |
+| Tier          | Brainstormer | Research | TDD  | Fresh Reviewer |
+| ------------- | ------------ | -------- | ---- | -------------- |
+| S (quick fix) | Skip         | Skip     | Skip | Always         |
+| SS (feature)  | Yes          | Optional | Yes  | Always         |
+| SSS (complex) | Yes          | Required | Yes  | Always         |
 
 ## Branch Isolation
 
@@ -408,12 +418,12 @@ On every writer command, `tff-tools` compares `git rev-parse --abbrev-ref HEAD` 
 
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "REFUSED_ON_DEFAULT_BRANCH",
-    "message": "Refusing to run \"<command>\" on default branch \"<branch>\". Create a worktree before proceeding.",
-    "context": { "command": "<command>", "branch": "<branch>" }
-  }
+	"ok": false,
+	"error": {
+		"code": "REFUSED_ON_DEFAULT_BRANCH",
+		"message": "Refusing to run \"<command>\" on default branch \"<branch>\". Create a worktree before proceeding.",
+		"context": { "command": "<command>", "branch": "<branch>" }
+	}
 }
 ```
 
@@ -442,14 +452,14 @@ Project settings live in `.tff-cc/settings.yaml`. Generated automatically by `/t
 ```yaml
 model-profiles:
   quality:
-    model: opus       # brainstormer, architect, code-reviewer, security-auditor
+    model: opus # brainstormer, architect, code-reviewer, security-auditor
   balanced:
-    model: sonnet     # product-lead, tester
+    model: sonnet # product-lead, tester
   budget:
-    model: sonnet     # frontend-dev, backend-dev, devops, fixer, doc-writer
+    model: sonnet # frontend-dev, backend-dev, devops, fixer, doc-writer
 
 autonomy:
-  mode: guided        # "guided" (pause at every step) | "plan-to-pr" (auto-transition)
+  mode: guided # "guided" (pause at every step) | "plan-to-pr" (auto-transition)
 
 auto-learn:
   weights:
@@ -464,7 +474,6 @@ auto-learn:
   clustering:
     min-sessions: 3
     min-patterns: 2
-
 ```
 
 Settings are resilient: corrupted or partial files fall back to defaults per field. Run `/tff:settings` to detect and add missing fields.

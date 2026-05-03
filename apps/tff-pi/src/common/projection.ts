@@ -19,7 +19,7 @@ import { canTransitionSlice } from "./state-machine.js";
 import { SLICE_STATUSES } from "./types.js";
 import type { Phase, SliceStatus, Tier } from "./types.js";
 
-// biome-ignore lint/suspicious/noExplicitAny: dispatch table needs a base type; each handler has a concrete params type
+// oxlint-disable-next-line no-explicit-any -- dispatch table needs a base type; each handler has a concrete params type
 type ProjectionHandler = (db: Database.Database, root: string, params: any) => void;
 
 export class UnknownCommandError extends Error {

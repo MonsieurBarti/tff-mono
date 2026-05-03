@@ -5,9 +5,11 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 Analyze codebase → structured docs via parallel doc-writer agents.
 
 ## Prerequisites
+
 `project:init` has run (`.tff-cc/` symlink exists).
 
 ## Steps
+
 1. LOAD @skills/codebase-documentation/SKILL.md → SPAWN 3 subagents ∈ parallel:
    - **tech**: write STACK.md → `.tff-cc/docs/STACK.md` (load @skills/hexagonal-architecture/SKILL.md)
    - **arch**: write ARCHITECTURE.md → `.tff-cc/docs/ARCHITECTURE.md` (load @skills/hexagonal-architecture/SKILL.md)
