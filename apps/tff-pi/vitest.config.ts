@@ -5,7 +5,6 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
 	root: __dirname,
 	test: {
-		dir: './tests',
 		globals: true,
 		environment: "node",
 		include: ["tests/**/*.spec.ts"],

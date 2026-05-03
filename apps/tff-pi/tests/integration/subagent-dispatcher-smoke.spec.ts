@@ -7,7 +7,7 @@ import { prepareDispatch, readDispatchResult } from "../../src/common/subagent-d
 
 const EXT_DIST = pathResolve(__dirname, "..", "..", "dist", "index.js");
 
-describe.skipIf(process.env.CI)("SubagentDispatcher — real PI smoke", () => {
+describe.skipIf(process.env.CI || !process.env.ANTHROPIC_API_KEY)("SubagentDispatcher — real PI smoke", () => {
 	let root: string;
 	beforeEach(() => {
 		root = join(

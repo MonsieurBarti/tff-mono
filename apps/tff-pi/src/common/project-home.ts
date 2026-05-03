@@ -143,12 +143,14 @@ function isSymlink(p: string): boolean {
 }
 
 function resolveMergeDriverPath(): string {
-	// project-home.ts compiles to dist/common/project-home.js; the merge-driver
-	// bin lives at dist/tools/state-snapshot-merge.js. The `pnpm run build &&`
-	// prefix on the test script ensures the .js exists before any test triggers
-	// ensureSnapshotMergeDriver. If the .js is missing in production, surface
-	// it: a registered driver with a phantom path silently breaks every git merge.
-	const jsUrl = new URL("../tools/state-snapshot-merge.js", import.meta.url);
+	// The merge-driver bin always lives at <pkg>/dist/tools/state-snapshot-merge.js.
+	// Resolving via "../../dist/tools/..." from import.meta.url works whether
+	// project-home is loaded as src (vitest transform) or dist (compiled),
+	// because both src/common/ and dist/common/ are two levels below <pkg>/.
+	// The `pnpm run build &&` prefix on the test script ensures the .js exists
+	// before any test triggers ensureSnapshotMergeDriver. A phantom path here
+	// would silently break every git merge.
+	const jsUrl = new URL("../../dist/tools/state-snapshot-merge.js", import.meta.url);
 	const jsPath = decodeURIComponent(jsUrl.pathname);
 	if (existsSync(jsPath)) return jsPath;
 	throw new ProjectHomeError(
