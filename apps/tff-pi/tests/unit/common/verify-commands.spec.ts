@@ -148,7 +148,7 @@ describe("verify-commands", () => {
 			"utf-8",
 		);
 		const cmds = await detectVerifyCommands(root, AUTO);
-		const bunTestCmds = cmds.filter((c) => c.command === "pnpm test");
-		expect(bunTestCmds).toHaveLength(1);
+		const pnpmTestCmds = cmds.filter((c) => c.command === "pnpm test");
+		expect(pnpmTestCmds).toHaveLength(1);
 	});
 });
