@@ -1,0 +1,10 @@
+{
+	"name": "repo-root-lint",
+	"private": true,
+	"scripts": {
+		"lint": "cd ../.. && oxlint --deny-warnings --ignore-path tools/repo-root-lint/.oxlintignore .",
+		"lint:fix": "cd ../.. && oxlint --fix --deny-warnings --ignore-path tools/repo-root-lint/.oxlintignore .",
+		"format": "cd ../.. && prettier --write --ignore-path tools/repo-root-lint/.prettierignore .",
+		"format:check": "cd ../.. && prettier --check --ignore-path tools/repo-root-lint/.prettierignore ."
+	}
+}

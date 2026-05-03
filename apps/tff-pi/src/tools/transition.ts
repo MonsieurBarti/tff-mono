@@ -70,9 +70,9 @@ export function handleTransition(
 		};
 	}
 
-	const target = targetStatus
-		? (targetStatus as SliceStatus)
-		: nextSliceStatus(slice.status, slice.tier ?? undefined);
+	const target =
+		(targetStatus as SliceStatus | undefined) ??
+		nextSliceStatus(slice.status, slice.tier ?? undefined);
 
 	if (!target) {
 		return {

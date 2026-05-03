@@ -5,6 +5,24 @@ pre-commit:
   jobs:
     - name: branch-guard
       run: node scripts/hooks/branch-guard.mjs
+    - name: oxlint-staged
+      glob: "*.{ts,tsx,js,mjs,cjs}"
+      exclude:
+        - "apps/tff-cc/native/**"
+        - "apps/tff-cc/assets/**"
+        - "apps/tff-pi/.pi/**"
+        - "apps/tff-pi/.hippo/**"
+        - "apps/tff-pi/.superpowers/**"
+      run: pnpm exec oxlint --deny-warnings {staged_files}
+    - name: prettier-staged
+      glob: "*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}"
+      exclude:
+        - "apps/tff-cc/native/**"
+        - "apps/tff-cc/assets/**"
+        - "apps/tff-pi/.pi/**"
+        - "apps/tff-pi/.hippo/**"
+        - "apps/tff-pi/.superpowers/**"
+      run: pnpm exec prettier --check {staged_files}
 
 commit-msg:
   jobs:
@@ -13,5 +31,5 @@ commit-msg:
 
 pre-push:
   jobs:
-    - name: typecheck
-      run: pnpm -w typecheck
+    - name: verify
+      run: pnpm verify

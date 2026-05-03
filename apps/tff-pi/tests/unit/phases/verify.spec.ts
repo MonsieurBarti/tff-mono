@@ -161,9 +161,8 @@ describe("verifyPhase", () => {
 	});
 
 	it("AC-4: mechanical-verify failure does NOT register finalizer and does NOT write dispatch-config", async () => {
-		const { runMechanicalVerification, formatMechanicalReport } = await import(
-			"../../../src/common/mechanical-verifier.js"
-		);
+		const { runMechanicalVerification, formatMechanicalReport } =
+			await import("../../../src/common/mechanical-verifier.js");
 		vi.mocked(detectVerifyCommands).mockResolvedValueOnce([
 			{ name: "lint", command: "echo", source: "settings" },
 		]);
@@ -224,9 +223,8 @@ describe("verifyPhase", () => {
 	});
 
 	it("compresses VERIFICATION-MECHANICAL.md when enabled (pre-dispatch artifact write preserved)", async () => {
-		const { runMechanicalVerification, formatMechanicalReport } = await import(
-			"../../../src/common/mechanical-verifier.js"
-		);
+		const { runMechanicalVerification, formatMechanicalReport } =
+			await import("../../../src/common/mechanical-verifier.js");
 		vi.mocked(detectVerifyCommands).mockResolvedValueOnce([
 			{ name: "lint", command: "echo", source: "settings" },
 		]);

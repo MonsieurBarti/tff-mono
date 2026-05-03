@@ -108,10 +108,11 @@ export const validateSkill = (input: SkillInput): Result<ValidationResult, Domai
 			/\|\s*\b(nc|ncat|bash|sh|zsh)\b/, // pipe to shell/netcat
 		];
 
-		const hasDangerousPattern = DANGEROUS_PATTERNS.some((p) => p.test(input.content!));
+		const content = input.content ?? "";
+		const hasDangerousPattern = DANGEROUS_PATTERNS.some((p) => p.test(content));
 
 		// Check backtick-enclosed commands against safe list
-		const backtickCommands = input.content.match(/`[^`]+`/g) || [];
+		const backtickCommands = content.match(/`[^`]+`/g) || [];
 		const hasUnsafeBacktickCmd = backtickCommands.some(
 			(cmd) => !SAFE_COMMAND_PATTERNS.some((safe) => safe.test(cmd)),
 		);

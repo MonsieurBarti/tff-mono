@@ -235,9 +235,8 @@ describe("T14: Home directory resolver module", () => {
 	describe("ensureProjectHomeDir", () => {
 		it("should create directory structure under TFF_CC_HOME", async () => {
 			process.env.TFF_CC_HOME = tempDir;
-			const { ensureProjectHomeDir } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { ensureProjectHomeDir } =
+				await import("../../../src/infrastructure/home-directory.js");
 
 			const home = ensureProjectHomeDir("test-project-id");
 
@@ -253,9 +252,8 @@ describe("T14: Home directory resolver module", () => {
 			const projectDir = join(tempDir, "project3");
 			mkdirSync(projectDir, { recursive: true });
 
-			const { createTffCcSymlink, ensureProjectHomeDir } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { createTffCcSymlink, ensureProjectHomeDir } =
+				await import("../../../src/infrastructure/home-directory.js");
 			const _projectHome = ensureProjectHomeDir("symlink-test");
 			createTffCcSymlink(projectDir, "symlink-test");
 
@@ -279,9 +277,8 @@ describe("T14: Home directory resolver module", () => {
 			const projectDir = join(tempDir, "project-drift");
 			mkdirSync(projectDir, { recursive: true });
 
-			const { createTffCcSymlink, ensureProjectHomeDir, getProjectHome } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { createTffCcSymlink, ensureProjectHomeDir, getProjectHome } =
+				await import("../../../src/infrastructure/home-directory.js");
 
 			const oldProjectId = "old00000-0000-4000-8000-000000000000";
 			const newProjectId = "new00000-0000-4000-8000-111111111111";
@@ -309,9 +306,8 @@ describe("T14: Home directory resolver module", () => {
 			const projectDir = join(tempDir, "project-correct-symlink");
 			mkdirSync(projectDir, { recursive: true });
 
-			const { createTffCcSymlink, ensureProjectHomeDir, getProjectHome } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { createTffCcSymlink, ensureProjectHomeDir, getProjectHome } =
+				await import("../../../src/infrastructure/home-directory.js");
 
 			const projectId = "correct0-0000-4000-8000-000000000000";
 			ensureProjectHomeDir(projectId);
@@ -336,9 +332,8 @@ describe("T14: Home directory resolver module", () => {
 			const projectDir = join(tempDir, "project5");
 			mkdirSync(projectDir, { recursive: true });
 
-			const { readProjectIdFile, writeProjectIdFile } = await import(
-				"../../../src/infrastructure/home-directory.js"
-			);
+			const { readProjectIdFile, writeProjectIdFile } =
+				await import("../../../src/infrastructure/home-directory.js");
 
 			// Use valid UUID v4 format
 			const validUuid = "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d";

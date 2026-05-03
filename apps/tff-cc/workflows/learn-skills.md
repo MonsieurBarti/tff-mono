@@ -5,14 +5,17 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 Detect corrections to existing skills → propose refinements.
 
 ## Prerequisites
+
 observation enabled ∧ skills exist ∈ `skills/` ∧ ≥3 corrections observed
 
 ## Settings
+
 Read `.tff-cc/settings.yaml` → `auto-learn.guardrails`.
 Check cooldown: read `.tff-cc/drafts/metadata.jsonl`, verify canRefine().
 Pass maxDrift: `tff-tools skills:drift --max-drift 0.2`
 
 ## Steps
+
 1. DRIFT CHECK: ∀ skill, `tff-tools skills:drift --original "<original>" --current "<current>"`
 2. COMPARE actual sequences (sessions.jsonl) vs skill's documented steps → flag consistent deviations (≥3 occurrences)
 3. divergences found → LOAD @skills/skill-authoring/SKILL.md → SPAWN subagent ("Refine Existing Skill" mode):

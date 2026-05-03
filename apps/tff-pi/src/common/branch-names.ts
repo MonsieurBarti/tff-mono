@@ -9,7 +9,7 @@
 // git's check-ref-format provides a third layer, but we want to reject
 // malicious inputs at our own boundary before they reach git args.
 
-export const BRANCH_NAME_RE = /^[A-Za-z0-9._][A-Za-z0-9._/\-]*$/;
+export const BRANCH_NAME_RE = /^[A-Za-z0-9._][A-Za-z0-9._/-]*$/;
 
 export class InvalidBranchName extends Error {
 	constructor(message: string) {

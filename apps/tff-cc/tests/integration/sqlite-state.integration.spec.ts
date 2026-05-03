@@ -80,11 +80,9 @@ describe("SQLite integration", () => {
 		const db = getDb(adapter);
 		db.prepare("DELETE FROM schema_version").run();
 		db.prepare("INSERT INTO schema_version (version) VALUES (999)").run();
-		const adapterWithFutureSchema = new (
-			SQLiteStateAdapter as unknown as new (
-				db: Database.Database,
-			) => SQLiteStateAdapter
-		)(db);
+		const adapterWithFutureSchema = new (SQLiteStateAdapter as unknown as new (
+			db: Database.Database,
+		) => SQLiteStateAdapter)(db);
 		const result = adapterWithFutureSchema.init();
 		expect(isErr(result)).toBe(true);
 		if (isErr(result)) expect(result.error.code).toBe("VERSION_MISMATCH");

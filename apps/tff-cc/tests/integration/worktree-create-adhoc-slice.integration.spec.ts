@@ -120,9 +120,8 @@ describe("worktree:create — ad-hoc slice CLI errors", () => {
 		// doesn't preempt our resolver-error assertion.
 		const git = makeGit("feature/dev");
 
-		const { withMutatingCommand, resetMutatingCommandCache } = await import(
-			"../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand, resetMutatingCommandCache } =
+			await import("../../src/cli/utils/with-mutating-command.js");
 		resetMutatingCommandCache();
 		const { worktreeCreateCmd } = await import("../../src/cli/commands/worktree-create.cmd.js");
 
@@ -154,9 +153,8 @@ describe("worktree:create — ad-hoc slice CLI errors", () => {
 
 		const git = makeGit("feature/dev");
 
-		const { withMutatingCommand, resetMutatingCommandCache } = await import(
-			"../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand, resetMutatingCommandCache } =
+			await import("../../src/cli/utils/with-mutating-command.js");
 		resetMutatingCommandCache();
 		const { worktreeCreateCmd } = await import("../../src/cli/commands/worktree-create.cmd.js");
 

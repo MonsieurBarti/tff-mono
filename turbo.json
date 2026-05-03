@@ -1,14 +1,23 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
-  "globalDependencies": ["tsconfig.base.json"],
-  "globalEnv": ["CI", "NODE_ENV"],
-  "tasks": {
-    "build":        { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
-    "test":         { "outputs": ["coverage/**"] },
-    "lint":         { "outputs": [] },
-    "format":       { "cache": false },
-    "format:check": { "outputs": [] },
-    "typecheck":    { "outputs": [] },
-    "dev":          { "cache": false, "persistent": true }
-  }
+	"$schema": "https://turborepo.dev/schema.json",
+	"globalDependencies": [
+		"tsconfig.base.json",
+		".oxlintrc.json",
+		".oxlintignore",
+		".prettierrc.json",
+		".prettierignore",
+		"tools/repo-root-lint/package.json",
+		"tools/repo-root-lint/.oxlintignore",
+		"tools/repo-root-lint/.prettierignore"
+	],
+	"globalEnv": ["CI", "NODE_ENV"],
+	"tasks": {
+		"build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
+		"test": { "outputs": ["coverage/**"] },
+		"lint": { "outputs": [] },
+		"format": { "cache": false },
+		"format:check": { "outputs": [] },
+		"typecheck": { "outputs": [] },
+		"dev": { "cache": false, "persistent": true }
+	}
 }

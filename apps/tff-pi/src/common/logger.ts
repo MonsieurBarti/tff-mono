@@ -64,7 +64,7 @@ const ALLOWLIST: ReadonlyArray<Exclude<keyof LogContext, "stack">> = [
 
 const STACK_MAX_BYTES = 3 * 1024;
 const CREDENTIAL_URL_RE = /(https?:\/\/)[^/@\s]+:[^/@\s]+@/g;
-// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping control chars is the goal
+// oxlint-disable-next-line no-control-regex -- intentional: stripping control chars is the goal
 const CONTROL_CHAR_RE = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g;
 
 export interface AuditLogLine {
@@ -133,11 +133,11 @@ function sanitize(ctx: LogContext | undefined): LogContext {
 		} else if (key === "stderr") {
 			out.stderr = redactString(String(val));
 		} else if (typeof val === "string") {
-			// biome-ignore lint/suspicious/noExplicitAny: allowlist-guarded assignment of known-keyof value
-			(out as any)[key] = redactString(val);
+			// oxlint-disable-next-line no-explicit-any -- allowlist-guarded assignment of known-keyof value
+			(out as Record<string, any>)[key] = redactString(val);
 		} else {
-			// biome-ignore lint/suspicious/noExplicitAny: allowlist-guarded assignment of known-keyof value
-			(out as any)[key] = val;
+			// oxlint-disable-next-line no-explicit-any -- allowlist-guarded assignment of known-keyof value
+			(out as Record<string, any>)[key] = val;
 		}
 	}
 	return out;

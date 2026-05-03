@@ -5,6 +5,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 Draft new skill from pattern candidate ∨ user description.
 
 ## Steps
+
 1. INPUT: candidate number (load from candidates.jsonl) ∨ free-text description
 2. LOAD @skills/skill-authoring/SKILL.md → SPAWN subagent ("Draft New Skill" mode):
    - provide pattern evidence (∨ description) + existing skills as format examples

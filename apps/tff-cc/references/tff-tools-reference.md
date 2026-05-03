@@ -4,45 +4,45 @@ Complete reference for all tff-tools CLI commands.
 
 ## Quick Reference Table
 
-| Command | Purpose | Required Flags | Optional Flags |
-|---------|---------|----------------|----------------|
-| `project:init` | Initialize new TFF project | `--name` | `--vision` |
-| `project:get` | Get current project info | none | none |
-| `milestone:create` | Create new milestone | `--name` | none |
-| `milestone:list` | List all milestones | none | none |
-| `milestone:close` | Close milestone | `--milestone-id` | `--reason` |
-| `slice:create` | Create new slice | `--title` | `--milestone-id` |
-| `slice:list` | List all slices | none | `--milestone-id` |
-| `slice:transition` | Transition slice to new status | `--slice-id`, `--status` | none |
-| `slice:close` | Close slice | `--slice-id` | `--reason` |
-| `slice:classify` | Classify slice complexity | `--signals` | none |
-| `task:claim` | Claim task for execution | `--task-id` | `--claimed-by` |
-| `task:close` | Close completed task | `--task-id` | `--reason` |
-| `task:ready` | List ready tasks for slice | `--slice-id` | none |
-| `dep:add` | Add dependency between entities | `--from-id`, `--to-id` | none |
-| `direct-edit:guard` | Check for direct edits | none | none |
-| `pre-op:guard` | Validate operation allowed | `--slice-id`, `--operation` | none |
-| `spec-edit:guard` | Check for spec edits | none | none |
-| `waves:detect` | Detect execution waves from tasks | `--tasks` | none |
-| `sync:state` | Synchronize STATE.md for milestone | `--milestone-id` | none |
-| `worktree:create` | Create git worktree for slice | `--slice-id` | none |
-| `worktree:delete` | Delete git worktree | `--slice-id` | none |
-| `worktree:list` | List all git worktrees | none | none |
-| `review:check-fresh` | Check if reviewer is fresh | `--slice-id`, `--agent` | none |
-| `review:record` | Record review for slice | `--slice-id`, `--agent`, `--verdict`, `--type`, `--commit-sha` | none |
-| `checkpoint:save` | Save checkpoint for slice | `--slice-id`, `--base-commit`, `--current-wave`, `--completed-waves`, `--completed-tasks`, `--executor-log` | none |
-| `checkpoint:load` | Load checkpoint for slice | `--slice-id` | none |
-| `observe:record` | Record observation | `--ts`, `--session`, `--tool`, `--args`, `--project` | none |
-| `patterns:extract` | Extract patterns from observations | none | none |
-| `patterns:aggregate` | Aggregate patterns by frequency | none | `--min-count` |
-| `patterns:rank` | Rank pattern candidates | none | `--threshold` |
-| `compose:detect` | Detect clusters from observations | `--observations` | `--options` |
-| `skills:drift` | Check for drift between content | `--original`, `--current` | none |
-| `skills:validate` | Validate skill definition | `--skill` | none |
-| `workflow:next` | Get next workflow status | `--status` | none |
-| `workflow:should-auto` | Check if auto-transition allowed | `--status`, `--mode` | none |
-| `claim:check-stale` | Check for stale task claims | none | `--ttl-minutes` |
-| `session:remind` | Generate session reminder | none | none |
+| Command                | Purpose                            | Required Flags                                                                                              | Optional Flags   |
+| ---------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------- |
+| `project:init`         | Initialize new TFF project         | `--name`                                                                                                    | `--vision`       |
+| `project:get`          | Get current project info           | none                                                                                                        | none             |
+| `milestone:create`     | Create new milestone               | `--name`                                                                                                    | none             |
+| `milestone:list`       | List all milestones                | none                                                                                                        | none             |
+| `milestone:close`      | Close milestone                    | `--milestone-id`                                                                                            | `--reason`       |
+| `slice:create`         | Create new slice                   | `--title`                                                                                                   | `--milestone-id` |
+| `slice:list`           | List all slices                    | none                                                                                                        | `--milestone-id` |
+| `slice:transition`     | Transition slice to new status     | `--slice-id`, `--status`                                                                                    | none             |
+| `slice:close`          | Close slice                        | `--slice-id`                                                                                                | `--reason`       |
+| `slice:classify`       | Classify slice complexity          | `--signals`                                                                                                 | none             |
+| `task:claim`           | Claim task for execution           | `--task-id`                                                                                                 | `--claimed-by`   |
+| `task:close`           | Close completed task               | `--task-id`                                                                                                 | `--reason`       |
+| `task:ready`           | List ready tasks for slice         | `--slice-id`                                                                                                | none             |
+| `dep:add`              | Add dependency between entities    | `--from-id`, `--to-id`                                                                                      | none             |
+| `direct-edit:guard`    | Check for direct edits             | none                                                                                                        | none             |
+| `pre-op:guard`         | Validate operation allowed         | `--slice-id`, `--operation`                                                                                 | none             |
+| `spec-edit:guard`      | Check for spec edits               | none                                                                                                        | none             |
+| `waves:detect`         | Detect execution waves from tasks  | `--tasks`                                                                                                   | none             |
+| `sync:state`           | Synchronize STATE.md for milestone | `--milestone-id`                                                                                            | none             |
+| `worktree:create`      | Create git worktree for slice      | `--slice-id`                                                                                                | none             |
+| `worktree:delete`      | Delete git worktree                | `--slice-id`                                                                                                | none             |
+| `worktree:list`        | List all git worktrees             | none                                                                                                        | none             |
+| `review:check-fresh`   | Check if reviewer is fresh         | `--slice-id`, `--agent`                                                                                     | none             |
+| `review:record`        | Record review for slice            | `--slice-id`, `--agent`, `--verdict`, `--type`, `--commit-sha`                                              | none             |
+| `checkpoint:save`      | Save checkpoint for slice          | `--slice-id`, `--base-commit`, `--current-wave`, `--completed-waves`, `--completed-tasks`, `--executor-log` | none             |
+| `checkpoint:load`      | Load checkpoint for slice          | `--slice-id`                                                                                                | none             |
+| `observe:record`       | Record observation                 | `--ts`, `--session`, `--tool`, `--args`, `--project`                                                        | none             |
+| `patterns:extract`     | Extract patterns from observations | none                                                                                                        | none             |
+| `patterns:aggregate`   | Aggregate patterns by frequency    | none                                                                                                        | `--min-count`    |
+| `patterns:rank`        | Rank pattern candidates            | none                                                                                                        | `--threshold`    |
+| `compose:detect`       | Detect clusters from observations  | `--observations`                                                                                            | `--options`      |
+| `skills:drift`         | Check for drift between content    | `--original`, `--current`                                                                                   | none             |
+| `skills:validate`      | Validate skill definition          | `--skill`                                                                                                   | none             |
+| `workflow:next`        | Get next workflow status           | `--status`                                                                                                  | none             |
+| `workflow:should-auto` | Check if auto-transition allowed   | `--status`, `--mode`                                                                                        | none             |
+| `claim:check-stale`    | Check for stale task claims        | none                                                                                                        | `--ttl-minutes`  |
+| `session:remind`       | Generate session reminder          | none                                                                                                        | none             |
 
 ## Command Details
 
@@ -63,6 +63,7 @@ Complete reference for all tff-tools CLI commands.
 | `--vision` | string | Project vision statement |
 
 **Examples:**
+
 ```bash
 project:init --name "My Project"
 project:init --name "My Project" --vision "Build the best thing"
@@ -83,6 +84,7 @@ project:init --name "My Project" --vision "Build the best thing"
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 project:get
 ```
@@ -105,6 +107,7 @@ project:get
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 milestone:create --name "Phase 1: Core Features"
 ```
@@ -124,6 +127,7 @@ milestone:create --name "Phase 1: Core Features"
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 milestone:list
 ```
@@ -149,6 +153,7 @@ milestone:list
 | `--reason` | string | Reason for closing |
 
 **Examples:**
+
 ```bash
 milestone:close --milestone-id M01
 milestone:close --milestone-id M01 --reason "Completed"
@@ -175,6 +180,7 @@ milestone:close --milestone-id M01 --reason "Completed"
 | `--milestone-id` | string | Milestone ID (auto-detected if not provided) | `^M\d+$` |
 
 **Examples:**
+
 ```bash
 slice:create --title "Implement feature X"
 slice:create --title "Fix bug Y" --milestone-id M01
@@ -198,6 +204,7 @@ slice:create --title "Fix bug Y" --milestone-id M01
 | `--milestone-id` | string | Filter by milestone ID | `^M\d+$` |
 
 **Examples:**
+
 ```bash
 slice:list
 slice:list --milestone-id M01
@@ -222,6 +229,7 @@ slice:list --milestone-id M01
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 slice:transition --slice-id M01-S01 --status planning
 ```
@@ -247,6 +255,7 @@ slice:transition --slice-id M01-S01 --status planning
 | `--reason` | string | Reason for closing |
 
 **Examples:**
+
 ```bash
 slice:close --slice-id M01-S01
 slice:close --slice-id M01-S01 --reason "Completed"
@@ -270,6 +279,7 @@ slice:close --slice-id M01-S01 --reason "Completed"
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 slice:classify --signals '{"taskCount":5,"estimatedFilesAffected":3,"newFilesCreated":0,"modulesAffected":2,"hasExternalIntegrations":false,"requiresInvestigation":true,"architectureImpact":false,"unknownsSurfaced":1,"riskLevel":"low"}'
 ```
@@ -295,6 +305,7 @@ slice:classify --signals '{"taskCount":5,"estimatedFilesAffected":3,"newFilesCre
 | `--claimed-by` | string | Agent identity claiming task |
 
 **Examples:**
+
 ```bash
 task:claim --task-id M01-S01-T01
 task:claim --task-id M01-S01-T01 --claimed-by executor
@@ -321,6 +332,7 @@ task:claim --task-id M01-S01-T01 --claimed-by executor
 | `--reason` | string | Reason for closing |
 
 **Examples:**
+
 ```bash
 task:close --task-id M01-S01-T01
 task:close --task-id M01-S01-T01 --reason "Completed successfully"
@@ -344,6 +356,7 @@ task:close --task-id M01-S01-T01 --reason "Completed successfully"
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 task:ready --slice-id M01-S01
 ```
@@ -367,6 +380,7 @@ task:ready --slice-id M01-S01
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 dep:add --from-id M01-S01-T02 --to-id M01-S01-T01
 ```
@@ -394,6 +408,7 @@ dep:add --from-id M01-S01-T02 --to-id M01-S01-T01
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 checkpoint:save --slice-id M01-S01 --base-commit abc123 --current-wave 0 --completed-waves '[]' --completed-tasks '[]' --executor-log '[]'
 ```
@@ -416,6 +431,7 @@ checkpoint:save --slice-id M01-S01 --base-commit abc123 --current-wave 0 --compl
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 checkpoint:load --slice-id M01-S01
 ```
@@ -439,6 +455,7 @@ checkpoint:load --slice-id M01-S01
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 review:check-fresh --slice-id M01-S01 --agent tff-code-reviewer
 ```
@@ -465,6 +482,7 @@ review:check-fresh --slice-id M01-S01 --agent tff-code-reviewer
 **Optional Flags:** none
 
 **Examples:**
+
 ```bash
 review:record --slice-id M01-S01 --agent tff-code-reviewer --verdict approved --type code --commit-sha abc1234
 review:record --slice-id M01-S01 --agent tff-security-auditor --verdict changes_requested --type security --commit-sha abc1234
@@ -485,20 +503,40 @@ slice:transition --help
 ```
 
 Output:
+
 ```json
 {
-  "ok": true,
-  "data": {
-    "name": "slice:transition",
-    "purpose": "Transition a slice to a new status",
-    "syntax": "slice:transition --slice-id <string> --status <string>",
-    "requiredFlags": [
-      { "name": "--slice-id", "type": "string", "description": "Slice ID (e.g., M01-S01)", "pattern": "^M\\d+-S\\d+$" },
-      { "name": "--status", "type": "string", "description": "Target status", "enum": ["discussing", "researching", "planning", "executing", "verifying", "reviewing", "completing", "closed"] }
-    ],
-    "optionalFlags": [],
-    "examples": ["slice:transition --slice-id M01-S01 --status planning"]
-  }
+	"ok": true,
+	"data": {
+		"name": "slice:transition",
+		"purpose": "Transition a slice to a new status",
+		"syntax": "slice:transition --slice-id <string> --status <string>",
+		"requiredFlags": [
+			{
+				"name": "--slice-id",
+				"type": "string",
+				"description": "Slice ID (e.g., M01-S01)",
+				"pattern": "^M\\d+-S\\d+$"
+			},
+			{
+				"name": "--status",
+				"type": "string",
+				"description": "Target status",
+				"enum": [
+					"discussing",
+					"researching",
+					"planning",
+					"executing",
+					"verifying",
+					"reviewing",
+					"completing",
+					"closed"
+				]
+			}
+		],
+		"optionalFlags": [],
+		"examples": ["slice:transition --slice-id M01-S01 --status planning"]
+	}
 }
 ```
 
@@ -511,20 +549,38 @@ slice:transition --help --json
 ```
 
 Output:
+
 ```json
 {
-  "ok": true,
-  "data": {
-    "command": "slice:transition",
-    "flags": {
-      "type": "object",
-      "required": ["slice-id", "status"],
-      "properties": {
-        "slice-id": { "type": "string", "description": "Slice ID (e.g., M01-S01)", "pattern": "^M\\d+-S\\d+$" },
-        "status": { "type": "string", "description": "Target status", "enum": ["discussing", "researching", "planning", "executing", "verifying", "reviewing", "completing", "closed"] }
-      }
-    }
-  }
+	"ok": true,
+	"data": {
+		"command": "slice:transition",
+		"flags": {
+			"type": "object",
+			"required": ["slice-id", "status"],
+			"properties": {
+				"slice-id": {
+					"type": "string",
+					"description": "Slice ID (e.g., M01-S01)",
+					"pattern": "^M\\d+-S\\d+$"
+				},
+				"status": {
+					"type": "string",
+					"description": "Target status",
+					"enum": [
+						"discussing",
+						"researching",
+						"planning",
+						"executing",
+						"verifying",
+						"reviewing",
+						"completing",
+						"closed"
+					]
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -543,55 +599,68 @@ Output: Same as `--help --json` above.
 All error messages are structured JSON with helpful information:
 
 ### Missing Required Flag
+
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "MISSING_REQUIRED_FLAG",
-    "message": "Missing required flag(s): --status",
-    "missingFlags": ["status"],
-    "validFlags": ["slice-id", "status"]
-  }
+	"ok": false,
+	"error": {
+		"code": "MISSING_REQUIRED_FLAG",
+		"message": "Missing required flag(s): --status",
+		"missingFlags": ["status"],
+		"validFlags": ["slice-id", "status"]
+	}
 }
 ```
 
 ### Unknown Flag
+
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "UNKNOWN_FLAG",
-    "message": "Unknown flag: --target-status",
-    "unknownFlag": "target-status",
-    "validFlags": ["slice-id", "status"]
-  }
+	"ok": false,
+	"error": {
+		"code": "UNKNOWN_FLAG",
+		"message": "Unknown flag: --target-status",
+		"unknownFlag": "target-status",
+		"validFlags": ["slice-id", "status"]
+	}
 }
 ```
 
 ### Invalid Enum Value
+
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "INVALID_ENUM_VALUE",
-    "message": "Invalid value for --status: 'invalid'. Must be one of: discussing, researching, planning, executing, verifying, reviewing, completing, closed",
-    "flag": "status",
-    "provided": "invalid",
-    "validValues": ["discussing", "researching", "planning", "executing", "verifying", "reviewing", "completing", "closed"]
-  }
+	"ok": false,
+	"error": {
+		"code": "INVALID_ENUM_VALUE",
+		"message": "Invalid value for --status: 'invalid'. Must be one of: discussing, researching, planning, executing, verifying, reviewing, completing, closed",
+		"flag": "status",
+		"provided": "invalid",
+		"validValues": [
+			"discussing",
+			"researching",
+			"planning",
+			"executing",
+			"verifying",
+			"reviewing",
+			"completing",
+			"closed"
+		]
+	}
 }
 ```
 
 ### Pattern Mismatch
+
 ```json
 {
-  "ok": false,
-  "error": {
-    "code": "PATTERN_MISMATCH",
-    "message": "Invalid format for --slice-id: 'invalid'. Must match pattern: ^M\\d+-S\\d+$",
-    "flag": "slice-id",
-    "provided": "invalid",
-    "pattern": "^M\\d+-S\\d+$"
-  }
+	"ok": false,
+	"error": {
+		"code": "PATTERN_MISMATCH",
+		"message": "Invalid format for --slice-id: 'invalid'. Must match pattern: ^M\\d+-S\\d+$",
+		"flag": "slice-id",
+		"provided": "invalid",
+		"pattern": "^M\\d+-S\\d+$"
+	}
 }
 ```

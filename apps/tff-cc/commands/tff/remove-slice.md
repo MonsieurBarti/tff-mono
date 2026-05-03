@@ -10,7 +10,8 @@ Remove slice that hasn't been started yet. Only future slices (discussing status
 </objective>
 
 <execution_context>
+
 1. Verify slice ∈ discussing status (¬ started)
 2. Remove slice ∧ update dependencies
 3. Renumber subsequent slices
-</execution_context>
+   </execution_context>

@@ -119,9 +119,8 @@ describe("worktree:create on milestone branch", () => {
 		const branch = `milestone/${prefix}`;
 		const git = makeGit(branch);
 
-		const { withMutatingCommand, resetMutatingCommandCache } = await import(
-			"../../src/cli/utils/with-mutating-command.js"
-		);
+		const { withMutatingCommand, resetMutatingCommandCache } =
+			await import("../../src/cli/utils/with-mutating-command.js");
 		resetMutatingCommandCache();
 		const { worktreeCreateCmd } = await import("../../src/cli/commands/worktree-create.cmd.js");
 

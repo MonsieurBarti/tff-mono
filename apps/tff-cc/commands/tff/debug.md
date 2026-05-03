@@ -20,6 +20,7 @@ Emit a Phase D feedback event before analysis begins. Non-blocking — do not ha
 ```bash
 tff-tools routing:event --kind debug --slice <slice_id> 2>/dev/null || true
 ```
+
 </observability>
 
 <execution_context>

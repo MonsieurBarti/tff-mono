@@ -17,6 +17,7 @@ quality gate commands (settings → lefthook → CI → package.json →
 Makefile → language defaults).
 
 Upon the user's reply:
+
 - "Apply (commit + push)" → commit + push, then call `tff_ship_apply_done`.
 - "Reject (revert)" → restore the worktree, then call
   `tff_ship_apply_done({ rejected: true })`.

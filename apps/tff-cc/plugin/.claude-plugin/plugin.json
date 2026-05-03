@@ -6,11 +6,5 @@
 		"name": "MonsieurBarti"
 	},
 	"repository": "https://github.com/MonsieurBarti/The-Forge-Flow-CC",
-	"keywords": [
-		"orchestration",
-		"sqlite",
-		"plannotator",
-		"agents",
-		"tdd"
-	]
+	"keywords": ["orchestration", "sqlite", "plannotator", "agents", "tdd"]
 }

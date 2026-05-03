@@ -14,7 +14,7 @@ function tryOpen(
 	cand: BindingCandidate | undefined,
 ): Database.Database {
 	if (!cand) return new Database(dbPath, extraOpts);
-	return new Database(dbPath, { ...(extraOpts ?? {}), nativeBinding: cand.path });
+	return new Database(dbPath, { ...extraOpts, nativeBinding: cand.path });
 }
 
 /**

@@ -111,9 +111,8 @@ describe("branchGuardCheckCmd", () => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const git = makeGit("main", "main");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
@@ -129,9 +128,8 @@ describe("branchGuardCheckCmd", () => {
 		const prefix = milestoneId.slice(0, 8);
 		const git = makeGit(`milestone/${prefix}`, "main");
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
 
@@ -145,9 +143,8 @@ describe("branchGuardCheckCmd", () => {
 
 		const git = makeGit("feature/my-feature", "main");
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
 
@@ -163,9 +160,8 @@ describe("branchGuardCheckCmd", () => {
 		const prefix = milestoneId.slice(0, 8);
 		const git = makeGit(`milestone/${prefix}`, "main");
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
 
@@ -183,9 +179,8 @@ describe("branchGuardCheckCmd", () => {
 		const prefix = milestoneId.slice(0, 8);
 		const git = makeGit(`milestone/${prefix}`, "main");
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
 
@@ -202,9 +197,8 @@ describe("branchGuardCheckCmd", () => {
 
 		const git = makeGit("main", "main");
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		const result = JSON.parse(await cmd([]));
 
@@ -220,14 +214,12 @@ describe("branchGuardCheckCmd", () => {
 		const prefix = milestoneId.slice(0, 8);
 		const git = makeGit(`milestone/${prefix}`, "main");
 
-		const { createClosableStateStoresUnchecked } = await import(
-			"../../../../src/infrastructure/adapters/sqlite/create-state-stores.js"
-		);
+		const { createClosableStateStoresUnchecked } =
+			await import("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js");
 		vi.mocked(createClosableStateStoresUnchecked).mockClear();
 
-		const { branchGuardCheckCmd } = await import(
-			"../../../../src/cli/commands/branch-guard-check.cmd.js"
-		);
+		const { branchGuardCheckCmd } =
+			await import("../../../../src/cli/commands/branch-guard-check.cmd.js");
 		const cmd = branchGuardCheckCmd(() => git);
 		await cmd([]);
 

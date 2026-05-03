@@ -4,14 +4,14 @@ Canonical list of quality gates in `tff-cc`, the mechanism hardening each, and t
 
 ## Catalog
 
-| ID | Gate | Class | Mechanism | Status | Enforcement site | Meta-test |
-|---|---|---|---|---|---|---|
-| `fresh-reviewer` | Fresh-reviewer invariant on `recordReview` | III | adapter-invariant | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/review-store-fresh-reviewer-invariant.spec.ts` |
-| `branch-guard` | Branch-guard chokepoint on mutating CLI commands | III | chokepoint-wrapper | enforced | `src/cli/utils/with-mutating-command.ts` | `tests/structural/branch-guard-chokepoint.spec.ts` |
-| `ship-completeness` | Slice-close requires approved code + security reviews | V | adapter-invariant | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/slice-close-completeness-invariant.spec.ts` |
-| `milestone-completeness` | Milestone-close requires approved spec review per slice | V | adapter-invariant | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/milestone-close-completeness-invariant.spec.ts` |
-| `value-object-invariants` | Every value-object exports a Zod schema or parse fn | III | value-object | enforced | `src/domain/value-objects` | `tests/structural/value-object-invariants.spec.ts` |
-| `command-mutates-annotation` | Every registered CLI command explicitly annotates schema.mutates | III | value-object | enforced | `src/cli/utils/flag-parser.ts` | `tests/structural/command-schema-mutates-annotation.spec.ts` |
+| ID                           | Gate                                                             | Class | Mechanism          | Status   | Enforcement site                                             | Meta-test                                                         |
+| ---------------------------- | ---------------------------------------------------------------- | ----- | ------------------ | -------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `fresh-reviewer`             | Fresh-reviewer invariant on `recordReview`                       | III   | adapter-invariant  | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/review-store-fresh-reviewer-invariant.spec.ts`  |
+| `branch-guard`               | Branch-guard chokepoint on mutating CLI commands                 | III   | chokepoint-wrapper | enforced | `src/cli/utils/with-mutating-command.ts`                     | `tests/structural/branch-guard-chokepoint.spec.ts`                |
+| `ship-completeness`          | Slice-close requires approved code + security reviews            | V     | adapter-invariant  | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/slice-close-completeness-invariant.spec.ts`     |
+| `milestone-completeness`     | Milestone-close requires approved spec review per slice          | V     | adapter-invariant  | enforced | `src/infrastructure/adapters/sqlite/sqlite-state.adapter.ts` | `tests/structural/milestone-close-completeness-invariant.spec.ts` |
+| `value-object-invariants`    | Every value-object exports a Zod schema or parse fn              | III   | value-object       | enforced | `src/domain/value-objects`                                   | `tests/structural/value-object-invariants.spec.ts`                |
+| `command-mutates-annotation` | Every registered CLI command explicitly annotates schema.mutates | III   | value-object       | enforced | `src/cli/utils/flag-parser.ts`                               | `tests/structural/command-schema-mutates-annotation.spec.ts`      |
 
 ## Classes
 
@@ -46,8 +46,8 @@ Each mechanism has a worked example already in the repo. Follow the pattern clos
 5. **Add a row to this catalog** mirroring the registry entry.
 6. **Implement the enforcement** at the declared `enforcementSite`.
 7. **Replace the stub** with real assertions. Include at minimum:
-   - A *fires* test: gate triggers on a bypass attempt.
-   - A *structural* test: fails if the enforcement mechanism is removed (e.g., `vi.spyOn` on the sibling method called by an adapter-invariant; registry walk for a chokepoint wrapper).
+   - A _fires_ test: gate triggers on a bypass attempt.
+   - A _structural_ test: fails if the enforcement mechanism is removed (e.g., `vi.spyOn` on the sibling method called by an adapter-invariant; registry walk for a chokepoint wrapper).
 8. **Flip the registry entry to `status: "enforced"`** in both `src/shared/quality-gates/registry.ts` and this file.
 
 ### Sanity check before committing
@@ -56,4 +56,4 @@ Temporarily remove your enforcement (comment out the check). The structural test
 
 ## Invariant
 
-`tests/structural/quality-gates.spec.ts` walks `QUALITY_GATES` and fails if any entry points at a missing meta-test or enforcement site. It does *not* re-run each meta-test — those run as part of the normal vitest suite.
+`tests/structural/quality-gates.spec.ts` walks `QUALITY_GATES` and fails if any entry points at a missing meta-test or enforcement site. It does _not_ re-run each meta-test — those run as part of the normal vitest suite.

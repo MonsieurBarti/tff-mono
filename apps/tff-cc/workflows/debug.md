@@ -5,6 +5,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 Diagnose first (¬ slice), fix second (converges on standard pipeline).
 
 ## Prerequisites
+
 git repo ∃
 
 ## Phase 1: Diagnose (orchestrator-driven, ¬ slice)

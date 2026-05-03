@@ -15,7 +15,13 @@ routing:
 You MUST be invoked with an explicit `Evidence path:` line in your prompt. If that line is absent, respond with the following JSON and stop:
 
 ```json
-{"ok": false, "error": {"code": "MISSING_EVIDENCE_PATH", "message": "Outcome judge requires explicit Evidence path in prompt."}}
+{
+	"ok": false,
+	"error": {
+		"code": "MISSING_EVIDENCE_PATH",
+		"message": "Outcome judge requires explicit Evidence path in prompt."
+	}
+}
 ```
 
 `Evidence path:` points to a JSON file on disk whose contents conform to `JudgeEvidence` (spec §4.1). Read it via the Read tool.
@@ -57,6 +63,7 @@ Write the verdicts to a JSON file via the Write tool, using the path supplied in
 ```
 
 Required:
+
 - Top-level shape is the object `{ "verdicts": [...] }` — never a bare array.
 - Each entry has all four fields: `decision_id`, `dimension`, `verdict`, `reason`.
 - Emit two entries per item in `evidence.decisions`: one with `dimension: "agent"`, one with `dimension: "tier"`. Both share the same `decision_id` (the one from that decision entry).

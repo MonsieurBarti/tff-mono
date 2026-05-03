@@ -35,9 +35,9 @@ asking the user to approve it. The exact commands depend on the project
 5. **`Makefile`** — if it has `lint`, `test`, `build` targets, run
    `make <target>`.
 6. **Language-specific defaults** — Rust: `cargo fmt --check && cargo
-   clippy && cargo test && cargo build`. Go: `gofmt -l . && go vet ./...
-   && go test ./... && go build ./...`. Python: `ruff check && mypy .
-   && pytest`.
+clippy && cargo test && cargo build`. Go: `gofmt -l . && go vet ./...
+&& go test ./... && go build ./...`. Python: `ruff check && mypy .
+&& pytest`.
 
 If you can't determine the commands from any of the above, ASK the
 user via `tff_ask_user` what the project's lint/typecheck/test/build

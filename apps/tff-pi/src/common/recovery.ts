@@ -60,7 +60,7 @@ export function summarizeInput(toolName: string, input: unknown): string {
 	}
 }
 
-const TRANSITIONAL_STATUSES: SliceStatus[] = [
+const TRANSITIONAL_STATUSES: ReadonlySet<SliceStatus> = new Set([
 	"discussing",
 	"researching",
 	"planning",
@@ -68,7 +68,7 @@ const TRANSITIONAL_STATUSES: SliceStatus[] = [
 	"verifying",
 	"reviewing",
 	"shipping",
-];
+]);
 
 export type RecoveryClassification = "resume" | "rollback" | "skip" | "manual";
 
@@ -133,7 +133,7 @@ export function scanForStuckSlices(db: Database.Database): Slice[] {
 	for (const m of milestones) {
 		const slices = getSlices(db, m.id);
 		for (const s of slices) {
-			if (TRANSITIONAL_STATUSES.includes(s.status)) {
+			if (TRANSITIONAL_STATUSES.has(s.status)) {
 				stuck.push(s);
 			}
 		}

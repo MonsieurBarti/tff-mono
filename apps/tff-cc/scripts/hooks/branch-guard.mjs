@@ -13,16 +13,20 @@ if (!existsSync(cliPath)) process.exit(0); // build not produced yet — cannot 
 
 let out;
 try {
-  out = execSync(`node ${cliPath} branch-guard:check`, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+	out = execSync(`node ${cliPath} branch-guard:check`, {
+		cwd,
+		encoding: "utf8",
+		stdio: ["ignore", "pipe", "pipe"],
+	});
 } catch (e) {
-  // CLI failed (not a refusal — an actual failure) — don't block the commit, print stderr
-  process.stderr.write(`branch-guard:check crashed: ${e}\n`);
-  process.exit(0);
+	// CLI failed (not a refusal — an actual failure) — don't block the commit, print stderr
+	process.stderr.write(`branch-guard:check crashed: ${e}\n`);
+	process.exit(0);
 }
 
 const parsed = JSON.parse(out.trim().split("\n").pop());
 if (!parsed.ok && parsed.error.code === "REFUSED_ON_MILESTONE_BRANCH") {
-  process.stderr.write(`${parsed.error.message}\n`);
-  process.exit(1);
+	process.stderr.write(`${parsed.error.message}\n`);
+	process.exit(1);
 }
 process.exit(0);

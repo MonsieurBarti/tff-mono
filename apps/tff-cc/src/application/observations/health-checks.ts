@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import yaml from "js-yaml";
+import { load as yamlLoad, CORE_SCHEMA } from "js-yaml";
 
 const OBS_DIR = ".tff-cc/observations";
 const SESSIONS = `${OBS_DIR}/sessions.jsonl`;
@@ -100,7 +100,7 @@ export const checkFirstObservationSentinel = (root: string): SentinelResult | Pr
 				};
 			}
 			const content = fs.readFileSync(settingsPath, "utf8");
-			const parsed = yaml.load(content, { schema: yaml.CORE_SCHEMA }) as
+			const parsed = yamlLoad(content, { schema: CORE_SCHEMA }) as
 				| { enabled?: boolean }
 				| null
 				| undefined;

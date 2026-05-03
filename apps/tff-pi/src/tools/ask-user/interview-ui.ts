@@ -24,8 +24,7 @@
  *   Esc          exit confirmation
  */
 
-import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
-import type { Theme } from "@mariozechner/pi-coding-agent";
+import type { ExtensionContext, Theme } from "@mariozechner/pi-coding-agent";
 import { Editor, Key, type TUI, matchesKey, truncateToWidth } from "@mariozechner/pi-tui";
 import { INDENT, makeUI } from "./ui.js";
 

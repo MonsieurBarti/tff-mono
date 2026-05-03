@@ -7,9 +7,11 @@ Creates ad-hoc slice + worktree from current branch, writes lightweight plan, ha
 to standard pipeline.
 
 ## Prerequisites
+
 git repo ∃
 
 ## Steps
+
 1. CREATE ad-hoc quick slice:
    - DETECT base branch: `git rev-parse --abbrev-ref HEAD` → <base-branch>
    - PROMPT user inline for branch name with default `feat/<slugified-title>`
