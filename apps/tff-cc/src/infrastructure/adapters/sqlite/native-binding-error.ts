@@ -14,7 +14,7 @@ export interface NativeBindingErrorDetails {
 	remediation: string;
 }
 
-const REMEDIATION = "reinstall better-sqlite3: bun install --force better-sqlite3";
+const REMEDIATION = "reinstall better-sqlite3: pnpm install --force better-sqlite3";
 
 const renderMessage = (d: Omit<NativeBindingErrorDetails, "remediation">): string => {
 	const header = `failed to load better-sqlite3 native binding (platform=${d.platform} arch=${d.arch} node-abi=${d.nodeAbi})`;

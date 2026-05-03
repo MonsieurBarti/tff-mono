@@ -61,7 +61,7 @@ describe("CLI emits structured JSON when native binding fails", () => {
 			expect(payload.error.details.arch).toBe(process.arch);
 			expect(payload.error.details.nodeAbi).toBe(process.versions.modules);
 			expect(Array.isArray(payload.error.details.candidates)).toBe(true);
-			expect(payload.error.details.remediation).toContain("bun install --force better-sqlite3");
+			expect(payload.error.details.remediation).toContain("pnpm install --force better-sqlite3");
 		},
 	);
 

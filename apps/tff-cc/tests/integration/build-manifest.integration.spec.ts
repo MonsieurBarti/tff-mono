@@ -10,7 +10,7 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 describe("build manifest", () => {
 	it("writes dist/.build-manifest.json with sourceSha, bundleSha256, builtAt", () => {
 		// Ensure a clean build so timestamps and hashes are fresh.
-		execSync("bun run build", { stdio: "inherit", cwd: repoRoot });
+		execSync("pnpm run build", { stdio: "inherit", cwd: repoRoot });
 
 		const manifestPath = resolve(repoRoot, "dist/.build-manifest.json");
 		expect(existsSync(manifestPath)).toBe(true);

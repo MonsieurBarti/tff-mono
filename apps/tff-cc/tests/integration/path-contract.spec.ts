@@ -14,7 +14,7 @@ describe("path contract: artifacts under .tff-cc/ only", () => {
 		// produces a clear error instead of a cryptic ENOENT from node.
 		if (!existsSync(CLI)) {
 			throw new Error(
-				`Missing built CLI at ${CLI}. Run \`bun run build\` before the integration tests.`,
+				`Missing built CLI at ${CLI}. Run \`pnpm run build\` before the integration tests.`,
 			);
 		}
 	});

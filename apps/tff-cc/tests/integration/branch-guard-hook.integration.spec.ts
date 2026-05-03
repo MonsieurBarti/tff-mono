@@ -14,10 +14,10 @@ describe("pre-commit branch-guard hook (shells out to branch-guard:check)", () =
 	let repo: string;
 
 	beforeAll(() => {
-		// Ensure the CLI build is present — `bun run test` runs build first, but guard here.
+		// Ensure the CLI build is present — `pnpm run test` runs build first, but guard here.
 		if (!existsSync(CLI)) {
 			throw new Error(
-				`CLI build not found at ${CLI}. Run 'bun run build' before running this test.`,
+				`CLI build not found at ${CLI}. Run 'pnpm run build' before running this test.`,
 			);
 		}
 	});

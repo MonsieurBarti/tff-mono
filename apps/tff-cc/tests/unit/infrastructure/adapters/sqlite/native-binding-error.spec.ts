@@ -16,7 +16,7 @@ describe("NativeBindingError", () => {
 		expect(err.code).toBe("NATIVE_BINDING_FAILED");
 		expect(err.message).toContain("/a/prebuilt.node");
 		expect(err.message).toContain("ABI mismatch");
-		expect(err.details.remediation).toMatch(/bun install --force better-sqlite3/);
+		expect(err.details.remediation).toMatch(/pnpm install --force better-sqlite3/);
 	});
 
 	it("toJSON emits the structured envelope", () => {

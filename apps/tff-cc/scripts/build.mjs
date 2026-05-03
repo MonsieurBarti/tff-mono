@@ -67,7 +67,7 @@ let sourceSha = "";
 try {
 	sourceSha = execSync("git rev-parse HEAD", { cwd: rootDir, encoding: "utf8" }).trim();
 } catch {
-	// Rare: running `bun run build` outside a git checkout. Leave empty;
+	// Rare: running `pnpm run build` outside a git checkout. Leave empty;
 	// the validation workflow still byte-matches bundleSha256, and the
 	// scheduled rebuild-diff workflow reports "no source sha" rather than
 	// silently skipping the comparison.
