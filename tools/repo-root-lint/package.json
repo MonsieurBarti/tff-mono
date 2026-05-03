@@ -1,0 +1,10 @@
+{
+	"name": "repo-root-lint",
+	"private": true,
+	"scripts": {
+		"lint": "cd ../.. && oxlint --deny-warnings --ignore-pattern 'apps/**' --ignore-pattern 'tools/**' .",
+		"lint:fix": "cd ../.. && oxlint --fix --deny-warnings --ignore-pattern 'apps/**' --ignore-pattern 'tools/**' .",
+		"format": "cd ../.. && prettier --write --ignore-path tools/repo-root-lint/.prettierignore .",
+		"format:check": "cd ../.. && prettier --check --ignore-path tools/repo-root-lint/.prettierignore ."
+	}
+}

@@ -11,7 +11,8 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "verify": "turbo run typecheck lint format:check test"
   },
   "devDependencies": {
     "turbo": "^2.x",
@@ -19,6 +20,8 @@
     "@types/node": "^22.x",
     "lefthook": "^2.x",
     "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.8.0"
+    "@commitlint/config-conventional": "^19.8.0",
+    "oxlint": "0.15.x",
+    "prettier": "3.x"
   }
 }

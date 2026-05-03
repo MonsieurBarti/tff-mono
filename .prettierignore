@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+.tff-cc/
+pnpm-lock.yaml
+apps/*/CHANGELOG.md
+apps/tff-cc/native/
+apps/tff-cc/assets/
+apps/tff-pi/.pi/
+apps/tff-pi/.hippo/
+apps/tff-pi/.superpowers/
