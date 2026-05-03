@@ -34,7 +34,7 @@ Each mechanism has a worked example already in the repo. Follow the pattern clos
 
 - **adapter-invariant** — see `fresh-reviewer` (call sibling port method on `this` in a write path). Implementation: `SQLiteStateAdapter.recordReview` calls `this.getExecutorsForSlice`. Tests: `tests/integration/review-store-fresh-reviewer.spec.ts` (fires), `tests/structural/review-store-fresh-reviewer-invariant.spec.ts` (spy), `tests/integration/fresh-reviewer-redundancy.spec.ts` (two-layer defense).
 - **chokepoint-wrapper** — see `branch-guard`. Implementation: `src/cli/utils/with-mutating-command.ts` tags the wrapped handler with a symbol; `src/cli/index.ts` applies the wrapper when `schema.mutates === true`. Tests: `tests/integration/branch-guard-dispatcher.spec.ts` (fires), `tests/structural/branch-guard-chokepoint.spec.ts` (registry walk).
-- **mirror-in-ci** — see `coverage-in-ci` or `commitlint-in-ci`. Implementation: new job in `.github/workflows/ci.yml`. Test: YAML-parsing structural spec asserting the job exists and its key steps reference the right scripts.
+- **mirror-in-ci** — no gate currently uses this mechanism, so there is no worked example in the repo. Implementation: add a new job in `.github/workflows/ci.yml` that re-runs the check that contributors can bypass locally. Test: YAML-parsing structural spec asserting the job exists and its key steps reference the right scripts.
 - **value-object** — see `value-object-invariants`. Test: globs a directory and asserts each file exports a Zod schema or `parse`/`create` fn.
 
 ### Steps
