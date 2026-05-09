@@ -36,7 +36,7 @@ package.json       # root scripts (build/test/lint/format/typecheck/verify)
 pnpm-workspace.yaml
 turbo.json
 tsconfig.base.json
-.oxlintrc.json / .prettierrc.json (+ ignores)
+.oxlintrc.json / .oxfmtrc.json (+ ignores)
 lefthook.yml
 ```
 
