@@ -14,7 +14,7 @@ pre-commit:
         - "apps/tff-pi/.hippo/**"
         - "apps/tff-pi/.superpowers/**"
       run: pnpm exec oxlint --deny-warnings {staged_files}
-    - name: prettier-staged
+    - name: oxfmt-staged
       glob: "*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}"
       exclude:
         - "apps/tff-cc/native/**"
@@ -22,7 +22,7 @@ pre-commit:
         - "apps/tff-pi/.pi/**"
         - "apps/tff-pi/.hippo/**"
         - "apps/tff-pi/.superpowers/**"
-      run: pnpm exec prettier --check {staged_files}
+      run: pnpm exec oxfmt --check {staged_files}
 
 commit-msg:
   jobs:

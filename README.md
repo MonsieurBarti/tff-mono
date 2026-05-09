@@ -64,8 +64,8 @@ All run from the repo root and fan out via Turbo:
 turbo run build         # build every app
 turbo run test          # run every app's vitest suite
 turbo run lint          # oxlint across apps + repo-root-lint
-turbo run format        # prettier --write across the repo
-turbo run format:check  # prettier --check (CI-friendly)
+turbo run format        # oxfmt --write across the repo
+turbo run format:check  # oxfmt --check (CI-friendly)
 turbo run typecheck     # tsc --noEmit per app
 turbo run typecheck lint format:check test build  # the "everything passes" gate
 ```

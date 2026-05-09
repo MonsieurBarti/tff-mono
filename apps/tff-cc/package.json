@@ -15,8 +15,8 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "oxlint --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
 		"lint:fix": "oxlint --fix --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
-		"format": "prettier --write --ignore-path ../../.prettierignore .",
-		"format:check": "prettier --check --ignore-path ../../.prettierignore ."
+		"format": "oxfmt --write --config ../../.oxfmtrc.json .",
+		"format:check": "oxfmt --check --config ../../.oxfmtrc.json ."
 	},
 	"keywords": [
 		"claude-code",

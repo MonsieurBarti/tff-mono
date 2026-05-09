@@ -4,11 +4,11 @@
 		"tsconfig.base.json",
 		".oxlintrc.json",
 		".oxlintignore",
-		".prettierrc.json",
-		".prettierignore",
+		".oxfmtrc.json",
+		".oxfmtignore",
 		"tools/repo-root-lint/package.json",
 		"tools/repo-root-lint/.oxlintignore",
-		"tools/repo-root-lint/.prettierignore"
+		"tools/repo-root-lint/.oxfmtignore"
 	],
 	"globalEnv": ["CI", "NODE_ENV"],
 	"tasks": {
