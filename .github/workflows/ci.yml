@@ -1,0 +1,73 @@
+name: CI
+on:
+  push:
+    branches: [main, "milestone/*"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: turbo run typecheck lint format:check test build
+
+  tff-cc-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-forge-flow/tff-cc... build
+      - name: Smoke-test tff-tools CLI
+        run: |
+          set -e
+          PATH="$GITHUB_WORKSPACE/apps/tff-cc/bin:$PATH" tff-tools --help > /dev/null
+          WORK=$(mktemp -d)
+          cd "$WORK"
+          git init --quiet
+          git -c user.email=smoke@tff.invalid -c user.name=smoke-test \
+            commit --allow-empty -m "smoke-init" --quiet
+          git checkout -b smoke-branch --quiet
+          node "$GITHUB_WORKSPACE/apps/tff-cc/dist/cli/index.js" project:init --name pr-smoke
+          node "$GITHUB_WORKSPACE/apps/tff-cc/dist/cli/index.js" milestone:create --name "PR Smoke Milestone"
+          node "$GITHUB_WORKSPACE/apps/tff-cc/dist/cli/index.js" slice:create --title "pr smoke slice"
+          node "$GITHUB_WORKSPACE/apps/tff-cc/dist/cli/index.js" slice:list \
+            | jq -e '.data[] | select(.title == "pr smoke slice")' > /dev/null
+          echo "ok: tff-cc CLI smoke passed"
+
+  commitlint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Ensure base SHA is reachable
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git fetch --no-tags --depth=1 origin "$BASE_SHA" || git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+      - name: Lint commits
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA"
