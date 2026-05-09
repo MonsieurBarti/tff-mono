@@ -19,7 +19,7 @@ jobs:
           node-version: 22
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: turbo run typecheck lint format:check test build
+      - run: pnpm exec turbo run typecheck lint format:check test build
 
   tff-cc-smoke:
     runs-on: ubuntu-latest
