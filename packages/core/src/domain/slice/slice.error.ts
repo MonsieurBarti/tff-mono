@@ -72,3 +72,14 @@ export class HumanGateRequiredError extends BaseDomainError<{ status: string; me
 		this.context = { status, message };
 	}
 }
+
+export class ReviewNotFoundError extends BaseDomainError<{ reviewId: number; sliceId: string }> {
+	readonly errorLabel = "REVIEW_NOT_FOUND";
+	readonly status = 404;
+	readonly context: { reviewId: number; sliceId: string };
+
+	constructor(reviewId: number, sliceId: string) {
+		super();
+		this.context = { reviewId, sliceId };
+	}
+}

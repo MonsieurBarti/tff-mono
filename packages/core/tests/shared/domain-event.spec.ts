@@ -21,4 +21,10 @@ describe("DomainEvent", () => {
 		expect(event.occurredAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
 		expect(event.occurredAt.getTime()).toBeLessThanOrEqual(after.getTime());
 	});
+
+	it("has a UUID id", () => {
+		const event = DomainEvent.create("test", {});
+		expect(event.id).toBeDefined();
+		expect(event.id).toHaveLength(36);
+	});
 });

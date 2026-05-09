@@ -48,5 +48,14 @@ export class BranchName extends ValueObject<string> {
 		if (!this.props || this.props.trim() === "") {
 			throw new Error("branch name cannot be empty");
 		}
+		for (const char of this.props) {
+			const code = char.charCodeAt(0);
+			if (code <= 0x1f || code === 0x7f) {
+				throw new Error("branch name contains invalid characters");
+			}
+		}
+		if (this.props.includes("..") || this.props.startsWith("/") || this.props.startsWith("-")) {
+			throw new Error("branch name contains invalid characters");
+		}
 	}
 }

@@ -16,6 +16,7 @@ import {
 	TierClassificationError,
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
+	ReviewNotFoundError,
 } from "./slice.error.js";
 import { SLICE_TRANSITIONS, type ComplexityTier, type SliceStatus } from "./transitions.js";
 import { reviewExistsGuard, tierSkipGuard } from "./guards.js";
@@ -53,15 +54,15 @@ export interface TransitionContext {
 }
 
 export class Slice extends AggregateRoot {
-	private _milestoneId: string | null;
-	private _kind: "milestone" | "quick" | "debug";
-	private _number: number;
+	private readonly _milestoneId: string | null;
+	private readonly _kind: "milestone" | "quick" | "debug";
+	private readonly _number: number;
 	private _title: string;
 	private _status: SliceStatus;
 	private _tier: ComplexityTier | null;
-	private _baseBranch: string;
-	private _branchName: string;
-	private _createdAt: Date;
+	private readonly _baseBranch: string;
+	private readonly _branchName: string;
+	private readonly _createdAt: Date;
 	private _updatedAt: Date;
 	private _archivedAt: Date | null;
 	private _reviews: Review[] = [];
@@ -81,8 +82,7 @@ export class Slice extends AggregateRoot {
 		archivedAt: Date | null;
 		reviews: Review[] | undefined;
 	}) {
-		super();
-		this._id = props.id;
+		super(props.id);
 		this._milestoneId = props.milestoneId;
 		this._kind = props.kind;
 		this._number = props.number;
@@ -212,18 +212,21 @@ export class Slice extends AggregateRoot {
 	}
 
 	rename(title: string): void {
+		if (this.isArchived) {
+			throw new SliceAlreadyArchivedError(this._id);
+		}
 		const validated = renameSchema.parse(title);
 		this._title = validated;
 		this._updatedAt = new Date();
 	}
 
 	transition(to: SliceStatus, context?: TransitionContext): void {
+		if (this.isArchived) {
+			throw new SliceAlreadyArchivedError(this._id);
+		}
 		const allowed = SLICE_TRANSITIONS[this._status];
 		const isAllowed = allowed.includes(to);
-		const isTierSkip =
-			this._status === "discussing" &&
-			to === "planning" &&
-			tierSkipGuard(this._status, to, this._tier).ok;
+		const isTierSkip = tierSkipGuard(this._status, to, this._tier).ok;
 		if (!isAllowed && !isTierSkip) {
 			throw new InvalidTransitionError(this._status, to, allowed);
 		}
@@ -252,6 +255,9 @@ export class Slice extends AggregateRoot {
 	}
 
 	classifyTier(tier: ComplexityTier): void {
+		if (this.isArchived) {
+			throw new SliceAlreadyArchivedError(this._id);
+		}
 		const validated = tierSchema.safeParse(tier);
 		if (!validated.success) {
 			throw new TierClassificationError(tier, "Invalid tier value");
@@ -286,6 +292,9 @@ export class Slice extends AggregateRoot {
 		commitSha?: string;
 		notes?: string;
 	}): void {
+		if (this.isArchived) {
+			throw new SliceAlreadyArchivedError(this._id);
+		}
 		const reviewProps: {
 			sliceId: string;
 			type: string;
@@ -315,9 +324,12 @@ export class Slice extends AggregateRoot {
 		reviewId: number,
 		verdict: "approved" | "changes_requested" | "commented",
 	): void {
+		if (this.isArchived) {
+			throw new SliceAlreadyArchivedError(this._id);
+		}
 		const review = this._reviews.find((r) => r.id === reviewId);
 		if (!review) {
-			throw new Error(`Review with id ${reviewId} not found on slice ${this._id}`);
+			throw new ReviewNotFoundError(reviewId, this._id);
 		}
 		review.setVerdict(verdict);
 		const reviewEvents = review.pullEvents();

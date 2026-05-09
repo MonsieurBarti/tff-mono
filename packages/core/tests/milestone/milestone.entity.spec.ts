@@ -278,12 +278,40 @@ describe("Milestone aggregate root", () => {
 		});
 	});
 
+	describe("archived immutability", () => {
+		it("throws when renaming an archived milestone", () => {
+			const milestone = Milestone.createNew({ projectId: "proj-1", number: 1, name: "M1" });
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			milestone.archive(dp);
+			expect(() => milestone.rename("New")).toThrow(MilestoneAlreadyArchivedError);
+		});
+
+		it("throws when transitioning an archived milestone", () => {
+			const milestone = Milestone.createNew({ projectId: "proj-1", number: 1, name: "M1" });
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			milestone.archive(dp);
+			expect(() => milestone.transition("in_progress")).toThrow(MilestoneAlreadyArchivedError);
+		});
+
+		it("throws when setting close reason on an archived milestone", () => {
+			const milestone = Milestone.createNew({ projectId: "proj-1", number: 1, name: "M1" });
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			milestone.archive(dp);
+			expect(() => milestone.setCloseReason("Shipped")).toThrow(MilestoneAlreadyArchivedError);
+		});
+	});
+
 	describe("setCloseReason", () => {
 		it("sets the close reason", () => {
 			const milestone = Milestone.createNew({ projectId: "proj-1", number: 1, name: "M1" });
 			milestone.pullEvents();
 			milestone.setCloseReason("Shipped");
 			expect(milestone.closeReason).toBe("Shipped");
+		});
+
+		it("throws for an empty close reason", () => {
+			const milestone = Milestone.createNew({ projectId: "proj-1", number: 1, name: "M1" });
+			expect(() => milestone.setCloseReason("")).toThrow();
 		});
 
 		it("updates updatedAt", () => {

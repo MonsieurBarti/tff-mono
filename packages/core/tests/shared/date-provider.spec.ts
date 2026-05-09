@@ -21,7 +21,13 @@ describe("IDateProvider", () => {
 	it("FakeDateProvider can update the fixed date", () => {
 		const provider = new FakeDateProvider(new Date("2024-01-01T00:00:00Z"));
 		const newDate = new Date("2024-06-15T12:30:00Z");
-		provider.setDate(newDate);
+		provider.set(newDate);
 		expect(provider.now()).toBe(newDate);
+	});
+
+	it("FakeDateProvider can advance the fixed date", () => {
+		const provider = new FakeDateProvider(new Date("2024-01-01T00:00:00Z"));
+		provider.advance(3600_000);
+		expect(provider.now()).toEqual(new Date("2024-01-01T01:00:00Z"));
 	});
 });

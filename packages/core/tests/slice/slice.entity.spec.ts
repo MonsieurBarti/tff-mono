@@ -16,6 +16,7 @@ import {
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
 	HumanGateRequiredError,
+	ReviewNotFoundError,
 } from "../../src/domain/slice/slice.error.js";
 import { SliceRepository } from "../../src/domain/slice/slice.repository.js";
 import { SLICE_TRANSITIONS, type SliceStatus } from "../../src/domain/slice/transitions.js";
@@ -740,7 +741,7 @@ describe("Slice aggregate root", () => {
 			});
 		});
 
-		it("throws when review id is not found", () => {
+		it("throws ReviewNotFoundError when review id is not found", () => {
 			const slice = Slice.createNew({
 				milestoneId: "ms-1",
 				kind: "milestone",
@@ -748,7 +749,78 @@ describe("Slice aggregate root", () => {
 				title: "Test",
 				baseBranch: "main",
 			});
-			expect(() => slice.setReviewVerdict(99, "approved")).toThrow();
+			expect(() => slice.setReviewVerdict(99, "approved")).toThrow(ReviewNotFoundError);
+		});
+	});
+
+	describe("archived immutability", () => {
+		it("throws when renaming an archived slice", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			slice.archive(dp);
+			expect(() => slice.rename("New")).toThrow(SliceAlreadyArchivedError);
+		});
+
+		it("throws when transitioning an archived slice", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			slice.archive(dp);
+			expect(() => slice.transition("discussing")).toThrow(SliceAlreadyArchivedError);
+		});
+
+		it("throws when classifying tier on an archived slice", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			slice.archive(dp);
+			expect(() => slice.classifyTier("S")).toThrow(SliceAlreadyArchivedError);
+		});
+
+		it("throws when recording a review on an archived slice", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			slice.archive(dp);
+			expect(() => slice.recordReview({ type: "code", reviewer: "agent" })).toThrow(
+				SliceAlreadyArchivedError,
+			);
+		});
+
+		it("throws when setting review verdict on an archived slice", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			slice.recordReview({ type: "code", reviewer: "agent" });
+			const reviewId = slice.reviews[0].id;
+			const dp = new FakeDateProvider(new Date("2025-06-01"));
+			slice.archive(dp);
+			expect(() => slice.setReviewVerdict(reviewId, "approved")).toThrow(SliceAlreadyArchivedError);
 		});
 	});
 });

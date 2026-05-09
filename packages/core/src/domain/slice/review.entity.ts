@@ -25,14 +25,14 @@ export interface ReviewState {
 }
 
 export class Review {
-	private _id: number;
-	private _sliceId: string;
-	private _type: string;
-	private _reviewer: string;
+	private readonly _id: number;
+	private readonly _sliceId: string;
+	private readonly _type: string;
+	private readonly _reviewer: string;
 	private _verdict: "approved" | "changes_requested" | "commented" | null;
-	private _commitSha: string | null;
-	private _notes: string | null;
-	private _createdAt: Date;
+	private readonly _commitSha: string | null;
+	private readonly _notes: string | null;
+	private readonly _createdAt: Date;
 	private _events: DomainEvent<unknown>[] = [];
 
 	private constructor(props: {

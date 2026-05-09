@@ -1,8 +1,13 @@
 import type { DomainEvent } from "./domain-event.js";
 
 export abstract class AggregateRoot {
-	protected _id: string = "";
+	protected readonly _id: string;
 	protected _events: DomainEvent<unknown>[] = [];
+
+	protected constructor(id: string) {
+		this._id = id;
+		this._events = [];
+	}
 
 	addEvent(event: DomainEvent<unknown>): void {
 		this._events.push(event);

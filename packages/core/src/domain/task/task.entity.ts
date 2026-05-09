@@ -8,19 +8,20 @@ import { TaskCreatedEvent } from "./task-created.event.js";
 import { TaskClaimedEvent } from "./task-claimed.event.js";
 import { TaskClosedEvent } from "./task-closed.event.js";
 import { TaskUnclaimedEvent } from "./task-unclaimed.event.js";
-import { AlreadyClaimedError } from "./task.error.js";
-import { type TaskStatus } from "./transitions.js";
+import { AlreadyClaimedError, InvalidTransitionError } from "./task.error.js";
+import { TASK_TRANSITIONS, type TaskStatus } from "./transitions.js";
 
 const createTaskSchema = z.object({
 	sliceId: z.string().min(1),
 	number: z.number().int().positive(),
 	title: z.string().min(1),
 	description: z.string().optional(),
-	wave: z.number().int().optional(),
-	difficulty: z.number().int().optional(),
+	wave: z.number().int().nonnegative().optional(),
+	difficulty: z.number().int().nonnegative().optional(),
 });
 
 const renameSchema = z.string().min(1);
+const closeReasonSchema = z.string().min(1);
 
 export interface TaskState {
 	id: string;
@@ -39,8 +40,8 @@ export interface TaskState {
 }
 
 export class Task extends AggregateRoot {
-	private _sliceId: string;
-	private _number: number;
+	private readonly _sliceId: string;
+	private readonly _number: number;
 	private _title: string;
 	private _description: string;
 	private _status: TaskStatus;
@@ -49,7 +50,7 @@ export class Task extends AggregateRoot {
 	private _claimedAt: Date | null;
 	private _claimedBy: string | null;
 	private _closedReason: string | null;
-	private _createdAt: Date;
+	private readonly _createdAt: Date;
 	private _updatedAt: Date;
 
 	private constructor(props: {
@@ -67,8 +68,7 @@ export class Task extends AggregateRoot {
 		createdAt: Date;
 		updatedAt: Date;
 	}) {
-		super();
-		this._id = props.id;
+		super(props.id);
 		this._sliceId = props.sliceId;
 		this._number = props.number;
 		this._title = props.title;
@@ -211,6 +211,9 @@ export class Task extends AggregateRoot {
 		if (this._claimedBy !== null) {
 			throw new AlreadyClaimedError(this._id, this._claimedBy);
 		}
+		if (this._status !== "open") {
+			throw new InvalidTransitionError(this._status, "in_progress", TASK_TRANSITIONS[this._status]);
+		}
 		this._claimedBy = actor;
 		this._claimedAt = dateProvider.now();
 		this._status = "in_progress";
@@ -226,20 +229,27 @@ export class Task extends AggregateRoot {
 	}
 
 	close(reason: string, dateProvider: IDateProvider): void {
-		this._closedReason = reason;
+		if (this._status !== "in_progress") {
+			throw new InvalidTransitionError(this._status, "closed", TASK_TRANSITIONS[this._status]);
+		}
+		const validated = closeReasonSchema.parse(reason);
+		this._closedReason = validated;
 		this._status = "closed";
 		this._updatedAt = dateProvider.now();
 		this.addEvent(
 			TaskClosedEvent.create({
 				taskId: this._id,
 				sliceId: this._sliceId,
-				closedReason: reason,
+				closedReason: validated,
 				closedAt: this._updatedAt.toISOString(),
 			}),
 		);
 	}
 
 	unclaim(): void {
+		if (this._status !== "in_progress") {
+			throw new InvalidTransitionError(this._status, "open", TASK_TRANSITIONS[this._status]);
+		}
 		this._claimedBy = null;
 		this._claimedAt = null;
 		this._status = "open";

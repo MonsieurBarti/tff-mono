@@ -23,3 +23,18 @@ export class TaskNotFoundError extends BaseDomainError<{ taskId: string }> {
 		this.context = { taskId };
 	}
 }
+
+export class InvalidTransitionError extends BaseDomainError<{
+	from: string;
+	to: string;
+	expected: readonly string[];
+}> {
+	readonly errorLabel = "INVALID_TRANSITION";
+	readonly status = 409;
+	readonly context: { from: string; to: string; expected: readonly string[] };
+
+	constructor(from: string, to: string, expected: readonly string[]) {
+		super();
+		this.context = { from, to, expected };
+	}
+}

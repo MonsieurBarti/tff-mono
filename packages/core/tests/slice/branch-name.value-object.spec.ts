@@ -21,6 +21,18 @@ describe("BranchName", () => {
 		it("throws when label is empty", () => {
 			expect(() => BranchName.create("")).toThrow();
 		});
+
+		it("throws when label contains path traversal", () => {
+			expect(() => BranchName.create("../foo")).toThrow();
+		});
+
+		it("throws when label starts with slash", () => {
+			expect(() => BranchName.create("/foo")).toThrow();
+		});
+
+		it("throws when label starts with hyphen", () => {
+			expect(() => BranchName.create("-foo")).toThrow();
+		});
 	});
 
 	describe("generate", () => {

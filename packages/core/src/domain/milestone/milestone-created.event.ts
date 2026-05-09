@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 export class MilestoneCreatedEvent {
+	readonly id: string;
 	readonly eventName = "milestone.created";
 	readonly payload: { milestoneId: string; projectId: string; number: number; name: string };
 	readonly occurredAt: Date;
@@ -9,6 +12,7 @@ export class MilestoneCreatedEvent {
 		number: number;
 		name: string;
 	}) {
+		this.id = randomUUID();
 		this.payload = payload;
 		this.occurredAt = new Date();
 	}

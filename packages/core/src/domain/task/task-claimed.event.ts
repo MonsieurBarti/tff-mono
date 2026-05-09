@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 export class TaskClaimedEvent {
+	readonly id: string;
 	readonly eventName = "task.claimed";
 	readonly payload: {
 		taskId: string;
@@ -14,6 +17,7 @@ export class TaskClaimedEvent {
 		claimedBy: string;
 		claimedAt: string;
 	}) {
+		this.id = randomUUID();
 		this.payload = payload;
 		this.occurredAt = new Date();
 	}

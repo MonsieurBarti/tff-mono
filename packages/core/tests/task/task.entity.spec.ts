@@ -7,7 +7,11 @@ import { TaskCreatedEvent } from "../../src/domain/task/task-created.event.js";
 import { TaskClaimedEvent } from "../../src/domain/task/task-claimed.event.js";
 import { TaskClosedEvent } from "../../src/domain/task/task-closed.event.js";
 import { TaskUnclaimedEvent } from "../../src/domain/task/task-unclaimed.event.js";
-import { AlreadyClaimedError, TaskNotFoundError } from "../../src/domain/task/task.error.js";
+import {
+	AlreadyClaimedError,
+	InvalidTransitionError,
+	TaskNotFoundError,
+} from "../../src/domain/task/task.error.js";
 import { TaskRepository } from "../../src/domain/task/task.repository.js";
 import { TASK_TRANSITIONS, type TaskStatus } from "../../src/domain/task/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
@@ -384,6 +388,41 @@ describe("Task aggregate root", () => {
 			const before = task.updatedAt.getTime();
 			task.unclaim();
 			expect(task.updatedAt.getTime()).toBeGreaterThanOrEqual(before);
+		});
+	});
+
+	describe("transition validation", () => {
+		it("throws InvalidTransitionError when claiming a non-open task", () => {
+			const task = Task.createNew({ sliceId: "s", number: 1, title: "T" });
+			const dp = new FakeDateProvider(new Date("2024-06-01"));
+			task.claim("user-1", dp);
+			expect(() => task.claim("user-2", dp)).toThrow(AlreadyClaimedError);
+		});
+
+		it("throws InvalidTransitionError when closing an open task", () => {
+			const task = Task.createNew({ sliceId: "s", number: 1, title: "T" });
+			const dp = new FakeDateProvider(new Date("2024-06-01"));
+			expect(() => task.close("done", dp)).toThrow(InvalidTransitionError);
+		});
+
+		it("throws InvalidTransitionError when closing a closed task", () => {
+			const task = Task.createNew({ sliceId: "s", number: 1, title: "T" });
+			const dp = new FakeDateProvider(new Date("2024-06-01"));
+			task.claim("user-1", dp);
+			task.close("done", dp);
+			expect(() => task.close("again", dp)).toThrow(InvalidTransitionError);
+		});
+
+		it("throws InvalidTransitionError when unclaiming an open task", () => {
+			const task = Task.createNew({ sliceId: "s", number: 1, title: "T" });
+			expect(() => task.unclaim()).toThrow(InvalidTransitionError);
+		});
+
+		it("throws for an empty close reason", () => {
+			const task = Task.createNew({ sliceId: "s", number: 1, title: "T" });
+			const dp = new FakeDateProvider(new Date("2024-06-01"));
+			task.claim("user-1", dp);
+			expect(() => task.close("", dp)).toThrow();
 		});
 	});
 

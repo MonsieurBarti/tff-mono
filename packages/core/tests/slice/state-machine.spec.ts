@@ -116,6 +116,11 @@ describe("nextSliceStatus", () => {
 		expect(result).toBe("verifying");
 	});
 
+	it("returns planning from discussing for S-tier slices", () => {
+		const result = nextSliceStatus("discussing", "S", [], emptyArtifacts);
+		expect(result).toBe("planning");
+	});
+
 	it("returns null at discussing (human gate)", () => {
 		const result = nextSliceStatus("discussing", null, [], emptyArtifacts);
 		expect(result).toBeNull();

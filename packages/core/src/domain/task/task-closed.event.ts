@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 export class TaskClosedEvent {
+	readonly id: string;
 	readonly eventName = "task.closed";
 	readonly payload: {
 		taskId: string;
@@ -14,6 +17,7 @@ export class TaskClosedEvent {
 		closedReason: string;
 		closedAt: string;
 	}) {
+		this.id = randomUUID();
 		this.payload = payload;
 		this.occurredAt = new Date();
 	}

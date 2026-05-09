@@ -15,6 +15,7 @@ const createMilestoneSchema = z.object({
 });
 
 const renameSchema = z.string().min(1);
+const closeReasonSchema = z.string().min(1);
 
 export interface MilestoneState {
 	id: string;
@@ -30,13 +31,13 @@ export interface MilestoneState {
 }
 
 export class Milestone extends AggregateRoot {
-	private _projectId: string;
-	private _number: number;
+	private readonly _projectId: string;
+	private readonly _number: number;
 	private _name: string;
 	private _status: MilestoneStatus;
 	private _branch: string;
 	private _closeReason: string | null;
-	private _createdAt: Date;
+	private readonly _createdAt: Date;
 	private _updatedAt: Date;
 	private _archivedAt: Date | null;
 
@@ -52,8 +53,7 @@ export class Milestone extends AggregateRoot {
 		updatedAt: Date;
 		archivedAt: Date | null;
 	}) {
-		super();
-		this._id = props.id;
+		super(props.id);
 		this._projectId = props.projectId;
 		this._number = props.number;
 		this._name = props.name;
@@ -153,12 +153,18 @@ export class Milestone extends AggregateRoot {
 	}
 
 	rename(name: string): void {
+		if (this.isArchived) {
+			throw new MilestoneAlreadyArchivedError(this._id);
+		}
 		const validated = renameSchema.parse(name);
 		this._name = validated;
 		this._updatedAt = new Date();
 	}
 
 	transition(to: MilestoneStatus): void {
+		if (this.isArchived) {
+			throw new MilestoneAlreadyArchivedError(this._id);
+		}
 		const allowed = MILESTONE_TRANSITIONS[this._status];
 		if (!allowed.includes(to)) {
 			throw new InvalidTransitionError(this._status, to, allowed);
@@ -190,7 +196,11 @@ export class Milestone extends AggregateRoot {
 	}
 
 	setCloseReason(reason: string): void {
-		this._closeReason = reason;
+		if (this.isArchived) {
+			throw new MilestoneAlreadyArchivedError(this._id);
+		}
+		const validated = closeReasonSchema.parse(reason);
+		this._closeReason = validated;
 		this._updatedAt = new Date();
 	}
 }

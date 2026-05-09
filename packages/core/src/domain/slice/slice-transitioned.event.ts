@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 export class SliceTransitionedEvent {
+	readonly id: string;
 	readonly eventName = "slice.transitioned";
 	readonly payload: {
 		sliceId: string;
@@ -14,6 +17,7 @@ export class SliceTransitionedEvent {
 		to: string;
 		triggeredBy?: string;
 	}) {
+		this.id = randomUUID();
 		this.payload = payload;
 		this.occurredAt = new Date();
 	}

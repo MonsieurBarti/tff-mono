@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 export class ReviewRecordedEvent {
+	readonly id: string;
 	readonly eventName = "review.recorded";
 	readonly payload: { reviewId: number; sliceId: string; type: string; reviewer: string };
 	readonly occurredAt: Date;
@@ -9,6 +12,7 @@ export class ReviewRecordedEvent {
 		type: string;
 		reviewer: string;
 	}) {
+		this.id = randomUUID();
 		this.payload = payload;
 		this.occurredAt = new Date();
 	}

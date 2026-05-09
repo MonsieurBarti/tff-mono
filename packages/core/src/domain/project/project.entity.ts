@@ -23,12 +23,11 @@ export interface ProjectState {
 export class Project extends AggregateRoot {
 	private _name: string;
 	private _vision: string;
-	private _createdAt: Date;
+	private readonly _createdAt: Date;
 	private _updatedAt: Date;
 
 	private constructor(props: { name: string; vision: string; createdAt: Date; updatedAt: Date }) {
-		super();
-		this._id = "singleton";
+		super("singleton");
 		this._name = props.name;
 		this._vision = props.vision;
 		this._createdAt = props.createdAt;

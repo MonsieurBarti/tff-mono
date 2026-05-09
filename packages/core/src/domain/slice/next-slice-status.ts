@@ -33,13 +33,16 @@ const PHASE_TO_STATUS: Record<string, SliceStatus> = {
 
 export function nextSliceStatus(
 	current: SliceStatus,
-	_tier: "S" | "SS" | "SSS" | null,
+	tier: "S" | "SS" | "SSS" | null,
 	phaseRuns: PhaseRun[],
 	_artifacts: ArtifactStatus,
 ): SliceStatus | null {
 	const transitions = SLICE_TRANSITIONS[current];
 	if (transitions.length === 0) {
 		return null;
+	}
+	if (current === "discussing" && tier === "S") {
+		return "planning";
 	}
 	if (HUMAN_GATES.includes(current)) {
 		return null;

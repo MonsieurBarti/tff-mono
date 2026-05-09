@@ -20,7 +20,11 @@ export class FakeDateProvider extends IDateProvider {
 		return this._date;
 	}
 
-	setDate(date: Date): void {
+	set(date: Date): void {
 		this._date = date;
+	}
+
+	advance(ms: number): void {
+		this._date = new Date(this._date.getTime() + ms);
 	}
 }
