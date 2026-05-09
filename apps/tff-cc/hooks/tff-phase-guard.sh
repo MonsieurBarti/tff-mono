@@ -29,8 +29,13 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-# Call CLI to check for spec edit with the file path
-CLI_OUTPUT=$(node "${CLAUDE_PLUGIN_ROOT}/dist/cli/index.js" spec-edit:guard "$FILE_PATH" 2>/dev/null)
+# Call CLI to check for spec edit with the file path.
+# Avoid $(...) around the node invocation so shell metacharacters in
+# FILE_PATH are passed literally as arguments rather than evaluated.
+TMPFILE=$(mktemp)
+node "${CLAUDE_PLUGIN_ROOT}/dist/cli/index.js" spec-edit:guard "$FILE_PATH" > "$TMPFILE" 2>/dev/null
+CLI_OUTPUT=$(cat "$TMPFILE")
+rm -f "$TMPFILE"
 if [ -z "$CLI_OUTPUT" ]; then
   echo '{"suppressOutput":true}'
   exit 0
