@@ -24,11 +24,11 @@ describe("BranchName", () => {
 	});
 
 	describe("generate", () => {
-		it("generates milestone branch as slice/<8hex>", () => {
+		it("generates milestone branch as slice/<uuid-prefix>", () => {
 			const branch = BranchName.generate("milestone" as SliceKind, 255);
-			expect(branch.value).toBe("slice/000000ff");
+			expect(branch.value).toMatch(/^slice\/[a-f0-9]{8}$/);
 			expect(branch.prefix).toBe("slice");
-			expect(branch.label).toBe("000000ff");
+			expect(branch.label).toHaveLength(8);
 		});
 
 		it("generates quick branch as quick/<number>", () => {

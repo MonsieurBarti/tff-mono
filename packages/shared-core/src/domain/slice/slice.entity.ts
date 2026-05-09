@@ -18,7 +18,7 @@ import {
 	PreconditionViolationError,
 } from "./slice.error.js";
 import { SLICE_TRANSITIONS, type ComplexityTier, type SliceStatus } from "./transitions.js";
-import { reviewExistsGuard } from "./guards.js";
+import { reviewExistsGuard, tierSkipGuard } from "./guards.js";
 
 const createSliceSchema = z.object({
 	milestoneId: z.string().min(1).nullable(),
@@ -219,7 +219,12 @@ export class Slice extends AggregateRoot {
 
 	transition(to: SliceStatus, context?: TransitionContext): void {
 		const allowed = SLICE_TRANSITIONS[this._status];
-		if (!allowed.includes(to)) {
+		const isAllowed = allowed.includes(to);
+		const isTierSkip =
+			this._status === "discussing" &&
+			to === "planning" &&
+			tierSkipGuard(this._status, to, this._tier).ok;
+		if (!isAllowed && !isTierSkip) {
 			throw new InvalidTransitionError(this._status, to, allowed);
 		}
 

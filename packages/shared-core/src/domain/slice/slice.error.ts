@@ -61,3 +61,14 @@ export class PreconditionViolationError extends BaseDomainError<{ preconditions:
 		this.context = { preconditions };
 	}
 }
+
+export class HumanGateRequiredError extends BaseDomainError<{ status: string; message: string }> {
+	readonly errorLabel = "HUMAN_GATE_REQUIRED";
+	readonly status = 403;
+	readonly context: { status: string; message: string };
+
+	constructor(status: string, message: string) {
+		super();
+		this.context = { status, message };
+	}
+}

@@ -15,6 +15,7 @@ import {
 	SliceNotFoundError,
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
+	HumanGateRequiredError,
 } from "../../src/domain/slice/slice.error.js";
 import { SliceRepository } from "../../src/domain/slice/slice.repository.js";
 import { SLICE_TRANSITIONS, type SliceStatus } from "../../src/domain/slice/transitions.js";
@@ -90,7 +91,7 @@ describe("Slice aggregate root", () => {
 				title: "Test",
 				baseBranch: "main",
 			});
-			expect(slice.branchName).toBe("slice/000000ff");
+			expect(slice.branchName).toMatch(/^slice\/[a-f0-9]{8}$/);
 		});
 
 		it("sets createdAt and updatedAt to the current time", () => {
@@ -518,6 +519,33 @@ describe("Slice aggregate root", () => {
 			slice.transition("reviewing");
 			expect(slice.status).toBe("reviewing");
 		});
+
+		it("allows discussing→planning for S-tier slices", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			slice.classifyTier("S");
+			slice.transition("discussing");
+			slice.transition("planning");
+			expect(slice.status).toBe("planning");
+		});
+
+		it("throws InvalidTransitionError for discussing→planning on non-S-tier slices", () => {
+			const slice = Slice.createNew({
+				milestoneId: "ms-1",
+				kind: "milestone",
+				number: 1,
+				title: "Test",
+				baseBranch: "main",
+			});
+			slice.classifyTier("SS");
+			slice.transition("discussing");
+			expect(() => slice.transition("planning")).toThrow(InvalidTransitionError);
+		});
 	});
 
 	describe("classifyTier", () => {
@@ -821,6 +849,13 @@ describe("Slice errors", () => {
 		expect(error.status).toBe(422);
 		expect(error.context).toEqual({ preconditions: ["No review exists on this slice"] });
 	});
+
+	it("HumanGateRequiredError has correct label and status", () => {
+		const error = new HumanGateRequiredError("shipping", "Approval required");
+		expect(error.errorLabel).toBe("HUMAN_GATE_REQUIRED");
+		expect(error.status).toBe(403);
+		expect(error.context).toEqual({ status: "shipping", message: "Approval required" });
+	});
 });
 
 describe("SliceRepository", () => {
@@ -833,7 +868,7 @@ describe("SliceRepository", () => {
 describe("SLICE_TRANSITIONS", () => {
 	it("defines the correct allowed transitions", () => {
 		expect(SLICE_TRANSITIONS.created).toEqual(["discussing"]);
-		expect(SLICE_TRANSITIONS.discussing).toEqual(["researching", "planning"]);
+		expect(SLICE_TRANSITIONS.discussing).toEqual(["researching"]);
 		expect(SLICE_TRANSITIONS.researching).toEqual(["planning"]);
 		expect(SLICE_TRANSITIONS.planning).toEqual(["planning", "executing"]);
 		expect(SLICE_TRANSITIONS.executing).toEqual(["verifying"]);

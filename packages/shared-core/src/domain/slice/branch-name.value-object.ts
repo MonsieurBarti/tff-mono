@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { ValueObject } from "../shared/value-object.js";
 import type { SliceKind } from "./slice-kind.js";
 
@@ -15,8 +16,8 @@ export class BranchName extends ValueObject<string> {
 	static generate(sliceKind: SliceKind, sliceNumber: number): BranchName {
 		switch (sliceKind) {
 			case "milestone": {
-				const hex = sliceNumber.toString(16).padStart(8, "0");
-				return new BranchName(`slice/${hex}`);
+				const prefix = randomUUID().split("-")[0];
+				return new BranchName(`slice/${prefix}`);
 			}
 			case "quick":
 				return new BranchName(`quick/${sliceNumber.toString()}`);
