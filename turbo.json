@@ -13,7 +13,7 @@
 	"globalEnv": ["CI", "NODE_ENV"],
 	"tasks": {
 		"build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
-		"test": { "outputs": ["coverage/**"] },
+		"test": { "dependsOn": ["build"], "outputs": ["coverage/**"] },
 		"lint": { "outputs": [] },
 		"format": { "cache": false },
 		"format:check": { "outputs": [] },

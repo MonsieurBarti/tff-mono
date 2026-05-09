@@ -19,9 +19,9 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json && rm -rf dist/resources && cp -R src/resources dist/resources",
 		"dev": "tsc -p tsconfig.build.json --watch",
-		"test": "pnpm run build && vitest run",
+		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:coverage": "pnpm run build && vitest run --coverage",
+		"test:coverage": "vitest run --coverage",
 		"lint": "oxlint --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
 		"lint:fix": "oxlint --fix --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
 		"format": "prettier --write --ignore-path ../../.prettierignore .",
