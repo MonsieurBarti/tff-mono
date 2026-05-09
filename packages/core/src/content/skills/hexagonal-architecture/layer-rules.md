@@ -1,72 +1,84 @@
 # Layer Rules — Hexagonal Architecture
 
-Companion to [SKILL.md](./SKILL.md). Quick-reference for layer boundaries.
+Companion to [SKILL.md](./SKILL.md). Quick-reference for layer boundaries in `tff-mono`.
 
 ---
 
 ## Dependency Matrix
 
 ```
-Domain         → nothing (pure, zero external imports beyond zod/crypto/Result)
-Application    → Domain only
-Infrastructure → Domain, Application (implements ports defined in domain)
-Presentation   → Application only (invokes commands/queries, wires DI)
+Presentation (apps/)  → Application (apps/)
+Application (apps/)   → Domain (packages/core/src/domain/)
+Infrastructure        → Domain (implements ports defined in domain)
+Domain                → nothing (pure, zero SQLite / file I/O / host API)
 ```
 
-**Iron Law:** ∀ import in file F at layer L — the imported module must be at L or an inner layer. Violations are architectural bugs, not style issues.
+**Iron Law:** Every import in file F at layer L must be at L or an inner layer. Violations are architectural bugs, not style issues.
 
 ---
 
-## What Belongs ∈ Each Layer
+## Package Structure
 
-### Domain
+| Directory       | Responsibility                                          | Host Access                      |
+| --------------- | ------------------------------------------------------- | -------------------------------- |
+| `src/domain/`   | Entities, Value Objects, Domain Events, errors, ports   | Both apps                        |
+| `src/contract/` | Client adapter interface + types                        | Both apps (implement in `apps/`) |
+| `src/content/`  | Agents, skills, workflows, protocols, commands, prompts | Both apps                        |
+| `src/db/`       | Schema, migrations, query layer                         | Both apps                        |
 
-| Belongs                           | Example                                              |
-| --------------------------------- | ---------------------------------------------------- |
-| Entities with behavior            | `User` with `rename()`, `deactivate()` methods       |
-| Value Objects                     | `Email`, `Money`, `DateRange`                        |
-| Aggregate roots                   | `Order` containing `OrderLine[]`                     |
-| Domain Events                     | `UserCreatedEvent`, `OrderPlacedEvent`               |
-| Domain Services                   | `PricingService.calculateDiscount(order)`            |
-| Repository port interfaces        | `UserRepository` (interface only, ¬ implementation)  |
-| Domain Errors                     | `DomainError.validation()`, `DomainError.notFound()` |
-| Zod schemas for domain validation | `UserPropsSchema`, `EmailSchema`                     |
+Dependency direction: `content` → `domain`; `contract` ← `domain` (domain defines ports, contract is the host-facing boundary); `db` → `domain` (implements repository ports).
 
-### Application
+---
 
-| Belongs                         | Example                                                |
-| ------------------------------- | ------------------------------------------------------ |
-| Commands                        | `CreateUserCommand`, `PlaceOrderCommand`               |
-| Command Handlers                | `CreateUserHandler.execute(cmd)`                       |
-| Queries                         | `GetUserQuery`, `ListOrdersQuery`                      |
-| Query Handlers                  | `GetUserHandler.execute(query)`                        |
-| Application Services            | `UserService` orchestrating multiple domain operations |
-| Application Errors              | `AppError.fromDomain()`, `AppError.unauthorized()`     |
-| Port usage (calling interfaces) | `this.userRepo.save(user)` via injected port           |
+## What Belongs in Each Layer
 
-### Infrastructure
+### Domain (`packages/core/src/domain/`)
 
-| Belongs                        | Example                                                  |
-| ------------------------------ | -------------------------------------------------------- |
-| Repository adapters            | `SqlUserRepository implements UserRepository`            |
-| ∈-memory adapters              | `InMemoryUserRepository implements UserRepository`       |
-| Data mappers                   | `SqlUserMapper.toDomain(row)` / `.toPersistence(entity)` |
-| External service adapters      | `StripePaymentAdapter implements PaymentGateway`         |
-| Database clients / connections | `DatabaseClient`, connection pool setup                  |
-| File system adapters           | `FsFileStorage implements FileStorage`                   |
-| HTTP/API clients               | `HttpNotificationAdapter implements NotificationPort`    |
+| Belongs                    | Example                                                              |
+| -------------------------- | -------------------------------------------------------------------- |
+| Entities with behavior     | `Slice` with `transition()`, `classifyTier()`, `archive()`           |
+| Value Objects              | `Phase` (has ordering logic), `BranchName` (validation + generation) |
+| Aggregate roots            | `Slice` containing `Task[]`, `Dependency`, `Review`                  |
+| Domain Events              | `SliceCreatedEvent`, `TaskClaimedEvent`                              |
+| Domain Services            | Stateless operations on entities/VOs passed in                       |
+| Repository port interfaces | `SliceRepository` (abstract class, not implementation)               |
+| Domain Errors              | `InvalidTransitionError`, `AlreadyClaimedError`                      |
+| Zod schemas                | `CreateSliceProps`, `UserPropsSchema`                                |
+| Transition tables          | `transitions.ts` — canonical edge table                              |
+| Guard predicates           | `guards.ts` — business-rule checks                                   |
 
-### Presentation
+### Application (`apps/*/application/`)
 
-| Belongs                 | Example                                                 |
-| ----------------------- | ------------------------------------------------------- |
-| Controllers / resolvers | `UserController.create(req, res)`                       |
-| CLI commands            | `CreateUserCliCommand` parsing args → building command  |
-| Request/Response DTOs   | `CreateUserRequestSchema` (Zod), `CreateUserResponse`   |
-| Exception filters       | Map `Result` errors → HTTP 400/404/500                  |
-| DI container wiring     | `container.bind(USER_REPOSITORY).to(SqlUserRepository)` |
-| Route definitions       | `router.post('/users', controller.create)`              |
-| Middleware              | Auth middleware, request logging                        |
+| Belongs              | Example                                        |
+| -------------------- | ---------------------------------------------- |
+| Commands             | `CreateSliceCommand`, `ClaimTaskCommand`       |
+| Command Handlers     | `CreateSliceHandler.execute(cmd)`              |
+| Queries              | `GetSliceQuery`, `ListOpenTasksQuery`          |
+| Query Handlers       | `GetSliceHandler.execute(query)`               |
+| Application Services | Orchestration of multiple domain operations    |
+| Event handlers       | Subscribers to domain events (fire-and-forget) |
+| Port usage           | `this.sliceRepo.save(slice)` via injected port |
+
+### Infrastructure (`packages/core/src/db/` + `apps/*/infrastructure/`)
+
+| Belongs                   | Example                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| Repository adapters       | `SQLiteSliceRepository extends SliceRepository`            |
+| In-memory adapters        | `InMemorySliceRepository extends SliceRepository`          |
+| Data mappers              | `SliceMapper.toDomain(row)` / `.toPersistence(entity)`     |
+| External service adapters | Host-specific glue (Claude Code native, PI `ExtensionAPI`) |
+| Database clients          | SQLite connection, schema, migrations                      |
+| File system adapters      | Path-guarded file I/O                                      |
+
+### Presentation (`apps/*/presentation/`)
+
+| Belongs                       | Example                                      |
+| ----------------------------- | -------------------------------------------- |
+| Slash commands / CLI handlers | `tff-tools` command dispatch                 |
+| Skill invocations             | Trigger routing and context curation         |
+| Request/Response DTOs         | Zod schemas at the boundary                  |
+| DI container wiring           | Port → concrete adapter binding              |
+| Exception / error mapping     | `Result` errors → host-appropriate responses |
 
 ---
 
@@ -76,42 +88,34 @@ Presentation   → Application only (invokes commands/queries, wires DI)
 
 ```typescript
 // VIOLATION: domain imports infrastructure
-import { SqlUserRepository } from '../infrastructure/repositories/sql-user.repository';
+import { SQLiteSliceRepository } from '../db/repositories/slice.repository';
 
 // VIOLATION: domain imports node:fs (I/O in pure layer)
 import { readFileSync } from 'node:fs';
 
-// VIOLATION: domain uses framework decorators
-@Injectable()
-export class User { ... }
-
 // VIOLATION: domain throws instead of returning Result
-static create(input: UserInput): User {
-  if (!input.email) throw new Error('Email required');  // WRONG
+static create(input: SliceInput): Slice {
+  if (!input.title) throw new Error('Title required');  // WRONG
 }
 
 // VIOLATION: domain imports application layer
-import { CreateUserHandler } from '../application/commands/create-user.handler';
+import { CreateSliceHandler } from '../application/commands/create-slice.handler';
 ```
 
 ### Application Violations
 
 ```typescript
 // VIOLATION: application imports infrastructure
-import { SqlUserRepository } from "../infrastructure/repositories/sql-user.repository";
+import { SQLiteSliceRepository } from "../../db/repositories/slice.repository";
 
 // VIOLATION: application does direct I/O
 import { readFile } from "node:fs/promises";
-const config = await readFile("/etc/config.json");
 
-// VIOLATION: application imports presentation
-import { CreateUserRequest } from "../presentation/dto/create-user.dto";
-
-// VIOLATION: business logic in application layer (should be in domain)
-class CreateUserHandler {
-	async execute(cmd: CreateUserCommand) {
-		// WRONG: discount logic belongs in domain
-		const discount = cmd.orderTotal > 100 ? 0.1 : 0;
+// VIOLATION: business logic in application layer
+class CreateSliceHandler {
+	async execute(cmd) {
+		// WRONG: tier classification belongs in domain
+		const tier = cmd.complexity > 5 ? "SSS" : "S";
 	}
 }
 ```
@@ -119,14 +123,11 @@ class CreateUserHandler {
 ### Infrastructure Violations
 
 ```typescript
-// VIOLATION: infrastructure imports presentation
-import { UserController } from "../presentation/controllers/user.controller";
-
 // VIOLATION: infrastructure contains business logic
-class SqlUserRepository implements UserRepository {
-	async save(user: User) {
+class SQLiteSliceRepository extends SliceRepository {
+	async save(slice: Slice) {
 		// WRONG: validation belongs in domain
-		if (!user.email.includes("@")) throw new Error("Invalid email");
+		if (!slice.title) throw new Error("Invalid title");
 	}
 }
 ```
@@ -134,21 +135,17 @@ class SqlUserRepository implements UserRepository {
 ### Presentation Violations
 
 ```typescript
-// VIOLATION: presentation imports domain directly (bypass application)
-import { User } from "../domain/entities/user.entity";
-const user = User.create({ email, name });
-await this.userRepo.save(user); // WRONG: should go through command handler
+// VIOLATION: presentation imports domain directly
+import { Slice } from "@tff/core/domain/entities/slice.entity";
+const slice = Slice.create({ title });
+await this.sliceRepo.save(slice); // WRONG: go through command handler
 
-// VIOLATION: presentation imports infrastructure directly
-import { SqlUserRepository } from "../infrastructure/repositories/sql-user.repository";
-const repo = new SqlUserRepository(db); // WRONG: should use DI
-
-// VIOLATION: business logic in controller
-class UserController {
-	async create(req) {
-		// WRONG: all this belongs in command handler / domain
-		if (await this.repo.findByEmail(req.email)) {
-			return res.status(409).json({ error: "Email taken" });
+// VIOLATION: business logic in controller / handler
+class TffCreateSliceCommand {
+	async run(args) {
+		// WRONG: belongs in command handler / domain
+		if (await this.repo.findByTitle(args.title)) {
+			return { error: "Slice exists" };
 		}
 	}
 }
@@ -158,21 +155,20 @@ class UserController {
 
 ## Import Rules — Quick Check
 
-| If you see this import...   | ∈ this layer... | Verdict                            |
-| --------------------------- | --------------- | ---------------------------------- |
-| `from '../infrastructure/'` | Domain          | VIOLATION                          |
-| `from '../application/'`    | Domain          | VIOLATION                          |
-| `from '../presentation/'`   | Domain          | VIOLATION                          |
-| `from '../infrastructure/'` | Application     | VIOLATION                          |
-| `from '../presentation/'`   | Application     | VIOLATION                          |
-| `from '../presentation/'`   | Infrastructure  | VIOLATION                          |
-| `from '../domain/'`         | Presentation    | VIOLATION (go through Application) |
-| `from '../infrastructure/'` | Presentation    | VIOLATION (use DI)                 |
-| `from 'node:fs'`            | Domain          | VIOLATION                          |
-| `from 'node:fs'`            | Application     | VIOLATION                          |
-| `from '@nestjs/'`           | Domain          | VIOLATION                          |
+| If you see this import...  | in this layer... | Verdict                            |
+| -------------------------- | ---------------- | ---------------------------------- |
+| `from '../db/'`            | Domain           | VIOLATION                          |
+| `from '../application/'`   | Domain           | VIOLATION                          |
+| `from '../../apps/'`       | Domain           | VIOLATION                          |
+| `from '../db/'`            | Application      | VIOLATION                          |
+| `from '../../apps/'`       | Application      | VIOLATION                          |
+| `from '../../apps/'`       | Infrastructure   | VIOLATION                          |
+| `from '@tff/core/domain/'` | Presentation     | VIOLATION (go through Application) |
+| `from '../db/'`            | Presentation     | VIOLATION (use DI)                 |
+| `from 'node:fs'`           | Domain           | VIOLATION                          |
+| `from 'node:fs'`           | Application      | VIOLATION                          |
 
-**Rule of thumb:** If you're importing from an outer layer, you have a dependency inversion problem. Define a port (interface) ∈ the inner layer ∧ implement it ∈ the outer layer.
+**Rule of thumb:** If you're importing from an outer layer, you have a dependency inversion problem. Define a port (abstract class) in the inner layer and implement it in the outer layer.
 
 ---
 
@@ -180,37 +176,82 @@ class UserController {
 
 Each layer must be testable **independently** without instantiating outer layers.
 
-| Layer          | Test Setup               | Dependencies                                          |
-| -------------- | ------------------------ | ----------------------------------------------------- |
-| Domain         | Direct instantiation     | ∅ — `User.create()` needs ¬ adapters                  |
-| Application    | Inject ∈-memory adapters | `new CreateUserHandler(new InMemoryUserRepository())` |
-| Infrastructure | Real DB (test container) | Database, but ¬application, ¬presentation             |
-| Presentation   | Supertest / CLI runner   | Full stack ∨ mocked application services              |
+| Layer                      | Test Setup                       | Dependencies                                            |
+| -------------------------- | -------------------------------- | ------------------------------------------------------- |
+| Domain                     | Direct instantiation             | None — `Slice.create()` needs no adapters               |
+| Commands (write use cases) | Inject in-memory adapters        | `new CreateSliceHandler(new InMemorySliceRepository())` |
+| Queries (read use cases)   | SQLite `:memory:`                | Verify projection + mapping                             |
+| Presentation               | Full stack or mocked application | Host-specific CLI runner                                |
 
 ### Testing Principle
 
-- Domain tests prove **business rules** work
-- Application tests prove **use cases** orchestrate correctly with ∈-memory adapters
-- Infrastructure tests prove **adapters** translate correctly (DB, APIs)
-- Presentation tests prove **entry points** parse input ∧ return expected output
+- **Domain tests** prove business rules work
+- **Command tests** prove use cases orchestrate correctly with in-memory adapters
+- **Query tests** prove adapter mapping and projection work (integration, real SQLite)
+- **Presentation tests** prove entry points parse input and return expected output
 
 ```typescript
-// Application test — fully isolated, no I/O
-describe("CreateUserHandler", () => {
-	let handler: CreateUserHandler;
-	let userRepo: InMemoryUserRepository;
+// Command test — fully isolated, no I/O
+describe("CreateSliceHandler", () => {
+	let handler: CreateSliceHandler;
+	let sliceRepo: InMemorySliceRepository;
 
 	beforeEach(() => {
-		userRepo = new InMemoryUserRepository();
-		handler = new CreateUserHandler(userRepo);
+		sliceRepo = new InMemorySliceRepository();
+		handler = new CreateSliceHandler(sliceRepo);
 	});
 
-	it("should create a user", async () => {
-		const result = await handler.execute(new CreateUserCommand("john@example.com", "John"));
+	it("should create a slice", async () => {
+		const result = await handler.execute(new CreateSliceCommand("M02-S03"));
 
 		expect(result.ok).toBe(true);
-		const saved = await userRepo.findById(result.value);
-		expect(saved.value?.email).toBe("john@example.com");
+		const saved = await sliceRepo.findById(result.value);
+		expect(saved.value?.title).toBe("M02-S03");
 	});
 });
+```
+
+---
+
+## Entity Construction Pattern
+
+```typescript
+// Zod schema for creation input (internal, not exported)
+const CreateSlicePropsSchema = z.object({ title: z.string().min(1) });
+type CreateSliceProps = z.infer<typeof CreateSlicePropsSchema>;
+
+// Exported state interface (used by mapper for reconstruct())
+export interface SliceState {
+	id: string;
+	title: string;
+	status: SliceStatus;
+}
+
+// Entity class
+export class Slice extends AggregateRoot {
+	private constructor(private readonly _state: SliceState) {
+		super();
+	}
+
+	static createNew(props: CreateSliceProps): Slice {
+		const parsed = CreateSlicePropsSchema.safeParse(props);
+		if (!parsed.success) throw BaseDomainError.validation(parsed.error);
+		return new Slice({
+			id: crypto.randomUUID(),
+			title: parsed.data.title,
+			status: SliceStatus.CREATED,
+		});
+	}
+
+	static reconstruct(state: SliceState): Slice {
+		return new Slice(state);
+	}
+
+	get title(): string {
+		return this._state.title;
+	}
+	get status(): SliceStatus {
+		return this._state.status;
+	}
+}
 ```
