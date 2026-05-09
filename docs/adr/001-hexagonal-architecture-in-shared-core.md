@@ -13,7 +13,7 @@ The `tff-mono` monorepo contains two host-specific applications:
 
 Both apps share the same domain concepts (milestones, slices, tasks, state machines) but currently implement them independently. `tff-cc` has a functional domain layer (Zod schemas + plain objects + standalone transition functions). `tff-pi` has minimal types with no runtime validation. This duplication creates drift risk and makes parity impossible.
 
-We need a single shared package (`packages/shared-core`) that both apps consume. The domain logic must be:
+We need a single shared package (`packages/core`) that both apps consume. The domain logic must be:
 
 - **Host-agnostic** — no Claude Code or PI-specific types leak in
 - **Framework-independent** — no NestJS, no GraphQL, no host framework
@@ -41,12 +41,12 @@ Dependency direction: `content` → `domain`; `contract` ← `domain` (domain de
 
 Four conceptual layers with strict dependency direction:
 
-| Layer                                                                          | Responsibility                                              | Depends On                |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------- |
-| **Presentation** (in `apps/`)                                                  | Slash commands, CLI handlers, skill invocations             | Application               |
-| **Application** (in `apps/`)                                                   | Use cases (commands/queries), orchestration, event handlers | Domain                    |
-| **Domain** (`packages/shared-core/src/domain/`)                                | Entities, VOs, Events, errors, repository ports             | Nothing                   |
-| **Infrastructure** (`packages/shared-core/src/db/` + `apps/*/infrastructure/`) | SQLite repos, file adapters, host-specific glue             | Domain (implements ports) |
+| Layer                                                                   | Responsibility                                              | Depends On                |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------- |
+| **Presentation** (in `apps/`)                                           | Slash commands, CLI handlers, skill invocations             | Application               |
+| **Application** (in `apps/`)                                            | Use cases (commands/queries), orchestration, event handlers | Domain                    |
+| **Domain** (`packages/core/src/domain/`)                                | Entities, VOs, Events, errors, repository ports             | Nothing                   |
+| **Infrastructure** (`packages/core/src/db/` + `apps/*/infrastructure/`) | SQLite repos, file adapters, host-specific glue             | Domain (implements ports) |
 
 The domain layer depends on **nothing** — zero SQLite, zero file I/O, zero host API. This is enforced by lint rules (no imports from outside `domain/` except TypeScript builtins and `zod`).
 
@@ -188,7 +188,7 @@ Every write goes through a domain entity, no exception.
 
 ### 15. Shared Kernel
 
-Complete shared kernel in `packages/shared-core/src/domain/shared/`.
+Complete shared kernel in `packages/core/src/domain/shared/`.
 
 Contains:
 
@@ -298,11 +298,11 @@ Unit tests on Domain + Commands. Integration tests on Queries only.
 
 ### 21. Content Surfaces
 
-Markdown files (agents, skills, workflows, protocols, commands, prompts) live as source under `src/content/`. Build step inlines them as TS string exports. Apps import from `packages/shared-core` programmatically — no raw markdown I/O in app code.
+Markdown files (agents, skills, workflows, protocols, commands, prompts) live as source under `src/content/`. Build step inlines them as TS string exports. Apps import from `packages/core` programmatically — no raw markdown I/O in app code.
 
 ### 22. Contract Layer
 
-`packages/shared-core/src/contract/` defines the client adapter interface — the contract each app must implement to host the shared core:
+`packages/core/src/contract/` defines the client adapter interface — the contract each app must implement to host the shared core:
 
 - `ToolExecutor` — execute tools (Claude Code native vs PI `ExtensionAPI`)
 - `FileIO` — read/write files with path traversal guards
@@ -315,7 +315,7 @@ Apps implement these ports in their infrastructure layer. The shared core is agn
 
 This ADR is a direct adaptation from a prior project's hexagonal architecture reference. Key differences for `tff-mono`:
 
-| Aspect           | Source Reference        | tff shared-core (This ADR)                      |
+| Aspect           | Source Reference        | tff core (This ADR)                             |
 | ---------------- | ----------------------- | ----------------------------------------------- |
 | Framework        | NestJS                  | Host-agnostic (no framework)                    |
 | DB               | MongoDB / Mongoose      | SQLite / better-sqlite3                         |
@@ -359,8 +359,8 @@ All structural decisions (entity pattern, shared kernel, event model, error hier
 
 ## Related References
 
-- `docs/adr/001-hexagonal-architecture-in-shared-core.md` — this document
+- `docs/adr/001-hexagonal-architecture-in-core.md` — this document
 - `apps/tff-cc/references/conventions.md` — tff workflow conventions
 - `apps/tff-cc/references/model-profiles.md` — agent model assignments
 - `apps/tff-cc/references/orchestrator-pattern.md` — agent dispatch patterns
-- `packages/shared-core/` — implementation package
+- `packages/core/` — implementation package
