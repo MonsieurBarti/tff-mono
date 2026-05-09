@@ -30,6 +30,7 @@
 	"license": "MIT",
 	"author": "MonsieurBarti",
 	"dependencies": {
+		"@tff/shared-core": "workspace:*",
 		"better-sqlite3": "^12.8.0"
 	},
 	"devDependencies": {
