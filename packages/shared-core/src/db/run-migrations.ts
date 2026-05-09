@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import type Database from "better-sqlite3";
@@ -9,11 +9,11 @@ export function getCurrentVersion(db: Database.Database): number {
 			| { version: number | null }
 			| undefined;
 		return row?.version ?? 0;
-	} catch (err) {
-		if (err instanceof Error && err.message.includes("no such table: schema_version")) {
+	} catch (error) {
+		if (error instanceof Error && error.message.includes("no such table: schema_version")) {
 			return 0;
 		}
-		throw err;
+		throw error;
 	}
 }
 
@@ -38,7 +38,7 @@ export function runMigrations(db: Database.Database, migrationsDir?: string): vo
 			throw new Error(`Invalid migration filename: ${file}`);
 		}
 		const version = Number.parseInt(match[1], 10);
-		const sql = readFileSync(join(resolvedDir, file), "utf-8");
+		const sql = readFileSync(join(resolvedDir, file), "utf8");
 		return { version, sql };
 	});
 
@@ -52,7 +52,9 @@ export function runMigrations(db: Database.Database, migrationsDir?: string): vo
 	db.pragma("foreign_keys = OFF");
 	try {
 		for (const migration of migrations) {
-			if (migration.version <= currentVersion) continue;
+			if (migration.version <= currentVersion) {
+				continue;
+			}
 
 			db.transaction(() => {
 				db.exec(migration.sql);

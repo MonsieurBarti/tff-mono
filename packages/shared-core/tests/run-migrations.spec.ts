@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { join, dirname } from "node:path";
+import { beforeEach, describe, expect, it } from "vitest";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
-import { runMigrations, getCurrentVersion } from "../src/db/run-migrations.js";
+import { getCurrentVersion, runMigrations } from "../src/db/run-migrations.js";
 
 describe("runMigrations", () => {
 	let db: Database.Database;
@@ -19,7 +19,7 @@ describe("runMigrations", () => {
 
 		const tables = db
 			.prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
-			.all() as Array<{ name: string }>;
+			.all() as { name: string }[];
 		const tableNames = tables.map((t) => t.name);
 
 		expect(tableNames).toContain("schema_version");
@@ -82,9 +82,9 @@ describe("runMigrations", () => {
 		try {
 			runMigrations(db, dir);
 			expect(getCurrentVersion(db)).toBe(2);
-			const cols = db
-				.prepare("SELECT name FROM pragma_table_info('t1') ORDER BY cid")
-				.all() as Array<{ name: string }>;
+			const cols = db.prepare("SELECT name FROM pragma_table_info('t1') ORDER BY cid").all() as {
+				name: string;
+			}[];
 			expect(cols.map((c) => c.name)).toEqual(["id", "name"]);
 		} finally {
 			rmSync(dir, { recursive: true });
@@ -102,9 +102,9 @@ describe("runMigrations", () => {
 		try {
 			runMigrations(db, dir);
 			expect(getCurrentVersion(db)).toBe(10);
-			const cols = db
-				.prepare("SELECT name FROM pragma_table_info('v1') ORDER BY cid")
-				.all() as Array<{ name: string }>;
+			const cols = db.prepare("SELECT name FROM pragma_table_info('v1') ORDER BY cid").all() as {
+				name: string;
+			}[];
 			expect(cols.map((c) => c.name)).toEqual(["id", "col2", "col10"]);
 		} finally {
 			rmSync(dir, { recursive: true });
