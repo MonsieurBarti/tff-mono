@@ -1,5 +1,6 @@
 import { ValueObject } from "../shared/value-object.js";
 
+/** Represents a directed dependency link between two task identifiers. */
 export class TaskDependency extends ValueObject<{ fromId: string; toId: string }> {
 	private constructor(public readonly props: { fromId: string; toId: string }) {
 		super();
