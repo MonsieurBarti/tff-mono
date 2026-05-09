@@ -1,0 +1,93 @@
+{
+	"name": "@the-forge-flow/tff-pi",
+	"version": "0.1.9",
+	"description": "TFF PI",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json && rm -rf dist/resources && cp -R src/resources dist/resources",
+		"dev": "tsc -p tsconfig.build.json --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage",
+		"lint": "oxlint --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
+		"lint:fix": "oxlint --fix --config ../../.oxlintrc.json --ignore-path ../../.oxlintignore --deny-warnings .",
+		"format": "oxfmt --write --config ../../.oxfmtrc.json .",
+		"format:check": "oxfmt --check --config ../../.oxfmtrc.json .",
+		"typecheck": "tsc --noEmit",
+		"clean": "rm -rf dist"
+	},
+	"keywords": [
+		"pi",
+		"pi-coding-agent",
+		"extension",
+		"tff",
+		"the-forge-flow"
+	],
+	"author": "The Forge Flow",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MonsieurBarti/tff-pi.git"
+	},
+	"bugs": {
+		"url": "https://github.com/MonsieurBarti/tff-pi/issues"
+	},
+	"homepage": "https://github.com/MonsieurBarti/tff-pi#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"pi": {
+		"extensions": [
+			"./dist/index.js"
+		],
+		"skills": [
+			"./dist/resources/skills"
+		]
+	},
+	"peerDependencies": {
+		"@mariozechner/pi-ai": "*",
+		"@mariozechner/pi-coding-agent": "*",
+		"@mariozechner/pi-tui": "*",
+		"@plannotator/pi-extension": "*",
+		"@sinclair/typebox": "*",
+		"@the-forge-flow/fff-pi": "*",
+		"@the-forge-flow/gh-pi": "*",
+		"@the-forge-flow/camoufox-pi": "*",
+		"@the-forge-flow/ultra-compress-pi": "*",
+		"pi-subagents": "^0.17.1"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
+		"@mariozechner/pi-ai": "^0.66.1",
+		"@mariozechner/pi-coding-agent": "^0.66.1",
+		"@mariozechner/pi-tui": "^0.66.1",
+		"@sinclair/typebox": "^0.34.0",
+		"@types/better-sqlite3": "^7.6.13",
+		"@types/node": "^22.0.0",
+		"@vitest/coverage-v8": "^2.1.0",
+		"lefthook": "^2.1.5",
+		"typescript": "^5.7.0",
+		"vitest": "^2.1.0"
+	},
+	"dependencies": {
+		"better-sqlite3": "^12.8.0",
+		"yaml": "^2.8.3"
+	}
+}
