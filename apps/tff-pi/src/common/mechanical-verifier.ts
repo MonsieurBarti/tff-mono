@@ -34,6 +34,7 @@ function parseShellCommand(cmd: string): string[] | null {
 
 	for (let i = 0; i < cmd.length; i++) {
 		const ch = cmd[i];
+		if (ch === undefined) continue;
 		if (escaped) {
 			current += ch;
 			escaped = false;
@@ -107,7 +108,9 @@ export async function runMechanicalVerification(
 		let stdout = "";
 		let stderr = "";
 
-		const result = spawnSync(args[0], args.slice(1), {
+		const [command, ...restArgs] = args;
+		if (!command) continue;
+		const result = spawnSync(command, restArgs, {
 			cwd,
 			encoding: "utf-8",
 			shell: false,
