@@ -9,12 +9,8 @@ export {
 	type AgentResult,
 	FileSystemEntrySchema,
 	type FileSystemEntry,
-	GitBranchInfoSchema,
-	type GitBranchInfo,
 	GitCommitInfoSchema,
 	type GitCommitInfo,
-	LifecyclePhaseSchema,
-	type LifecyclePhase,
 } from "./types.js";
 
 export { ContractError } from "./ports.js";

@@ -27,17 +27,8 @@ export const FileSystemEntrySchema = z.object({
 });
 export type FileSystemEntry = z.infer<typeof FileSystemEntrySchema>;
 
-export const GitBranchInfoSchema = z.object({
-	name: z.string(),
-	isDefault: z.boolean(),
-});
-export type GitBranchInfo = z.infer<typeof GitBranchInfoSchema>;
-
 export const GitCommitInfoSchema = z.object({
 	sha: z.string(),
 	message: z.string(),
 });
 export type GitCommitInfo = z.infer<typeof GitCommitInfoSchema>;
-
-export const LifecyclePhaseSchema = z.enum(["startup", "shutdown"]);
-export type LifecyclePhase = z.infer<typeof LifecyclePhaseSchema>;
