@@ -9,6 +9,7 @@ routing:
 capabilities:
   runs_tests: true
   validates_ac: true
+  read_only: true
 tools: [read, write, bash, find, grep]
 thinking: off
 systemPromptMode: replace

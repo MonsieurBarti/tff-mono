@@ -9,7 +9,6 @@ routing:
   priority: 10
   min_tier: haiku
 capabilities:
-  read_only: true
   validates_ac: true
 tools: [read, edit, write, bash]
 thinking: off

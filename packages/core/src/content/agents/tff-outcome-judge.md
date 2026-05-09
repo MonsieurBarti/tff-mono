@@ -9,7 +9,6 @@ routing:
   priority: 5
   min_tier: haiku
 capabilities:
-  read_only: true
   audits_decisions: true
 tools: [read, write]
 thinking: off

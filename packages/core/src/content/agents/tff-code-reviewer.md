@@ -10,7 +10,6 @@ routing:
   min_tier: haiku
 capabilities:
   reviews_code: true
-  read_only: true
 tools: [read, edit, write, bash]
 thinking: off
 systemPromptMode: replace

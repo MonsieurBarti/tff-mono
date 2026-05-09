@@ -18,6 +18,11 @@ function sha256(content) {
 	return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
 
+let existing = { version: 1, agents: {}, skills: {} };
+if (fs.existsSync(baselinesPath)) {
+	existing = JSON.parse(fs.readFileSync(baselinesPath, "utf8"));
+}
+
 const baselines = { version: 1, agents: {}, skills: {} };
 
 // Agents
@@ -25,9 +30,11 @@ const agentsDir = path.join(contentRoot, "agents");
 for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith(".md"))) {
 	const name = path.basename(file, ".md");
 	const content = fs.readFileSync(path.join(agentsDir, file), "utf8");
+	const hash = sha256(normalize(content));
+	const prev = existing.agents[name];
 	baselines.agents[name] = {
-		approvedAt: new Date().toISOString(),
-		sha256: sha256(normalize(content)),
+		approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+		sha256: hash,
 	};
 }
 
@@ -37,11 +44,13 @@ for (const dir of fs.readdirSync(skillsDir)) {
 	const skillFile = path.join(skillsDir, dir, "SKILL.md");
 	if (!fs.existsSync(skillFile)) continue;
 	const content = fs.readFileSync(skillFile, "utf8");
+	const hash = sha256(normalize(content));
+	const prev = existing.skills[dir];
 	baselines.skills[dir] = {
-		approvedAt: new Date().toISOString(),
-		originalCommitSha: null,
-		refinementId: null,
-		sha256: sha256(normalize(content)),
+		approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+		originalCommitSha: prev ? prev.originalCommitSha : null,
+		refinementId: prev ? prev.refinementId : null,
+		sha256: hash,
 	};
 }
 
