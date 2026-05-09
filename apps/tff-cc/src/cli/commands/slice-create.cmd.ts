@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { resolveMilestoneId } from "../../application/milestone/resolve-milestone-id.js";
@@ -60,7 +60,7 @@ const VALID_KINDS: ReadonlySet<SliceKind> = new Set(["milestone", "quick", "debu
 
 const branchExistsLocally = (branch: string): boolean => {
 	try {
-		execSync(`git rev-parse --verify --quiet ${JSON.stringify(branch)}`, {
+		execFileSync("git", ["rev-parse", "--verify", "--quiet", branch], {
 			encoding: "utf8",
 			stdio: "pipe",
 		});
@@ -72,7 +72,7 @@ const branchExistsLocally = (branch: string): boolean => {
 
 const branchNameIsValid = (branch: string): boolean => {
 	try {
-		execSync(`git check-ref-format --branch ${JSON.stringify(branch)}`, {
+		execFileSync("git", ["check-ref-format", "--branch", branch], {
 			encoding: "utf8",
 			stdio: "pipe",
 		});

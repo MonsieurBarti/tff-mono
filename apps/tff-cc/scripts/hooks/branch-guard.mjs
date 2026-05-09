@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -13,7 +13,7 @@ if (!existsSync(cliPath)) process.exit(0); // build not produced yet — cannot 
 
 let out;
 try {
-	out = execSync(`node ${cliPath} branch-guard:check`, {
+	out = execFileSync("node", [cliPath, "branch-guard:check"], {
 		cwd,
 		encoding: "utf8",
 		stdio: ["ignore", "pipe", "pipe"],
