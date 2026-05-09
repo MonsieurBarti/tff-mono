@@ -19,7 +19,8 @@ export function runMigrations(db: Database.Database, migrationsDir?: string): vo
 
 	const currentVersion = getCurrentVersion(db);
 
-	const resolvedDir = migrationsDir ?? join(dirname(fileURLToPath(import.meta.url)), "migrations");
+	const resolvedDir =
+		migrationsDir ?? join(dirname(fileURLToPath(import.meta.url as string)), "migrations");
 
 	const files = readdirSync(resolvedDir)
 		.filter((f) => f.endsWith(".sql"))
@@ -27,7 +28,7 @@ export function runMigrations(db: Database.Database, migrationsDir?: string): vo
 
 	const migrations = files.map((file) => {
 		const match = file.match(/^v(\d+)\.sql$/);
-		if (!match) {
+		if (!match || match[1] === undefined) {
 			throw new Error(`Invalid migration filename: ${file}`);
 		}
 		const version = Number.parseInt(match[1], 10);
