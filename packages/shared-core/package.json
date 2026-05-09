@@ -13,7 +13,8 @@
 	],
 	"scripts": {
 		"build": "tsc && rm -rf dist/db/migrations && cp -r src/db/migrations dist/db/migrations",
-		"test": "vitest run"
+		"test": "vitest run",
+		"lint": "oxlint src/ tests/"
 	},
 	"dependencies": {
 		"better-sqlite3": "^12.8.0"
