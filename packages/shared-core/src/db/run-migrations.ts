@@ -9,8 +9,11 @@ export function getCurrentVersion(db: Database.Database): number {
 			| { version: number | null }
 			| undefined;
 		return row?.version ?? 0;
-	} catch {
-		return 0;
+	} catch (err) {
+		if (err instanceof Error && err.message.includes("no such table: schema_version")) {
+			return 0;
+		}
+		throw err;
 	}
 }
 
@@ -19,12 +22,15 @@ export function runMigrations(db: Database.Database, migrationsDir?: string): vo
 
 	const currentVersion = getCurrentVersion(db);
 
-	const resolvedDir =
-		migrationsDir ?? join(dirname(fileURLToPath(import.meta.url as string)), "migrations");
+	const resolvedDir = migrationsDir ?? join(dirname(fileURLToPath(import.meta.url)), "migrations");
 
 	const files = readdirSync(resolvedDir)
 		.filter((f) => f.endsWith(".sql"))
-		.sort();
+		.sort((a, b) => {
+			const va = Number.parseInt(a.match(/^v(\d+)\.sql$/)?.[1] ?? "0", 10);
+			const vb = Number.parseInt(b.match(/^v(\d+)\.sql$/)?.[1] ?? "0", 10);
+			return va - vb;
+		});
 
 	const migrations = files.map((file) => {
 		const match = file.match(/^v(\d+)\.sql$/);

@@ -12,7 +12,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc && cp -r src/db/migrations dist/db/migrations",
+		"build": "tsc && rm -rf dist/db/migrations && cp -r src/db/migrations dist/db/migrations",
 		"test": "vitest run"
 	},
 	"dependencies": {
