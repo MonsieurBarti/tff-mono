@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS workflow_session (
 CREATE TABLE IF NOT EXISTS review (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   slice_id TEXT NOT NULL REFERENCES slice(id),
-  type TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('code', 'security', 'spec')),
   reviewer TEXT NOT NULL,
   verdict TEXT NOT NULL CHECK (verdict IN ('approve', 'request_changes', 'reject')),
   commit_sha TEXT NOT NULL,
