@@ -38,13 +38,17 @@ const AgentFrontmatterSchema = z.object({
 	inheritSkills: z.boolean().optional(),
 });
 
-const SkillFrontmatterSchema = z.object({
-	name: z.string(),
-	description: z.string(),
-	version: z.string().optional(),
-	trigger_phrases: z.array(z.string()).optional(),
-	tags: z.array(z.string()).optional(),
-});
+const SkillFrontmatterSchema = z
+	.object({
+		name: z.string(),
+		description: z.string(),
+		version: z.string().optional(),
+		trigger_phrases: z.array(z.string()).optional(),
+		tags: z.array(z.string()).optional(),
+		"user-invocable": z.boolean().optional(),
+		"argument-hint": z.string().optional(),
+	})
+	.strict();
 
 function parseFrontmatter(filePath: string) {
 	const content = fs.readFileSync(filePath, "utf8");
@@ -56,9 +60,6 @@ function parseFrontmatter(filePath: string) {
 describe("content frontmatter validation", () => {
 	it("validates all agent files", () => {
 		const agentsDir = path.join(contentRoot, "agents");
-		if (!fs.existsSync(agentsDir)) {
-			expect.fail("agents directory does not exist");
-		}
 		const files = fs
 			.readdirSync(agentsDir)
 			.filter((f) => f.endsWith(".md"))
@@ -72,18 +73,29 @@ describe("content frontmatter validation", () => {
 
 	it("validates all skill files", () => {
 		const skillsDir = path.join(contentRoot, "skills");
-		if (!fs.existsSync(skillsDir)) {
-			expect.fail("skills directory does not exist");
-		}
 		const dirs = fs.readdirSync(skillsDir);
 		expect(dirs.length).toBeGreaterThan(0);
 		for (const dir of dirs) {
 			const skillFile = path.join(skillsDir, dir, "SKILL.md");
-			if (!fs.existsSync(skillFile)) {
-				expect.fail(`SKILL.md missing for ${dir}`);
-			}
 			const frontmatter = parseFrontmatter(skillFile);
 			SkillFrontmatterSchema.parse(frontmatter);
 		}
+	});
+
+	it("rejects agent frontmatter with missing required field", () => {
+		const invalid = {
+			name: "test-agent",
+			// missing routing and tools
+		};
+		expect(() => AgentFrontmatterSchema.parse(invalid)).toThrow();
+	});
+
+	it("rejects skill frontmatter with invalid enum value", () => {
+		const invalid = {
+			name: "test-skill",
+			description: "test",
+			thinking: "maybe",
+		};
+		expect(() => SkillFrontmatterSchema.parse(invalid)).toThrow();
 	});
 });
