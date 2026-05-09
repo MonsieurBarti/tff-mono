@@ -12,7 +12,7 @@
 		"format": "turbo run format",
 		"format:check": "turbo run format:check",
 		"typecheck": "turbo run typecheck",
-		"verify": "turbo run typecheck lint format:check test"
+		"verify": "turbo run typecheck lint format:check test build"
 	},
 	"devDependencies": {
 		"turbo": "^2.x",
