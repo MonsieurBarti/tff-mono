@@ -34,16 +34,23 @@ describe("mechanical-verifier", () => {
 		expect(report.commands[0]?.exitCode).toBe(1);
 	});
 
-	it("captures stdout and stderr", async () => {
+	it("captures stdout", async () => {
+		const commands: VerifyCommand[] = [
+			{ name: "output", command: "echo hello-stdout", source: "settings" },
+		];
+		const report = await runMechanicalVerification(commands, cwd);
+		expect(report.commands[0]?.stdout).toContain("hello-stdout");
+	});
+
+	it("captures stderr", async () => {
 		const commands: VerifyCommand[] = [
 			{
-				name: "output",
-				command: "echo hello-stdout && echo hello-stderr >&2",
+				name: "stderr",
+				command: "node -e \"console.error('hello-stderr')\"",
 				source: "settings",
 			},
 		];
 		const report = await runMechanicalVerification(commands, cwd);
-		expect(report.commands[0]?.stdout).toContain("hello-stdout");
 		expect(report.commands[0]?.stderr).toContain("hello-stderr");
 	});
 
