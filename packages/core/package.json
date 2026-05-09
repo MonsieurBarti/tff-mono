@@ -1,5 +1,5 @@
 {
-	"name": "@tff/shared-core",
+	"name": "@tff/core",
 	"version": "0.1.0",
 	"type": "module",
 	"exports": {
@@ -14,10 +14,11 @@
 	"scripts": {
 		"build": "tsc && rm -rf dist/db/migrations && cp -r src/db/migrations dist/db/migrations",
 		"test": "vitest run",
-		"lint": "oxlint src/ tests/"
+		"lint": "oxlint --config ../../.oxlintrc.json src/ tests/"
 	},
 	"dependencies": {
-		"better-sqlite3": "^12.8.0"
+		"better-sqlite3": "^12.8.0",
+		"zod": "^3.25.0"
 	},
 	"devDependencies": {
 		"@types/better-sqlite3": "^7.6.13",

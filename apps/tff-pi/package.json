@@ -87,7 +87,7 @@
 		"vitest": "^2.1.0"
 	},
 	"dependencies": {
-		"@tff/shared-core": "workspace:*",
+		"@tff/core": "workspace:*",
 		"better-sqlite3": "^12.8.0",
 		"yaml": "^2.8.3"
 	}
