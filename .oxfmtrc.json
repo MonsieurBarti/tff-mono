@@ -1,0 +1,29 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"tabWidth": 2,
+	"printWidth": 100,
+	"semi": true,
+	"singleQuote": false,
+	"trailingComma": "all",
+	"arrowParens": "always",
+	"endOfLine": "lf",
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		"node_modules/",
+		"dist/",
+		"coverage/",
+		".turbo/",
+		".tff-cc/",
+		"pnpm-lock.yaml",
+		"apps/*/CHANGELOG.md",
+		"apps/tff-cc/native/",
+		"apps/tff-cc/assets/",
+		"apps/tff-pi/.pi/",
+		"apps/tff-pi/.hippo/",
+		"apps/tff-pi/.superpowers/",
+		"apps/tff-cc/skills/",
+		"apps/tff-cc/scripts/backups/",
+		"apps/tff-pi/src/resources/skills/"
+	]
+}

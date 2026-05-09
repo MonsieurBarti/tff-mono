@@ -4,16 +4,16 @@
 		"tsconfig.base.json",
 		".oxlintrc.json",
 		".oxlintignore",
-		".prettierrc.json",
-		".prettierignore",
+		".oxfmtrc.json",
+		".oxfmtignore",
 		"tools/repo-root-lint/package.json",
 		"tools/repo-root-lint/.oxlintignore",
-		"tools/repo-root-lint/.prettierignore"
+		"tools/repo-root-lint/.oxfmtignore"
 	],
 	"globalEnv": ["CI", "NODE_ENV"],
 	"tasks": {
 		"build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
-		"test": { "outputs": ["coverage/**"] },
+		"test": { "dependsOn": ["build"], "outputs": ["coverage/**"] },
 		"lint": { "outputs": [] },
 		"format": { "cache": false },
 		"format:check": { "outputs": [] },

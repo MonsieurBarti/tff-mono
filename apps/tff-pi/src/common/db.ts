@@ -468,10 +468,9 @@ export function getActiveSlice(db: Database.Database, milestoneId: string): Slic
 
 export function countOpenSlicesInMilestone(db: Database.Database, milestoneId: string): number {
 	const row = db
-		.prepare<
-			[string],
-			{ n: number }
-		>("SELECT COUNT(*) as n FROM slice WHERE milestone_id = ? AND status != 'closed'")
+		.prepare<[string], { n: number }>(
+			"SELECT COUNT(*) as n FROM slice WHERE milestone_id = ? AND status != 'closed'",
+		)
 		.get(milestoneId);
 	return row?.n ?? 0;
 }

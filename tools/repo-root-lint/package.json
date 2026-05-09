@@ -4,7 +4,7 @@
 	"scripts": {
 		"lint": "cd ../.. && oxlint --deny-warnings --ignore-path tools/repo-root-lint/.oxlintignore .",
 		"lint:fix": "cd ../.. && oxlint --fix --deny-warnings --ignore-path tools/repo-root-lint/.oxlintignore .",
-		"format": "cd ../.. && prettier --write --ignore-path tools/repo-root-lint/.prettierignore .",
-		"format:check": "cd ../.. && prettier --check --ignore-path tools/repo-root-lint/.prettierignore ."
+		"format": "cd ../.. && oxfmt --write --ignore-path tools/repo-root-lint/.oxfmtignore .",
+		"format:check": "cd ../.. && oxfmt --check --ignore-path tools/repo-root-lint/.oxfmtignore ."
 	}
 }
