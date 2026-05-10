@@ -1,4 +1,4 @@
-import { unlinkSync } from "node:fs";
+import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import type { Milestone } from "../../../domain/entities/milestone.js";
@@ -140,11 +140,18 @@ export class SQLiteStateAdapter
 					return Err(versionMismatchError(dbVer, codeVer));
 				}
 				console.warn(
-					`[tff] Database schema version mismatch at ${this.dbPath}; wiping and recreating.`,
+					`[tff] Database schema version mismatch at ${this.dbPath}; backing up and recreating.`,
 				);
 				try {
+					const backupPath = `${this.dbPath}.backup.${Date.now()}`;
+					copyFileSync(this.dbPath, backupPath);
+					console.warn(`[tff] Backup saved to ${backupPath}`);
 					this.db.close();
 					unlinkSync(this.dbPath);
+					for (const suffix of ["-wal", "-shm"]) {
+						const companion = `${this.dbPath}${suffix}`;
+						if (existsSync(companion)) unlinkSync(companion);
+					}
 					this.db = openDatabase(this.dbPath);
 					runMigrations(this.db, this.migrationsDir);
 					return Ok(undefined);
