@@ -46,7 +46,7 @@ status = executing ∧ worktree ∃ at `{{project-dir}}/worktrees/<slice-id>/`
     - low → budget
     - medium → balanced
     - high → quality
-    IF model NOT configured in settings → SPAWN subagent without --model flag (uses Claude Code default)
+    IF model NOT configured in settings → SPAWN subagent without --model flag (uses the default model profile)
 
     tff-tools task:claim --task-id <id>
     LOAD @skills/executing-plans/SKILL.md + domain skills (see routing below) → SPAWN subagent: {task.description, task.criteria, task.files, @references/conventions.md, --model <MODEL (if configured)>}

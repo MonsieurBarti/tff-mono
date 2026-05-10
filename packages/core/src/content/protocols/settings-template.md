@@ -40,7 +40,7 @@ autonomy:
 # tracked workflow commands without blocking legitimate direct edits.
 # Balances guidance for newcomers with flexibility for experts.
 
-# Show reminder on new Claude Code sessions with current
+# Show reminder on new client sessions with current
 # milestone, slice, phase, and wave position
 workflow:
   reminders: true
