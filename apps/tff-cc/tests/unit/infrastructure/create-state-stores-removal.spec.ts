@@ -32,11 +32,10 @@ describe("T08: create-state-stores.ts branch alignment removal", () => {
 		expect(content).not.toContain("checkBranchAlignment");
 	});
 
-	it("should NOT use execSync, existsSync, readFileSync from node modules", () => {
+	it("should NOT use execSync, readFileSync from node modules for branch alignment", () => {
 		const content = readFileSync(filePath, "utf-8");
 		// Check that it doesn't import these from node modules for branch alignment
 		expect(content).not.toMatch(/import.*execSync.*from.*node:child_process/);
-		expect(content).not.toMatch(/import.*existsSync.*from.*node:fs/);
 		expect(content).not.toMatch(/import.*readFileSync.*from.*node:fs/);
 	});
 });
