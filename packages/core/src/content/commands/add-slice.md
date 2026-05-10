@@ -20,4 +20,5 @@ Add new slice to end of current milestone's slice list.
    `{{command-tool}} slice:create --milestone-id <id> --title <title> --branch <name>`
    (kind defaults to milestone)
 5. Slice number is auto-assigned by {{command-tool}}
-   </execution_context>
+
+</execution_context>

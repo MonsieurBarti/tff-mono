@@ -16,4 +16,5 @@ Load checkpoint ∧ resume execution from where it left off.
 2. Skip completed waves
 3. Continue execution from current wave
 4. Delegates to execute-slice workflow with checkpoint data
-   </execution_context>
+
+</execution_context>

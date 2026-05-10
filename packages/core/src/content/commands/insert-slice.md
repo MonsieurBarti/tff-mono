@@ -19,4 +19,5 @@ Insert new slice between existing slices, adjusting dependencies.
    `{{command-tool}} slice:create --milestone-id <id> --title <title> --branch <name>`
    (additional dep wiring via `{{command-tool}} dep:add-slice`)
 5. Update downstream slice dependencies
-   </execution_context>
+
+</execution_context>
