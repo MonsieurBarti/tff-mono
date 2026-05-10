@@ -48,7 +48,7 @@ if ("1" === process.env.TFF_ALLOW_MILESTONE_COMMIT) {
 
 process.stderr.write(
 	`✗ branch-guard: refusing commit on milestone branch ${branch}.\n` +
-		`  Switch to the slice worktree at .tff-cc/worktrees/<slice-id>/, or set\n` +
+		`  Switch to the slice worktree at .tff/worktrees/<slice-id>/, or set\n` +
 		`  TFF_ALLOW_MILESTONE_COMMIT=1 for a one-off override.\n`,
 );
 process.exit(1);

@@ -2,7 +2,7 @@ node_modules/
 dist/
 coverage/
 .turbo/
-.tff-cc/
+.tff/
 pnpm-lock.yaml
 apps/*/CHANGELOG.md
 apps/tff-cc/native/

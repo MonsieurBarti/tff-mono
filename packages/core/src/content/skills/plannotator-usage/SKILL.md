@@ -1,6 +1,6 @@
 ---
 name: plannotator-usage
-description: "Use when invoking plannotator for approval review of generated .tff-cc milestone artifacts (plan, verification, spec)."
+description: "Use when invoking plannotator for approval review of generated .tff milestone artifacts (plan, verification, spec)."
 version: "1.0.0"
 tags: [process, review]
 ---
@@ -9,7 +9,7 @@ tags: [process, review]
 
 ## When to Use
 
-∀ workflows that generate a load-bearing `.md` artifact under `.tff-cc/milestones/` or `.tff-cc/{quick,debug}/`.
+∀ workflows that generate a load-bearing `.md` artifact under `.tff/milestones/` or `.tff/{quick,debug}/`.
 
 ## Integration Points
 
