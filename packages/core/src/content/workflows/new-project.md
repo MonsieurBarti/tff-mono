@@ -4,7 +4,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Prerequisites
 
-∄ `.tff/PROJECT.md` — if ∃ → "Use `{{command-prefix}}new-milestone`" ∧ stop
+∄ `{{project-dir}}/PROJECT.md` — if ∃ → "Use `{{command-prefix}}new-milestone`" ∧ stop
 
 ## Steps
 
@@ -17,7 +17,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 2. ONBOARD existing codebase:
    a. ASK: "This repo has existing code. I'd like to analyze it first to understand your project. Proceed?"
    - If ¬ → skip to step 3 (user provides everything manually)
-     b. RUN: execute map-codebase workflow (3 parallel doc-writer agents → .tff/docs/)
+     b. RUN: execute map-codebase workflow (3 parallel doc-writer agents → {{project-dir}}/docs/)
    - If map-codebase fails → warn user, fall back to step 3 (manual input)
      c. SYNTHESIZE: read STACK.md, ARCHITECTURE.md, CONCERNS.md, CONVENTIONS.md
    - Propose: project name, vision statement, initial requirements
@@ -28,7 +28,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 3. ASK user: project name (required), vision statement
    - Pre-filled from step 2 if onboarding occurred
 4. INIT: `tff-tools project:init --name "<name>" --vision "<vision>"`
-5. SETTINGS: generate `.tff/settings.yaml` from @references/settings-template.md
+5. SETTINGS: generate `{{settings-path}}` from @references/settings-template.md
 6. SUMMARY: show created files (PROJECT.md, settings.yaml)
    - suggest `{{command-prefix}}new-milestone` to create first milestone
 

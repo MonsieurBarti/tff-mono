@@ -2,7 +2,7 @@
 
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
-**Autonomy**: check `.tff/settings.yaml` → `autonomy.mode` before pausing.
+**Autonomy**: check `{{settings-path}}` → `autonomy.mode` before pausing.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ LOAD @skills/brainstorming/SKILL.md
 
 ### 3. Write Spec
 
-WRITE `.tff/milestones/<milestone>/slices/<id>/SPEC.md` w/ validated design
+WRITE `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md` w/ validated design
 
 ### 4. Challenge Spec (SSS only — determined ∈ step 9)
 
@@ -57,12 +57,12 @@ LOAD @skills/acceptance-criteria-validation/SKILL.md → SPAWN subagent: {spec_c
 DISPATCH anonymous reviewer via {{spawn-agent}} (prompt: @skills/brainstorming/SKILL.md)
 Issues → fix, re-dispatch (max 3)
 
-### 7. Plannotator Review (REQUIRED gate)
+### 7. {{artifact-review}} Review (REQUIRED gate)
 
 **REQUIRED — do NOT proceed past this step until annotations are resolved.**
-This is a hard dependency per `skills/{{artifact-review}}-usage/SKILL.md` (no terminal fallback).
+This is a hard dependency per `the artifact review skill` (no terminal fallback).
 
-invoke Skill `{{artifact-review}}` with arg `.tff/milestones/<milestone>/slices/<id>/SPEC.md`
+invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md`
 
 - feedback → revise the artifact, re-invoke
 - approved (no annotations ∨ all resolved) → continue
@@ -70,7 +70,7 @@ invoke Skill `{{artifact-review}}` with arg `.tff/milestones/<milestone>/slices/
 
 ### 8. User Gate
 
-Ask user: "Spec at `.tff/milestones/<milestone>/slices/<id>/SPEC.md`. Approve?"
+Ask user: "Spec at `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md`. Approve?"
 
 ### 9. Classify Complexity
 
@@ -102,7 +102,7 @@ IF `ok` = true ∧ `warnings.length > 0`:
 
 After completing all steps above:
 
-1. READ `.tff/settings.yaml` → check `autonomy.mode`
+1. READ `{{settings-path}}` → check `autonomy.mode`
 2. IF `plan-to-pr`:
    - Non-gate steps: IMMEDIATELY invoke the next workflow — do NOT ask user
    - Human gates (plan approval, spec approval, completion): pause ∧ ask

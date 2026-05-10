@@ -2,7 +2,7 @@
 
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
-**Autonomy**: check `.tff/settings.yaml` → `autonomy.mode` before pausing.
+**Autonomy**: check `{{settings-path}}` → `autonomy.mode` before pausing.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ LOAD @skills/architecture-review/SKILL.md
 2. RESEARCH (if needed):
    - Read relevant codebase areas
    - Check dependencies + integration points
-   - Output → `.tff/milestones/<milestone>/slices/<slice-id>/RESEARCH.md`
+   - Output → `{{project-dir}}/milestones/<milestone>/slices/<slice-id>/RESEARCH.md`
 3. TRANSITION: `tff-tools slice:transition --slice-id <id> --status planning`
    CHECK: `ok` = true → continue | `ok` = false → warn user, offer retry ∨ abort
    IF `ok` = true ∧ `warnings.length > 0`:
@@ -26,7 +26,7 @@ LOAD @skills/architecture-review/SKILL.md
 
 After completing all steps above:
 
-1. READ `.tff/settings.yaml` → check `autonomy.mode`
+1. READ `{{settings-path}}` → check `autonomy.mode`
 2. IF `plan-to-pr`:
    - Non-gate steps: IMMEDIATELY invoke the next workflow — do NOT ask user
    - Human gates (plan approval, spec approval, completion): pause ∧ ask

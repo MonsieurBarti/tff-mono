@@ -2,7 +2,7 @@
 
 Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
-**Autonomy**: check `.tff/settings.yaml` → `autonomy.mode` before pausing.
+**Autonomy**: check `{{settings-path}}` → `autonomy.mode` before pausing.
 
 ## Prerequisites
 
@@ -62,7 +62,7 @@ LOAD @skills/finishing-work/SKILL.md
    - DRAIN routing judgment (run inline, before branch deletion):
      a. `tff-tools routing:judge-prepare --slice <slice-id>` → parse JSON
      b. IF `data.evidence == null` → `tff-tools judge:pending:clear --slice-id <slice-id>` (already judged) ∧ skip c–d
-     c. ELSE: write `data.evidence` to `<evidence-path>` (a temp file). Pick a `<verdicts-path>` (also a temp file). SPAWN `tff-cc:tff-outcome-judge` with `subagent_type: "tff-outcome-judge"` and this prompt verbatim — do NOT inline a schema; the agent's own definition is authoritative:
+     c. ELSE: write `data.evidence` to `<evidence-path>` (a temp file). Pick a `<verdicts-path>` (also a temp file). SPAWN `{{outcome-judge}}` with `subagent_type: "{{outcome-judge}}"` and this prompt verbatim — do NOT inline a schema; the agent's own definition is authoritative:
 
      ```
      Evidence path: <evidence-path>
@@ -86,7 +86,7 @@ LOAD @skills/finishing-work/SKILL.md
 
 After completing all steps above:
 
-1. READ `.tff/settings.yaml` → check `autonomy.mode`
+1. READ `{{settings-path}}` → check `autonomy.mode`
 2. IF `plan-to-pr`:
    - Non-gate steps: IMMEDIATELY invoke the next workflow — do NOT ask user
    - Human gates (plan approval, spec approval, merge gate): pause ∧ ask

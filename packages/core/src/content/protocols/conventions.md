@@ -88,7 +88,7 @@ Anti-pattern: `M01-S05: <summary>` (no `<type>`, no scope parentheses) — relea
 Agents and humans work on **slice branches only** while a milestone has open slices. Two guards enforce this:
 
 1. **Default-branch guard** — every mutating `tff-tools` command refuses to run when the current branch equals the repo's default branch (usually `main`). Error code: `REFUSED_ON_DEFAULT_BRANCH`. Remedy: create a milestone branch or slice worktree before proceeding.
-2. **Milestone-branch guard** — `slice:transition`, `task:claim`, `task:close`, and `review:record` refuse to run on a `milestone/<8hex>` branch while any slice in that milestone is not `closed`. Error code: `REFUSED_ON_MILESTONE_BRANCH`. Remedy: switch to the slice worktree at `.tff/worktrees/<slice-id>/`.
+2. **Milestone-branch guard** — `slice:transition`, `task:claim`, `task:close`, and `review:record` refuse to run on a `milestone/<8hex>` branch while any slice in that milestone is not `closed`. Error code: `REFUSED_ON_MILESTONE_BRANCH`. Remedy: switch to the slice worktree at `{{project-dir}}/worktrees/<slice-id>/`.
 
 A pre-commit hook (`scripts/hooks/branch-guard.mjs`, registered in `lefthook.yml`) mirrors the milestone-branch guard at the git level: it blocks commits on a milestone branch while slices are open.
 
@@ -100,7 +100,7 @@ Once **all slices are closed**, small follow-up commits may go directly to the m
 ## Project Directory
 
 ```
-.tff/
+{{project-dir}}/
   PROJECT.md              ← project vision (markdown-authoritative)
   STATE.md                ← DERIVED, never edit manually
   settings.yaml           ← model profiles, quality gates
@@ -117,7 +117,7 @@ Once **all slices are closed**, small follow-up commits may go directly to the m
     M01-S01/              ← git worktree (gitignored)
 ```
 
-Note: `.tff/` in the repo is a symlink to `~/.tff/{projectId}/`, created by `project:init`. Direct `mkdir -p .tff/…` before init is unsafe and will cause symlink creation to fail with "`.tff/` exists as a real directory."
+Note: `{{project-dir}}/` in the repo is a symlink to `~/.tff/{projectId}/`, created by `project:init`. Direct `mkdir -p {{project-dir}}/…` before init is unsafe and will cause symlink creation to fail with "`{{project-dir}}/` exists as a real directory."
 
 ## State Rules
 
@@ -133,11 +133,11 @@ Classification at end of discuss. User confirms tier — ¬ auto-routing.
 
 All tiers follow same pipeline. Tiers control **depth**, ¬ which steps run.
 
-| Tier                | Discuss             | Research | Plan Review | Execute | Code Review                |
-| ------------------- | ------------------- | -------- | ----------- | ------- | -------------------------- |
-| S (single-file fix) | Lightweight         | Skip     | Plannotator | No TDD  | Agent-only                 |
-| SS (default)        | Full                | Optional | Plannotator | TDD     | Agent-only                 |
-| SSS (complex)       | Full + brainstormer | Required | Plannotator | TDD     | Agent-only, multi-reviewer |
+| Tier                | Discuss             | Research | Plan Review         | Execute | Code Review                |
+| ------------------- | ------------------- | -------- | ------------------- | ------- | -------------------------- |
+| S (single-file fix) | Lightweight         | Skip     | {{artifact-review}} | No TDD  | Agent-only                 |
+| SS (default)        | Full                | Optional | {{artifact-review}} | TDD     | Agent-only                 |
+| SSS (complex)       | Full + brainstormer | Required | {{artifact-review}} | TDD     | Agent-only, multi-reviewer |
 
 ## tff-tools Patterns
 

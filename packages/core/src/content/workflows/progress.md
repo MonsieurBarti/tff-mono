@@ -10,9 +10,9 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 3. SYNC debug STATE (if any debug slices ∃): `tff-tools sync:state --kind debug`
    - Probe: `tff-tools slice:list --kind debug` → if data is non-empty, run sync.
 4. DISPLAY:
-   - `.tff/STATE.md`: milestone progress (slices done/total), per-slice status + tasks
-   - `.tff/quick/STATE.md` (if ∃): in-progress quick tasks
-   - `.tff/debug/STATE.md` (if ∃): in-progress debug tasks
+   - `{{project-dir}}/STATE.md`: milestone progress (slices done/total), per-slice status + tasks
+   - `{{project-dir}}/quick/STATE.md` (if ∃): in-progress quick tasks
+   - `{{project-dir}}/debug/STATE.md` (if ∃): in-progress debug tasks
 5. ROUTE by current state:
    - discussing → `{{command-prefix}}discuss` | planning → `{{command-prefix}}plan`
    - executing → `{{command-prefix}}execute` | verifying → `{{command-prefix}}verify`

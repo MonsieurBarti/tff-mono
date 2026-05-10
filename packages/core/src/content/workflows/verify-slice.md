@@ -11,11 +11,11 @@ LOAD @skills/verification-before-completion/SKILL.md
 
 1. LOAD @skills/acceptance-criteria-validation/SKILL.md → SPAWN subagent: {acceptance_criteria from PLAN.md}
    - Verify each criterion against implementation
-2. Plannotator Review (REQUIRED gate)
+2. {{artifact-review}} Review (REQUIRED gate)
    **REQUIRED — do NOT proceed past this step until annotations are resolved.**
-   This is a hard dependency per `skills/{{artifact-review}}-usage/SKILL.md` (no terminal fallback).
+   This is a hard dependency per `the artifact review skill` (no terminal fallback).
 
-   FINDINGS → invoke Skill `{{artifact-review}}` with arg `.tff/milestones/<milestone>/slices/<slice-id>/VERIFICATION.md`
+   FINDINGS → invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/milestones/<milestone>/slices/<slice-id>/VERIFICATION.md`
    - feedback → revise the artifact, re-invoke
    - approved (no annotations ∨ all resolved) → continue
    - skipping this step is ¬ allowed; if {{artifact-review}} is unavailable, surface to user ∧ pause
@@ -28,7 +28,7 @@ LOAD @skills/verification-before-completion/SKILL.md
 
 ## Auto-Transition
 
-Read `.tff/settings.yaml` → `autonomy.mode`.
+Read `{{settings-path}}` → `autonomy.mode`.
 `plan-to-pr` ∧ ¬HUMAN_GATE → auto-invoke next workflow via `tff-tools workflow:next --status <status>`.
 `guided` → suggest next step, wait for user.
 Progress: `[tff] <slice-id>: verifying → reviewing`

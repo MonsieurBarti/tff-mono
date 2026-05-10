@@ -23,12 +23,12 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
    - Parse result → if `count > 0`:
      - ∀ stale claim: report `⚠ Task <id> (<title>) claimed at <claimedAt> — exceeds 30min TTL`
    - Add row to health report table: `| Stale claims | OK/X stale |`
-6. CHECK startup recovery: read `.tff/.recovery-marker` if present
+6. CHECK startup recovery: read `{{project-dir}}/.recovery-marker` if present
    - marker absent → row: `| Recovery | OK |`
    - marker present → read the JSON (`timestamp`, `errorMessage` fields)
      - re-run a throwaway CLI command: `node dist/cli/index.js schema --command slice:list 2>&1 >/dev/null` and capture stderr
      - stderr contains `tff: orphan recovery skipped` → row: `| Recovery | FAILING (see marker) |`; surface `timestamp` + `errorMessage` under the table; leave marker in place
-     - stderr is clean → delete `.tff/.recovery-marker` and row: `| Recovery | cleared |`
+     - stderr is clean → delete `{{project-dir}}/.recovery-marker` and row: `| Recovery | cleared |`
 7. CHECK observation liveness: `tff-tools observe:health`
    - Parse result:
      - `data.lastObservation.present === false` → row: `| Last observation | MISSING |`
@@ -65,7 +65,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
    ```
 
    - Recovery marker present with residual `tff: orphan recovery skipped` warning → report `FAILING` and surface the marker's `timestamp` + `errorMessage` under the table; leave the marker in place for the next run.
-   - Recovery marker present and stderr is clean → delete `.tff/.recovery-marker` to acknowledge recovery and report `cleared`.
+   - Recovery marker present and stderr is clean → delete `{{project-dir}}/.recovery-marker` to acknowledge recovery and report `cleared`.
 
 10. stale slices found → ask user: "Close stale slices?" → yes → `tff-tools slice:close --slice-id <id> --reason "PR already merged"`
 11. other issues found → offer `{{command-prefix}}sync` to reconcile

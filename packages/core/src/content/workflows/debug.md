@@ -34,14 +34,14 @@ exploration, spawn Explore subagents ∧ reason about their findings.
      (orchestrator drives prompt; tff-tools does ¬ prompt)
    - CREATE slice: `tff-tools slice:create --kind debug --base-branch <base-branch> --branch <name> --title <title>`
      → response includes slice_id
-   - CREATE worktree: `tff-tools worktree:create --slice-id <slice-id>` → `.tff/worktrees/D-##/`
+   - CREATE worktree: `tff-tools worktree:create --slice-id <slice-id>` → `{{project-dir}}/worktrees/D-##/`
 7. CLASSIFY: ask user → user picks tier (S / SS / SSS)
    - Default suggestion based on diagnosis: single-file root cause → S, multi-file → SS
 8. PLAN: write fix strategy + implicated files ∈ PLAN.md
-   - Write to `.tff/debug/<D-label>/PLAN.md`
+   - Write to `{{project-dir}}/debug/<D-label>/PLAN.md`
 9. HAND OFF to standard pipeline:
-   - invoke plan-slice workflow from step 8 (Plannotator Review) onward
-   - **step 8 is a REQUIRED gate** per `skills/{{artifact-review}}-usage/SKILL.md` — do NOT skip,
+   - invoke plan-slice workflow from step 8 ({{artifact-review}} Review) onward
+   - **step 8 is a REQUIRED gate** per `the artifact review skill` — do NOT skip,
      even for S-tier debug fixes; if {{artifact-review}} is unavailable, surface to user ∧ pause
    - then: execute-slice → verify-slice → ship-slice (standard workflows)
 

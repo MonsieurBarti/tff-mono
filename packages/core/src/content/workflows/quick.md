@@ -19,14 +19,14 @@ git repo ∃
    - CREATE slice via `tff-tools slice:create --kind quick --base-branch <base-branch> --branch <name> --title <title>`
      → response includes slice_id
    - CREATE worktree: `tff-tools worktree:create --slice-id <slice-id>`
-     → worktree at `.tff/worktrees/Q-##/`
+     → worktree at `{{project-dir}}/worktrees/Q-##/`
 2. CLASSIFY: ask user → user picks tier (S / SS / SSS)
    - Default suggestion: S (single-file fix) ∨ SS
 3. PLAN (lightweight): ask user for 1-2 sentence desc → single task ∈ PLAN.md
-   - Write to `.tff/quick/<Q-label>/PLAN.md`
+   - Write to `{{project-dir}}/quick/<Q-label>/PLAN.md`
 4. HAND OFF to standard pipeline:
-   - invoke plan-slice workflow from step 8 (Plannotator Review) onward
-   - **step 8 is a REQUIRED gate** per `skills/{{artifact-review}}-usage/SKILL.md` — do NOT skip,
+   - invoke plan-slice workflow from step 8 ({{artifact-review}} Review) onward
+   - **step 8 is a REQUIRED gate** per `the artifact review skill` — do NOT skip,
      even for S-tier quick fixes; if {{artifact-review}} is unavailable, surface to user ∧ pause
    - then: execute-slice → verify-slice → ship-slice (standard workflows)
 

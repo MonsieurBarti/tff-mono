@@ -10,7 +10,7 @@ tff project ∃
 
 ## Steps
 
-1. READ `.tff/settings.yaml` (if ∃)
+1. READ `{{settings-path}}` (if ∃)
    - If missing → offer to create from @references/settings-template.md
 2. DETECT missing fields: compare against template, list any absent sections
    - If missing fields found → offer to add them with defaults (preserve existing values + comments)
@@ -26,5 +26,5 @@ tff project ∃
    - Autonomy: mode selection with explanation of guided vs plan-to-pr
    - Workflow: toggle reminders/guards
    - Routing: enable/disable, tier policy, calibration toggles, model_judge enable
-6. WRITE updated `.tff/settings.yaml` (preserve comments where possible)
+6. WRITE updated `{{settings-path}}` (preserve comments where possible)
 7. NEXT: @references/next-steps.md

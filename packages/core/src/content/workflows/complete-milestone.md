@@ -27,7 +27,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
      Then DRAIN routing judgment (same dance as ship-slice.md step 7):
      a. `tff-tools routing:judge-prepare --slice <id>` → parse JSON
      b. IF `data.evidence == null` → `tff-tools judge:pending:clear --slice-id <id>` ∧ skip c–d
-     c. ELSE: write evidence to temp file, SPAWN tff-outcome-judge with evidence + verdicts paths, await
+     c. ELSE: write evidence to temp file, SPAWN {{outcome-judge}} with evidence + verdicts paths, await
      d. `tff-tools routing:judge-record --slice <id> --verdicts-path <verdicts-path>`
      - any error → surface, leave pending row, abort milestone close (user drains later via `{{command-prefix}}judge`)
    - if ¬ merged → warn user, block milestone completion

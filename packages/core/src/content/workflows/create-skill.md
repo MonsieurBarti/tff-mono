@@ -9,12 +9,12 @@ Draft new skill from pattern candidate ∨ user description.
 1. INPUT: candidate number (load from candidates.jsonl) ∨ free-text description
 2. LOAD @skills/skill-authoring/SKILL.md → SPAWN subagent ("Draft New Skill" mode):
    - provide pattern evidence (∨ description) + existing skills as format examples
-   - draft → `.tff/drafts/<skill-name>.md`
+   - draft → `{{project-dir}}/drafts/<skill-name>.md`
 3. VALIDATE: `tff-tools skills:validate --skill '<json>'`
    - fail → drafter fixes ∧ re-validates
-4. REVIEW: invoke Skill `{{artifact-review}}` with arg `.tff/drafts/<skill-name>.md`
+4. REVIEW: invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/drafts/<skill-name>.md`
 5. HANDLE:
-   - approved → move `.tff/drafts/<name>.md` → `skills/<name>.md`
+   - approved → move `{{project-dir}}/drafts/<name>.md` → `skills/<name>.md`
    - feedback → revise ∧ re-invoke `{{artifact-review}}`
    - rejected → delete draft
 6. NEXT: @references/next-steps.md

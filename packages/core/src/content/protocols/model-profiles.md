@@ -1,6 +1,6 @@
 # Model Profiles
 
-Agent model assignments configured per-project ∈ `.tff/settings.yaml`.
+Agent model assignments configured per-project ∈ `{{settings-path}}`.
 
 ## Default Profiles
 
@@ -21,7 +21,7 @@ Default model: {{balanced-model}}
 
 ## Configuration
 
-∈ `.tff/settings.yaml`:
+∈ `{{settings-path}}`:
 
 ```yaml
 model-profiles:

@@ -1,6 +1,6 @@
 ---
 name: settings-template
-description: Canonical commented YAML template for .tff/settings.yaml — single source of truth for defaults
+description: Canonical commented YAML template for {{settings-path}} — single source of truth for defaults
 ---
 
 ```yaml
@@ -14,13 +14,13 @@ description: Canonical commented YAML template for .tff/settings.yaml — single
 model-profiles:
   # Used by: code-reviewer, spec-reviewer, security-auditor
   quality:
-    model: { { quality-model } }
+    model: {{quality-model}}
   # Used by: subagents with critical skills
   balanced:
-    model: { { balanced-model } }
+    model: {{balanced-model}}
   # Used by: fixer, subagents with workflow/background skills
   budget:
-    model: { { balanced-model } }
+    model: {{balanced-model}}
 
 # ── Autonomy ──────────────────────────────────────────────────
 # Controls how workflows transition between phases.
@@ -80,14 +80,14 @@ routing:
   # Risk-level → model-tier mapping used by the layered router.
   # Tiers: {{budget-model}} (fastest), {{balanced-model}} (balanced), {{quality-model}} (most capable).
   tier_policy:
-    low: { { budget-model } }
-    medium: { { balanced-model } }
-    high: { { quality-model } }
+    low: {{budget-model}}
+    medium: {{balanced-model}}
+    high: {{quality-model}}
 
   # JSONL log of every routing decision. Path is resolved relative to
   # the project root and must remain inside it.
   logging:
-    path: .tff/logs/routing.jsonl
+    path: {{project-dir}}/logs/routing.jsonl
 
   # Calibration: aggregates routing outcomes per signal cell to flag
   # systematically over/under-tiered decisions.
@@ -107,7 +107,7 @@ routing:
     # Enabled by default; set `enabled: false` to disable `{{command-prefix}}judge`.
     model_judge:
       enabled: true
-      model: claude-{{budget-model}}-4-5-20251001
+      model: {{budget-model}}
       temperature: 0
       max_patch_bytes: 32768
       max_spec_bytes: 16384
