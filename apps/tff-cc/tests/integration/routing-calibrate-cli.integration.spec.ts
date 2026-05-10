@@ -13,10 +13,10 @@ describe("routing:calibrate CLI integration", () => {
 		dir = await mkdtemp(join(tmpdir(), "routing-calibrate-"));
 		process.chdir(dir);
 
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 	});
@@ -37,7 +37,7 @@ describe("routing:calibrate CLI integration", () => {
 	});
 
 	it("is deterministic: same logs produce byte-identical reports", async () => {
-		const routingPath = join(dir, ".tff-cc/logs/routing.jsonl");
+		const routingPath = join(dir, ".tff/logs/routing.jsonl");
 		await mkdir(dirname(routingPath), { recursive: true });
 		await appendFile(
 			routingPath,
@@ -59,9 +59,9 @@ describe("routing:calibrate CLI integration", () => {
 		);
 
 		await routingCalibrateCmd([]);
-		const md1 = await readFile(join(dir, ".tff-cc/logs/routing-calibration.md"), "utf8");
+		const md1 = await readFile(join(dir, ".tff/logs/routing-calibration.md"), "utf8");
 		await routingCalibrateCmd([]);
-		const md2 = await readFile(join(dir, ".tff-cc/logs/routing-calibration.md"), "utf8");
+		const md2 = await readFile(join(dir, ".tff/logs/routing-calibration.md"), "utf8");
 		const strip = (s: string) => s.replace(/^Generated at:.*$/m, "Generated at: <STABLE>");
 		expect(strip(md1)).toEqual(strip(md2));
 	});

@@ -44,7 +44,7 @@ describe("versionCmd", () => {
 	});
 
 	it("verbose output with marker present reports lastRecovery.status=skipped", async () => {
-		mkdirSync(join(repo, ".tff-cc"), { recursive: true });
+		mkdirSync(join(repo, ".tff"), { recursive: true });
 		const marker = {
 			timestamp: "2026-04-21T14:32:07.421Z",
 			errorMessage: "prior failure",
@@ -53,7 +53,7 @@ describe("versionCmd", () => {
 			platform: process.platform,
 			arch: process.arch,
 		};
-		writeFileSync(join(repo, ".tff-cc", ".recovery-marker"), JSON.stringify(marker));
+		writeFileSync(join(repo, ".tff", ".recovery-marker"), JSON.stringify(marker));
 		const out = JSON.parse(await versionCmd(["--verbose"]));
 		expect(out.data.lastRecovery).toEqual({
 			status: "skipped",

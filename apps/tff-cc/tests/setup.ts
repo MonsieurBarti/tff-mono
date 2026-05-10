@@ -3,7 +3,7 @@
  * Scrubs GIT_* environment variables to prevent ghost staging
  * during test execution, and isolates TFF_CC_HOME so tests that
  * transitively call getProjectId()/ensureProjectHomeDir() don't
- * leak empty project skeletons into the user's real ~/.tff-cc/.
+ * leak empty project skeletons into the user's real ~/.tff/.
  */
 
 import { mkdtempSync, rmSync } from "node:fs";

@@ -21,17 +21,17 @@ describe("routing:event CLI", () => {
 
 	it("writes a debug event line to routing.jsonl", async () => {
 		const { writeFile, mkdir } = await import("node:fs/promises");
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 
 		const out = await routingEventCmd(["--kind", "debug", "--slice", "M01-S01"]);
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(true);
-		const raw = await readFile(join(dir, ".tff-cc/logs/routing.jsonl"), "utf8");
+		const raw = await readFile(join(dir, ".tff/logs/routing.jsonl"), "utf8");
 		const entry = JSON.parse(raw.trim().split("\n").pop() ?? "");
 		expect(entry.kind).toBe("debug");
 		expect(entry.slice_id).toBe("M01-S01");
@@ -46,10 +46,10 @@ describe("routing:event CLI", () => {
 
 	it("debounces a second debug event for the same slice within 60s", async () => {
 		const { writeFile, mkdir } = await import("node:fs/promises");
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 
@@ -67,10 +67,10 @@ describe("routing:event CLI", () => {
 
 	it("returns reason=routing_disabled when routing is off", async () => {
 		const { writeFile, mkdir } = await import("node:fs/promises");
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: false\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: false\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 

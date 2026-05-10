@@ -47,7 +47,7 @@ describe("generateState", () => {
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/STATE.md");
+		const content = await artifactStore.read(".tff/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — MVP");
@@ -113,13 +113,13 @@ describe("generateState — kind scope", () => {
 		adapter.saveProject({ name: "Test", vision: "v" });
 	});
 
-	it("renders quick STATE with no slices and writes to .tff-cc/quick/STATE.md", async () => {
+	it("renders quick STATE with no slices and writes to .tff/quick/STATE.md", async () => {
 		const result = await generateState(
 			{ scope: "kind", kind: "quick" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/quick/STATE.md");
+		const content = await artifactStore.read(".tff/quick/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — Quick Slices");
@@ -127,13 +127,13 @@ describe("generateState — kind scope", () => {
 		}
 	});
 
-	it("renders debug STATE and writes to .tff-cc/debug/STATE.md", async () => {
+	it("renders debug STATE and writes to .tff/debug/STATE.md", async () => {
 		const result = await generateState(
 			{ scope: "kind", kind: "debug" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/debug/STATE.md");
+		const content = await artifactStore.read(".tff/debug/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — Debug Slices");
@@ -167,7 +167,7 @@ describe("generateState — kind scope", () => {
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/quick/STATE.md");
+		const content = await artifactStore.read(".tff/quick/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("Q-01");
@@ -184,7 +184,7 @@ describe("generateState — kind scope", () => {
 			{ scope: "kind", kind: "quick" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
-		const milestoneState = await artifactStore.read(".tff-cc/STATE.md");
+		const milestoneState = await artifactStore.read(".tff/STATE.md");
 		expect(isOk(milestoneState)).toBe(false);
 	});
 });

@@ -13,8 +13,8 @@ describe("SliceSpecFsReader", () => {
 
 	it("reads SPEC.md from a milestone-bound slice directory", async () => {
 		// Layout matches what slice:create writes:
-		//   .tff-cc/milestones/M01/slices/M01-S02/SPEC.md
-		const dir = join(root, ".tff-cc", "milestones", "M01", "slices", "M01-S02");
+		//   .tff/milestones/M01/slices/M01-S02/SPEC.md
+		const dir = join(root, ".tff", "milestones", "M01", "slices", "M01-S02");
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(join(dir, "SPEC.md"), "# auth flow spec\n\nbody", "utf8");
 
@@ -29,7 +29,7 @@ describe("SliceSpecFsReader", () => {
 	});
 
 	it("reads SPEC.md from a quick slice directory", async () => {
-		const dir = join(root, ".tff-cc", "quick", "Q-01");
+		const dir = join(root, ".tff", "quick", "Q-01");
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(join(dir, "SPEC.md"), "# quick spec", "utf8");
 
@@ -42,7 +42,7 @@ describe("SliceSpecFsReader", () => {
 	});
 
 	it("reads SPEC.md from a debug slice directory", async () => {
-		const dir = join(root, ".tff-cc", "debug", "D-03");
+		const dir = join(root, ".tff", "debug", "D-03");
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(join(dir, "SPEC.md"), "# debug spec", "utf8");
 
@@ -71,7 +71,7 @@ describe("SliceSpecFsReader", () => {
 	});
 
 	it("returns missing=true when the slice dir exists but SPEC.md is absent", async () => {
-		const dir = join(root, ".tff-cc", "milestones", "M01", "slices", "M01-S02");
+		const dir = join(root, ".tff", "milestones", "M01", "slices", "M01-S02");
 		mkdirSync(dir, { recursive: true });
 
 		const reader = new SliceSpecFsReader({ projectRoot: root });
@@ -82,7 +82,7 @@ describe("SliceSpecFsReader", () => {
 	});
 
 	it("truncates text larger than maxBytes and marks truncated=true", async () => {
-		const dir = join(root, ".tff-cc", "milestones", "M01", "slices", "M01-S02");
+		const dir = join(root, ".tff", "milestones", "M01", "slices", "M01-S02");
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(join(dir, "SPEC.md"), "x".repeat(500), "utf8");
 

@@ -123,7 +123,7 @@ describe("buildRoutingExtractInput", () => {
 		]);
 		expect(result.affected_files.length).toBeGreaterThanOrEqual(5); // → medium tier downstream
 		expect(result.spec_path).toBe(
-			join("/repo", ".tff-cc", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
+			join("/repo", ".tff", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
 		);
 	});
 
@@ -183,7 +183,7 @@ describe("buildRoutingExtractInput", () => {
 		expect(result.affected_files).toEqual([]);
 		// spec_path is still set so the keyword scan can still pick up SPEC.md
 		expect(result.spec_path).toBe(
-			join("/repo", ".tff-cc", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
+			join("/repo", ".tff", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
 		);
 	});
 });

@@ -49,7 +49,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("slice/a1b2c3d4");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/M01-S03");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/M01-S03");
 			expect(gitOps.hasBranch("slice/a1b2c3d4")).toBe(true);
 		}
 	});
@@ -75,7 +75,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("fix/payload");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/Q-07");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/Q-07");
 			expect(gitOps.hasBranch("fix/payload")).toBe(true);
 		}
 	});
@@ -101,7 +101,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("slice/12345678");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/D-03");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/D-03");
 			expect(gitOps.hasBranch("slice/12345678")).toBe(true);
 		}
 	});

@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe("CLI startup runs orphan recovery", () => {
-	it("cleans up stale *.tmp files in .tff-cc before dispatching", () => {
+	it("cleans up stale *.tmp files in .tff before dispatching", () => {
 		const stale = join(home, projectId, "STATE.md.tmp");
 		writeFileSync(stale, "stale");
 		const old = Math.floor(Date.now() / 1000) - 600;
@@ -49,7 +49,7 @@ describe("CLI startup runs orphan recovery", () => {
 		expect(existsSync(stale)).toBe(false);
 	});
 
-	it("cleans up stale *.tmp files in .tff-cc subdirectories before dispatching", () => {
+	it("cleans up stale *.tmp files in .tff subdirectories before dispatching", () => {
 		const subDir = join(home, projectId, "milestones", "M01", "slices", "M01-S01");
 		mkdirSync(subDir, { recursive: true });
 		const stale = join(subDir, "PLAN.md.tmp");

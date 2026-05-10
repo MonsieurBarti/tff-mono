@@ -9,12 +9,12 @@ let originalCwd: string;
 
 const setupProject = async () => {
 	tmp = await mkdtemp(join(tmpdir(), "routing-phase-c-"));
-	await mkdir(join(tmp, ".tff-cc", "logs"), { recursive: true });
+	await mkdir(join(tmp, ".tff", "logs"), { recursive: true });
 	await mkdir(join(tmp, "agents"), { recursive: true });
 	await mkdir(join(tmp, "commands", "tff"), { recursive: true });
 	await writeFile(
-		join(tmp, ".tff-cc", "settings.yaml"),
-		`routing:\n  enabled: true\n  confidence_threshold: 0.5\n  tier_policy:\n    low: haiku\n    medium: sonnet\n    high: opus\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n`,
+		join(tmp, ".tff", "settings.yaml"),
+		`routing:\n  enabled: true\n  confidence_threshold: 0.5\n  tier_policy:\n    low: haiku\n    medium: sonnet\n    high: opus\n  logging:\n    path: .tff/logs/routing.jsonl\n`,
 	);
 	const agent = (id: string, handles: string, priority: number) =>
 		`---\nname: ${id}\nmodel: opus\nrouting:\n  handles: [${handles}]\n  priority: ${priority}\n  min_tier: haiku\n---\n\n# ${id}\n`;
@@ -69,7 +69,7 @@ describe("routing phase C — /tff:ship integration", () => {
 			expect(d.tier_decision_id).toMatch(/^[0-9a-f-]{36}$/);
 		}
 
-		const raw = await readFile(join(tmp, ".tff-cc", "logs", "routing.jsonl"), "utf8");
+		const raw = await readFile(join(tmp, ".tff", "logs", "routing.jsonl"), "utf8");
 		const lines = raw
 			.trim()
 			.split("\n")

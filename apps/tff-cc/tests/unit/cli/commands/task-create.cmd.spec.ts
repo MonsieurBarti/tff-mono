@@ -96,7 +96,7 @@ describe("task:create — persists tasks + regenerates STATE.md", () => {
 	});
 
 	it("regenerates STATE.md so Tasks: N/M reflects the new task", async () => {
-		const stateFile = path.join(tmpDir, ".tff-cc", "STATE.md");
+		const stateFile = path.join(tmpDir, ".tff", "STATE.md");
 
 		// Before: empty slice → 0/0
 		const before = readFileSync(stateFile, "utf8");

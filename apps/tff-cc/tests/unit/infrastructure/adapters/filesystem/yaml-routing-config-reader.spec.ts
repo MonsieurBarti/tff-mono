@@ -9,14 +9,13 @@ describe("YamlRoutingConfigReader", () => {
 	let dir: string;
 	beforeEach(async () => {
 		dir = await mkdtemp(join(tmpdir(), "routing-cfg-"));
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 	});
 	afterEach(async () => {
 		await rm(dir, { recursive: true, force: true });
 	});
 
-	const write = (contents: string) =>
-		writeFile(join(dir, ".tff-cc/settings.yaml"), contents, "utf8");
+	const write = (contents: string) => writeFile(join(dir, ".tff/settings.yaml"), contents, "utf8");
 
 	it("returns disabled default when settings.yaml has no routing section", async () => {
 		await write("autonomy:\n  mode: guided\n");
@@ -33,7 +32,7 @@ describe("YamlRoutingConfigReader", () => {
   enabled: true
   confidence_threshold: 0.5
   logging:
-    path: .tff-cc/logs/routing.jsonl
+    path: .tff/logs/routing.jsonl
 `,
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: dir });
@@ -42,7 +41,7 @@ describe("YamlRoutingConfigReader", () => {
 		if (!isOk(res)) return;
 		expect(res.data.enabled).toBe(true);
 		expect(res.data.confidence_threshold).toBe(0.5);
-		expect(res.data.logging.path).toBe(".tff-cc/logs/routing.jsonl");
+		expect(res.data.logging.path).toBe(".tff/logs/routing.jsonl");
 	});
 
 	it("returns disabled default when settings.yaml does not exist", async () => {
@@ -59,7 +58,7 @@ describe("YamlRoutingConfigReader.readPool", () => {
 
 	const mkProject = async (): Promise<string> => {
 		const dir = await mkdtemp(join(tmpdir(), "yaml-routing-pool-"));
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await mkdir(join(dir, "agents"), { recursive: true });
 		await mkdir(join(dir, "commands", "tff"), { recursive: true });
 		return dir;
@@ -106,7 +105,7 @@ describe("YamlRoutingConfigReader.readPool", () => {
 		await writeAgent(tmp, "tff-security-auditor", ["c"]);
 		await writeShipFrontmatter(tmp, ["tff-spec-reviewer"]);
 		await writeFile(
-			join(tmp, ".tff-cc", "settings.yaml"),
+			join(tmp, ".tff", "settings.yaml"),
 			`routing:\n  enabled: true\n  pools:\n    tff:ship:\n      - tff-code-reviewer\n      - tff-security-auditor\n`,
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: tmp });
@@ -272,7 +271,7 @@ describe("YamlRoutingConfigReader.readPool", () => {
 		await writeAgent(tmp, "tff-spec-reviewer", ["x"]);
 		await writeShipFrontmatter(tmp, ["tff-spec-reviewer"]);
 		await writeFile(
-			join(tmp, ".tff-cc", "settings.yaml"),
+			join(tmp, ".tff", "settings.yaml"),
 			"routing:\n  pools:\n    - not-a-map-but-array\n",
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: tmp });
@@ -286,7 +285,7 @@ describe("YamlRoutingConfigReader.readPool", () => {
 		await writeAgent(tmp, "tff-spec-reviewer", ["x"]);
 		await writeShipFrontmatter(tmp, ["tff-spec-reviewer"]);
 		await writeFile(
-			join(tmp, ".tff-cc", "settings.yaml"),
+			join(tmp, ".tff", "settings.yaml"),
 			"routing:\n  pools:\n    tff:ship: [oops\n",
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: tmp });
@@ -309,7 +308,7 @@ describe("YamlRoutingConfigReader — calibration block", () => {
 	let dir: string;
 	beforeEach(async () => {
 		dir = await mkdtemp(join(tmpdir(), "yaml-calib-"));
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 	});
 	afterEach(async () => {
 		await rm(dir, { recursive: true, force: true });
@@ -317,8 +316,8 @@ describe("YamlRoutingConfigReader — calibration block", () => {
 
 	it("parses routing.calibration.{n_min, debug_join.enabled}", async () => {
 		await writeFile(
-			join(dir, ".tff-cc/settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n  calibration:\n    n_min: 3\n    debug_join:\n      enabled: false\n",
+			join(dir, ".tff/settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n  calibration:\n    n_min: 3\n    debug_join:\n      enabled: false\n",
 			"utf8",
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: dir });
@@ -331,8 +330,8 @@ describe("YamlRoutingConfigReader — calibration block", () => {
 
 	it("calibration block is optional — absence produces undefined", async () => {
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 		const reader = new YamlRoutingConfigReader({ projectRoot: dir });
@@ -351,9 +350,9 @@ describe("logging.path containment", () => {
 		const { join: j } = await import("node:path");
 		const d = await mkdtemp(j(tmpdir(), "yaml-path-esc-"));
 		try {
-			await mkdir(j(d, ".tff-cc"), { recursive: true });
+			await mkdir(j(d, ".tff"), { recursive: true });
 			await wf(
-				j(d, ".tff-cc", "settings.yaml"),
+				j(d, ".tff", "settings.yaml"),
 				"routing:\n  enabled: true\n  logging:\n    path: ../../evil/routing.jsonl\n",
 				"utf8",
 			);
@@ -374,10 +373,10 @@ describe("logging.path containment", () => {
 		const { join: j } = await import("node:path");
 		const d = await mkdtemp(j(tmpdir(), "yaml-path-ok-"));
 		try {
-			await mkdir(j(d, ".tff-cc"), { recursive: true });
+			await mkdir(j(d, ".tff"), { recursive: true });
 			await wf(
-				j(d, ".tff-cc", "settings.yaml"),
-				"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+				j(d, ".tff", "settings.yaml"),
+				"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 				"utf8",
 			);
 			const { YamlRoutingConfigReader: R } =

@@ -8,10 +8,10 @@ const SLICE = "M01-S02";
 const D1 = "00000000-0000-4000-8000-000000000001";
 
 const seed = (root: string) => {
-	mkdirSync(join(root, ".tff-cc", "logs"), { recursive: true });
-	mkdirSync(join(root, ".tff-cc", "milestones", "M01", "S02-auth"), { recursive: true });
+	mkdirSync(join(root, ".tff", "logs"), { recursive: true });
+	mkdirSync(join(root, ".tff", "milestones", "M01", "S02-auth"), { recursive: true });
 	writeFileSync(
-		join(root, ".tff-cc", "settings.yaml"),
+		join(root, ".tff", "settings.yaml"),
 		`routing:
   enabled: true
   calibration:
@@ -20,7 +20,7 @@ const seed = (root: string) => {
 `,
 	);
 	writeFileSync(
-		join(root, ".tff-cc", "logs", "routing.jsonl"),
+		join(root, ".tff", "logs", "routing.jsonl"),
 		`${JSON.stringify({
 			kind: "route",
 			timestamp: "2026-04-20T09:00:00.000Z",
@@ -63,7 +63,7 @@ describe("routing:judge-record — roundtrip", () => {
 		expect(parsed.ok).toBe(true);
 		expect(parsed.data.outcomes_emitted).toBe(1);
 
-		const lines = readFileSync(join(root, ".tff-cc", "logs", "routing-outcomes.jsonl"), "utf8")
+		const lines = readFileSync(join(root, ".tff", "logs", "routing-outcomes.jsonl"), "utf8")
 			.trim()
 			.split("\n")
 			.filter(Boolean);

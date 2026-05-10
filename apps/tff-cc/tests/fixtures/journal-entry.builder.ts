@@ -10,7 +10,7 @@ import type {
 	TaskFailedEntry,
 	TaskStartedEntry,
 } from "../../src/domain/value-objects/journal-entry.js";
-import { sliceDir } from "../../src/shared/paths.js";
+import { sliceDir } from "@tff/core";
 
 export class JournalEntryBuilder {
 	private _sliceId: string = crypto.randomUUID();

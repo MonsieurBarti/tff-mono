@@ -17,7 +17,7 @@ const DETERMINISTIC_SIGNALS: Signals = {
 const CONFIG: RoutingConfig = {
 	enabled: true,
 	confidence_threshold: 0.5,
-	logging: { path: ".tff-cc/logs/routing.jsonl" },
+	logging: { path: ".tff/logs/routing.jsonl" },
 };
 
 const mkDeps = () => {

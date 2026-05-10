@@ -17,13 +17,13 @@ describe("touchMutatingSentinel", () => {
 
 	it("creates the sentinel file on first call", () => {
 		touchMutatingSentinel(tmp);
-		expect(fs.existsSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"))).toBe(true);
+		expect(fs.existsSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"))).toBe(true);
 	});
 
 	it("is idempotent on repeated calls", () => {
 		touchMutatingSentinel(tmp);
 		touchMutatingSentinel(tmp);
-		expect(fs.existsSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"))).toBe(true);
+		expect(fs.existsSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"))).toBe(true);
 	});
 
 	it("swallows errors silently (non-fatal to mutating commands)", () => {
