@@ -1,3 +1,4 @@
+import { unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import type { Milestone } from "../../../domain/entities/milestone.js";
@@ -51,7 +52,7 @@ import type { TaskUpdateProps } from "../../../domain/value-objects/task-update-
 import type { WorkflowSession } from "../../../domain/value-objects/workflow-session.js";
 import { getProjectHome, getProjectId } from "../../home-directory.js";
 import { openDatabase } from "./open-database.js";
-import { runMigrations } from "./schema.js";
+import { runMigrations } from "@tff/core";
 
 interface SliceRow {
 	id: string;
@@ -94,7 +95,11 @@ export class SQLiteStateAdapter
 		MilestoneAuditStore,
 		PendingJudgmentStore
 {
-	constructor(private db: Database.Database) {}
+	constructor(
+		private db: Database.Database,
+		private dbPath: string,
+		private migrationsDir?: string,
+	) {}
 
 	/**
 	 * Create adapter with path derived from home directory.
@@ -111,27 +116,37 @@ export class SQLiteStateAdapter
 	 * Create adapter with explicit path (backward compatibility).
 	 * Used by tests and migrations.
 	 */
-	static createWithPath(dbPath: string): SQLiteStateAdapter {
+	static createWithPath(dbPath: string, migrationsDir?: string): SQLiteStateAdapter {
 		const db = openDatabase(dbPath);
-		return new SQLiteStateAdapter(db);
+		return new SQLiteStateAdapter(db, dbPath, migrationsDir);
 	}
 
-	static createInMemory(): SQLiteStateAdapter {
+	static createInMemory(migrationsDir?: string): SQLiteStateAdapter {
 		const db = openDatabase(":memory:");
-		return new SQLiteStateAdapter(db);
+		return new SQLiteStateAdapter(db, ":memory:", migrationsDir);
 	}
 
 	// DatabaseInit
 	init(): Result<void, DomainError> {
 		try {
-			runMigrations(this.db);
+			runMigrations(this.db, this.migrationsDir);
 			return Ok(undefined);
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : String(e);
 			if (msg.includes("VERSION_MISMATCH")) {
-				const dbVer = Number(msg.match(/version (\d+)/)?.[1] ?? 0);
-				const codeVer = Number(msg.match(/code version (\d+)/)?.[1] ?? 0);
-				return Err(versionMismatchError(dbVer, codeVer));
+				if (!this.dbPath || this.dbPath === ":memory:") {
+					const dbVer = Number(msg.match(/version (\d+)/)?.[1] ?? 0);
+					const codeVer = Number(msg.match(/code version (\d+)/)?.[1] ?? 0);
+					return Err(versionMismatchError(dbVer, codeVer));
+				}
+				console.warn(
+					`[tff] Database schema version mismatch at ${this.dbPath}; wiping and recreating.`,
+				);
+				this.db.close();
+				unlinkSync(this.dbPath);
+				this.db = openDatabase(this.dbPath);
+				runMigrations(this.db, this.migrationsDir);
+				return Ok(undefined);
 			}
 			return Err(createDomainError("WRITE_FAILURE", `Migration failed: ${msg}`));
 		}
