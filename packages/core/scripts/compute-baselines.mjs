@@ -18,14 +18,32 @@ function sha256(content) {
 	return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
 
-let existing = { version: 1, agents: {}, skills: {}, workflows: {}, protocols: {} };
+let existing = {
+	version: 1,
+	agents: {},
+	skills: {},
+	workflows: {},
+	protocols: {},
+	commands: {},
+	templates: {},
+};
 if (fs.existsSync(baselinesPath)) {
 	existing = JSON.parse(fs.readFileSync(baselinesPath, "utf8"));
 	existing.workflows = existing.workflows || {};
 	existing.protocols = existing.protocols || {};
+	existing.commands = existing.commands || {};
+	existing.templates = existing.templates || {};
 }
 
-const baselines = { version: 1, agents: {}, skills: {}, workflows: {}, protocols: {} };
+const baselines = {
+	version: 1,
+	agents: {},
+	skills: {},
+	workflows: {},
+	protocols: {},
+	commands: {},
+	templates: {},
+};
 
 // Agents
 const agentsDir = path.join(contentRoot, "agents");
@@ -86,7 +104,37 @@ if (fs.existsSync(protocolsDir)) {
 	}
 }
 
+// Commands
+const commandsDir = path.join(contentRoot, "commands");
+if (fs.existsSync(commandsDir)) {
+	for (const file of fs.readdirSync(commandsDir).filter((f) => f.endsWith(".md"))) {
+		const name = path.basename(file, ".md");
+		const content = fs.readFileSync(path.join(commandsDir, file), "utf8");
+		const hash = sha256(normalize(content));
+		const prev = existing.commands[name];
+		baselines.commands[name] = {
+			approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+			sha256: hash,
+		};
+	}
+}
+
+// Templates
+const templatesDir = path.join(contentRoot, "templates");
+if (fs.existsSync(templatesDir)) {
+	for (const file of fs.readdirSync(templatesDir).filter((f) => f.endsWith(".md"))) {
+		const name = path.basename(file, ".md");
+		const content = fs.readFileSync(path.join(templatesDir, file), "utf8");
+		const hash = sha256(normalize(content));
+		const prev = existing.templates[name];
+		baselines.templates[name] = {
+			approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+			sha256: hash,
+		};
+	}
+}
+
 fs.writeFileSync(baselinesPath, JSON.stringify(baselines, null, 2) + "\n");
 console.log(
-	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills, ${Object.keys(baselines.workflows).length} workflows, ${Object.keys(baselines.protocols).length} protocols`,
+	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills, ${Object.keys(baselines.workflows).length} workflows, ${Object.keys(baselines.protocols).length} protocols, ${Object.keys(baselines.commands).length} commands, ${Object.keys(baselines.templates).length} template`,
 );
