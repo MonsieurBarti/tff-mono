@@ -983,22 +983,16 @@ export class SQLiteStateAdapter
 	// MilestoneAuditStore
 	upsertAudit(r: MilestoneAuditRecord): Result<void, DomainError> {
 		try {
-			const existing = this.db
-				.prepare("SELECT 1 FROM milestone_audit WHERE milestone_id = ?")
-				.get(r.milestoneId);
-			if (existing) {
-				this.db
-					.prepare(
-						"UPDATE milestone_audit SET verdict = ?, audited_at = ?, notes = ? WHERE milestone_id = ?",
-					)
-					.run(r.verdict, r.auditedAt, r.notes ?? null, r.milestoneId);
-			} else {
-				this.db
-					.prepare(
-						"INSERT INTO milestone_audit(milestone_id, verdict, audited_at, notes) VALUES (?, ?, ?, ?)",
-					)
-					.run(r.milestoneId, r.verdict, r.auditedAt, r.notes ?? null);
-			}
+			this.db
+				.prepare(
+					`INSERT INTO milestone_audit(milestone_id, verdict, audited_at, notes)
+					 VALUES (?, ?, ?, ?)
+					 ON CONFLICT(milestone_id) DO UPDATE SET
+					   verdict = excluded.verdict,
+					   audited_at = excluded.audited_at,
+					   notes = excluded.notes`,
+				)
+				.run(r.milestoneId, r.verdict, r.auditedAt, r.notes ?? null);
 			return Ok(undefined);
 		} catch (e) {
 			return Err(createDomainError("WRITE_FAILURE", `Failed to upsert audit: ${e}`));
