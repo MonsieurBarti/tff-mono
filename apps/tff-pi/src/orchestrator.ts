@@ -38,6 +38,19 @@ const CORE_PROTOCOLS_DIR = join(
 	"protocols",
 );
 
+const CORE_SKILLS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"skills",
+);
+
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);
 	if (!project) return null;
@@ -79,6 +92,20 @@ function loadResource(path: string): string {
 			// Placeholder resolution for tff-pi context
 			content = content.replace(/\{\{project-dir\}\}/g, ".pi/.tff");
 			return content;
+		} catch {
+			return "";
+		}
+	}
+}
+
+export function loadSkill(skillName: string): string {
+	const localPath = join(RESOURCES_DIR, "skills", skillName, "SKILL.md");
+	try {
+		return readFileSync(localPath, "utf-8");
+	} catch {
+		const corePath = join(CORE_SKILLS_DIR, skillName, "SKILL.md");
+		try {
+			return readFileSync(corePath, "utf-8");
 		} catch {
 			return "";
 		}
