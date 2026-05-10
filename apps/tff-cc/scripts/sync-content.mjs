@@ -9,6 +9,7 @@ import {
 	statSync,
 	writeFileSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -138,9 +139,27 @@ for (const { from, to, ext, isDir, exclude } of mappings) {
 // ── Generate skill-baselines.json ──────────────────────────────────
 const coreBaselinesPath = join(coreContent, "content-baselines.json");
 const coreBaselines = JSON.parse(readFileSync(coreBaselinesPath, "utf8"));
+const skills = { ...coreBaselines.skills };
+
+// Merge app-specific skills not present in core
+const appSkillsDir = join(appRoot, "skills");
+for (const id of readdirSync(appSkillsDir)) {
+	const skillPath = join(appSkillsDir, id, "SKILL.md");
+	if (!existsSync(skillPath)) continue;
+	if (skills[id]) continue;
+	const content = readFileSync(skillPath, "utf8");
+	const sha256 = createHash("sha256").update(content, "utf8").digest("hex");
+	skills[id] = {
+		approvedAt: new Date().toISOString(),
+		originalCommitSha: null,
+		refinementId: null,
+		sha256,
+	};
+}
+
 const skillBaselines = {
 	version: coreBaselines.version,
-	skills: coreBaselines.skills,
+	skills,
 };
 writeFileSync(
 	join(appRoot, "skills", "skill-baselines.json"),

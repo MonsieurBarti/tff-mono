@@ -35,121 +35,121 @@
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "0f2dbad25801d574741686f621193e663f4a548f61d8df39abb61e2ce1a1f3b1"
+			"sha256": "f72d619ef11f2a34437c31830fd864fc6fd0a9e94ec080a90ef95895fe6ba6cd"
 		},
 		"agent-authoring": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "5fb1c57c541cc5a0d808338bd64bd434771065aa173322bab0b53e9f9c0163dd"
+			"sha256": "e57cf523ac578e977e17bff8633f5f6965daad63cecb129060bc08dab67738cc"
 		},
 		"architecture-review": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "d7e1b62c50c48d13280d278975b471cbf707afdab34f6865f3a457c1cd2ec6e0"
+			"sha256": "35846c2f270c680ccf3ea1ca4c20de83f47246942d32fdf870ca3fa2161ca58d"
 		},
 		"brainstorming": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "36ffea1b1ee25af5e97351871018eae10b5938bfd639c5d0b6f7b61cc8243c3c"
+			"sha256": "98808a8bab4685c8d0b0177a58d25d2bfcd33b2318b841a2d567d6b2edafc15f"
 		},
 		"code-review-protocol": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "6591b85a2e4cfbfdf9222bad8a7dc9cae74f143c0eaf91d4ec72c1b6cccdb327"
+			"sha256": "e72d2ef49c3099008461230e50bc331fc732d37f8d2289030854f6d620a28d5b"
 		},
 		"codebase-documentation": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "cce3eec3a392dfb29e2418a1325bd65dc6f5ebee74e989073cf1ade78e5c6036"
+			"sha256": "43f9c4e17ab47d4e4cf1641b1b0687431bea7e4ca336279a49597231fe7cfa30"
 		},
 		"commit-conventions": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "378440993db31da9a54c253286a789442d11a5642fd52720db677f046a5efab8"
+			"sha256": "3af47bd5d9b78a860bca1d4aec093c06c63ef3a6ffb0b14e6166833914e7315e"
 		},
 		"create-skill": {
 			"approvedAt": "2026-05-09T22:03:34.424Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "e366c32c32b3415ff4625b47e23ea8555684a479e684ba2f71e5ee1ce853a35f"
+			"sha256": "49867caad3721934c4280846f2f025e1500488c6b3a98d3494d591b3def8ecf8"
 		},
 		"executing-plans": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "74f7b393ab2b1bda318ce55441b79bbd3b378e7d1cb792c434a18b8d5d172684"
+			"sha256": "b2e5521c29c6744c4277dc8965321f84ecbc11c54b0c6f2d4da4ee539b1eed36"
 		},
 		"finishing-work": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "8ff79a7250923ad39f00defbe634b1d1686896a7921019f0973bcce2f20993e1"
+			"sha256": "c0346eb41e2efe60ba140148d654f6c8f90857b080502ba0fb3087f779ee32c3"
 		},
 		"hexagonal-architecture": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "c57c2515757d3c116f68a61220a655c78b2abd2b1fed16e2ab685ba4e9fbe2b6"
+			"sha256": "3d7dc5b7a624f2654e9361bac1446b88a51d8b28ae3271a4f51e109aba193a4e"
 		},
 		"plannotator-usage": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "e493e7431caf2fbaff8b96eb4e54710d5c4d97d68e10cc92099966b41b840818"
+			"sha256": "d88c9ebac0d9fb57a728b0792f8027eeee927a28b7be505bd9f8a701b189c014"
 		},
 		"receiving-code-review": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "3e65ef2f52650f32f9d0ab8835965a728e3394f8bd3428f8ac9e3b914cabf195"
+			"sha256": "9b9ad044d4cb65d8f34b6c03034b253e96e3ec86da82f79db38a63871b41fb6e"
 		},
 		"report-issue": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "b774ade8e5ce31b9bd3358fea79b62ab28bc36578d8e43c4e5f9812c5083af96"
+			"sha256": "7c23378f5c036084ea8d8baa9e7baeed0f0cba982961617f7dd37c9517b6cb1a"
 		},
 		"security-review": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "a355532a47b690f549ed7248900bd1270252b6f93cdcc8bc9922a53f85886caf"
+			"sha256": "9c065203e81200e626f7ac28306134d632b6197bd9ee1c4694a05163c3a3dc0e"
 		},
 		"stress-testing-specs": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "12aff271b45e48d00f40639c7007a83ddcfb495be5039c452d1c210dbcb8799c"
+			"sha256": "6f8ad9dec5468fe248689c605f77bfe8e58137ff9fb7a06634af7a80691b21a3"
 		},
 		"systematic-debugging": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "013358fcdc140f10aed71d488a8266d349b954c5d15b0ea6044f3cbafa93dd1b"
+			"sha256": "536e5c505ee2f184bfd077176db6eb4e9a8d3ecb0ce0fa260343cca8a0480f9e"
 		},
 		"test-driven-development": {
 			"approvedAt": "2026-05-09T22:03:34.425Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "214c93df5a59492e39fcc1c1940dab22c06959f127dff7ed074ba6ae1eb27c85"
+			"sha256": "f5fabb0a5ee50dc21c1c867c71541d913c1fe75a7f860bac0f11d5fb11c28ee8"
 		},
 		"verification-before-completion": {
 			"approvedAt": "2026-05-09T22:03:34.426Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "d49eae1e40e6f6291ad0fbafa43372693e2e85c046f69b525a806e8dc9b3b5d7"
+			"sha256": "f1f5bbb48bb55f99219a216f63c2cbe0ffa2e74427a35cd37fba02b695be4d7a"
 		},
 		"writing-plans": {
 			"approvedAt": "2026-05-09T22:03:34.426Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "28ae3399ced8b30a67b71bb569af7118f64729bf5d7dab8338c4c0795ec39d50"
+			"sha256": "495d5b7e525d4c9913fc0a9462c1480b216412ee57f52c5d22fcbc4e61577fcd"
 		}
 	},
 	"workflows": {
