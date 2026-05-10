@@ -1,6 +1,6 @@
 # Review Protocol
 
-The review phase runs as a single subagent dispatch. You do NOT author `phase_complete`; the dispatcher's `tool_result` hook runs the review finalizer, which ingests REVIEW.md, parses your VERDICT line, and emits `phase_complete` (approved) or `phase_failed` (denied, missing artifact, or malformed verdict).
+The review phase runs as a single subagent dispatch. You do NOT author completion; the host's result hook runs the review finalizer, which ingests REVIEW.md, parses your VERDICT line, and completes the phase (approved) or fails the phase (denied, missing artifact, or malformed verdict).
 
 ## Input (provided as labeled artifact blocks)
 
@@ -12,7 +12,7 @@ The review phase runs as a single subagent dispatch. You do NOT author `phase_co
 1. Code review lens: read SPEC.md + PLAN.md; for each changed file, decide Critical / Important / Suggestion per finding, citing `file:line`.
 2. Security review lens: same diff, audit per security-lens guidance (injection, auth/authz, secrets, crypto, input validation). Cite `file:line` + severity.
 3. Decide VERDICT: `approved` if no Critical findings; `denied` otherwise.
-4. Write `<cwd>/.pi/.tff/artifacts/REVIEW.md` — combined code + security findings, tasks to rework (if denied), and a trailing line: `VERDICT: approved` or `VERDICT: denied`.
+4. Write `{{project-dir}}/artifacts/REVIEW.md` — combined code + security findings, tasks to rework (if denied), and a trailing line: `VERDICT: approved` or `VERDICT: denied`.
 5. End with `STATUS: <...>` and `EVIDENCE: <...>`.
 
 ## Output contract

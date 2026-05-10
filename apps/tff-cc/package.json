@@ -7,7 +7,9 @@
 		"node": ">=22"
 	},
 	"scripts": {
-		"build": "node scripts/build.mjs",
+		"postinstall": "node scripts/sync-content.mjs",
+		"sync-content": "node scripts/sync-content.mjs",
+		"build": "pnpm run sync-content && node scripts/build.mjs",
 		"dev": "tsc -p tsconfig.build.json --watch",
 		"test": "vitest run",
 		"test:watch": "vitest",
