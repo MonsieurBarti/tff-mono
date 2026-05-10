@@ -22,12 +22,6 @@ import {
 } from "../../home-directory.js";
 import { JsonlJournalAdapter } from "../journal/jsonl-journal.adapter.js";
 import { SQLiteStateAdapter } from "./sqlite-state.adapter.js";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
-const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-const computedMigrationsDir = path.resolve(moduleDir, "migrations");
-const defaultMigrationsDir = existsSync(computedMigrationsDir) ? computedMigrationsDir : undefined;
 
 export interface StateStores {
 	db: DatabaseInit & TransactionRunner;
@@ -74,7 +68,7 @@ export function createStateStoresUnchecked(dbPath?: string): StateStores {
 		? { dbPath, journalPath: path.join(path.dirname(dbPath), "journal") }
 		: getDerivedPaths();
 
-	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath, defaultMigrationsDir);
+	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath);
 	const initResult = adapter.init();
 	if (!initResult.ok) throw new Error(`DB init failed: ${initResult.error.message}`);
 	const journalRepository = new JsonlJournalAdapter(journalPath);
@@ -112,7 +106,7 @@ export function createClosableStateStoresUnchecked(dbPath?: string): ClosableSta
 		? { dbPath, journalPath: path.join(path.dirname(dbPath), "journal") }
 		: getDerivedPaths();
 
-	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath, defaultMigrationsDir);
+	const adapter = SQLiteStateAdapter.createWithPath(resolvedPath);
 	const initResult = adapter.init();
 	if (!initResult.ok) throw new Error(`DB init failed: ${initResult.error.message}`);
 	const journalRepository = new JsonlJournalAdapter(journalPath);
