@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
 import { readArtifact } from "./common/artifacts.js";
@@ -24,6 +24,32 @@ export interface PhasePrompt {
 }
 
 export const RESOURCES_DIR = join(fileURLToPath(new URL(".", import.meta.url)), "resources");
+
+const CORE_PROTOCOLS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"protocols",
+);
+
+const CORE_SKILLS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"skills",
+);
 
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);
@@ -58,7 +84,32 @@ function loadResource(path: string): string {
 	try {
 		return readFileSync(path, "utf-8");
 	} catch {
-		return "";
+		// Fallback: shared protocols may have been migrated to core
+		const filename = basename(path);
+		const corePath = join(CORE_PROTOCOLS_DIR, filename);
+		try {
+			let content = readFileSync(corePath, "utf-8");
+			// Placeholder resolution for tff-pi context
+			content = content.replace(/\{\{project-dir\}\}/g, ".pi/.tff");
+			return content;
+		} catch {
+			return "";
+		}
+	}
+}
+
+export function loadSkill(skillName: string): string {
+	validateResourceName(skillName);
+	const localPath = join(RESOURCES_DIR, "skills", skillName, "SKILL.md");
+	try {
+		return readFileSync(localPath, "utf-8");
+	} catch {
+		const corePath = join(CORE_SKILLS_DIR, skillName, "SKILL.md");
+		try {
+			return readFileSync(corePath, "utf-8");
+		} catch {
+			return "";
+		}
 	}
 }
 
@@ -96,7 +147,19 @@ export const PHASE_TOOLS: Record<Phase, string[]> = {
 	"ship-fix": ["tff_ask_user", "tff_ship_apply_done"],
 };
 
+function validateResourceName(name: string): void {
+	if (
+		!/^[a-z0-9-]{1,64}$/.test(name) ||
+		name.startsWith("-") ||
+		name.endsWith("-") ||
+		name.includes("--")
+	) {
+		throw new Error(`Invalid resource name: ${name}`);
+	}
+}
+
 export function loadAgentResource(agentName: string): string {
+	validateResourceName(agentName);
 	return loadResource(join(RESOURCES_DIR, "agents", `${agentName}.md`));
 }
 

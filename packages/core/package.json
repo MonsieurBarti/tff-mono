@@ -1,0 +1,30 @@
+{
+	"name": "@tff/core",
+	"version": "0.1.0",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc && rm -rf dist/db/migrations && cp -r src/db/migrations dist/db/migrations",
+		"test": "vitest run",
+		"lint": "oxlint --config ../../.oxlintrc.json src/ tests/"
+	},
+	"dependencies": {
+		"better-sqlite3": "^12.8.0",
+		"zod": "^3.25.0"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.13",
+		"@types/node": "^25.5.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.0",
+		"yaml": "^2.8.4"
+	}
+}

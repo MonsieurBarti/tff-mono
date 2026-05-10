@@ -41,3 +41,15 @@ coverage/
 
 # TFF defaults
 /.tff
+
+# Derived content (synced from packages/core)
+# NOTE: exception patterns are order-dependent. Add new app-specific
+# exceptions BEFORE the wildcard and AFTER the exception.
+/agents/
+/commands/tff/
+/workflows/
+
+/skills/*
+
+/references/*
+!/references/release-checklist.md

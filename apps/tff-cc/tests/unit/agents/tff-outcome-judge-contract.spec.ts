@@ -39,7 +39,7 @@ describe("tff-outcome-judge agent contract", () => {
 describe("ship-slice DRAIN block — judge prompt", () => {
 	it("references the agent by id and does NOT inline a custom verdict schema", () => {
 		const drainSection = shipDoc.split("DRAIN routing judgment")[1] ?? "";
-		expect(drainSection).toContain("tff-outcome-judge");
+		expect(drainSection).toMatch(/tff-outcome-judge|\{\{outcome-judge\}\}/);
 
 		// Must not inline a wrong/incomplete schema (the bug from issue #166).
 		// The JSON schema lives in the agent definition only.

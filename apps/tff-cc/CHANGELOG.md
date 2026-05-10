@@ -1175,7 +1175,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `sync:reconcile` -- full bidirectional markdown/beads reconciliation (5 new tests)
-- Release checklist reference document (`references/release-checklist.md`)
+- Release checklist reference document (`references/release-checklist.md` — preserved app-specific file, excluded from sync bridge)
 - PR URLs always shown to user in ship-slice and complete-milestone workflows
 
 ### Changed

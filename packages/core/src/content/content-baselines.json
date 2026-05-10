@@ -1,0 +1,437 @@
+{
+	"version": 1,
+	"agents": {
+		"tff-code-reviewer": {
+			"approvedAt": "2026-05-09T22:09:36.544Z",
+			"sha256": "eb917cb99c97cb9931d6c425c35040f5abbb0a53e3436036acbd8228041ee12e"
+		},
+		"tff-executor": {
+			"approvedAt": "2026-05-09T22:03:34.423Z",
+			"sha256": "1c7091b65f6eda0f12e2829e0e0ce2e350f7bc04fb5fe7aba4712f8fec099f2c"
+		},
+		"tff-fixer": {
+			"approvedAt": "2026-05-09T22:03:34.423Z",
+			"sha256": "0329f02dc11e8522ec95055eba784619289fb8ef44d10bda64fa72de8fe502a1"
+		},
+		"tff-outcome-judge": {
+			"approvedAt": "2026-05-09T22:09:36.545Z",
+			"sha256": "52e83dba4e1e3920c2c991e4e81cd76019a8c4e81b3e9ea9ed01625481eec60f"
+		},
+		"tff-security-auditor": {
+			"approvedAt": "2026-05-09T22:03:34.423Z",
+			"sha256": "6c2709286071649cd6b7a5d48826b60f377b602d41636100e9e3574d3072082a"
+		},
+		"tff-spec-reviewer": {
+			"approvedAt": "2026-05-09T22:09:36.545Z",
+			"sha256": "4d3d43a5238cae997031d10ce687fe13a7007e649e8610e54d4f4f2f0c5723c8"
+		},
+		"tff-verifier": {
+			"approvedAt": "2026-05-09T22:09:36.545Z",
+			"sha256": "013aa0d7bef031e4f13f788e6b4b46b10260f6e9dce3a2f0881cea30a9d03acd"
+		}
+	},
+	"skills": {
+		"acceptance-criteria-validation": {
+			"approvedAt": "2026-05-10T14:56:26.450Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "0f2dbad25801d574741686f621193e663f4a548f61d8df39abb61e2ce1a1f3b1"
+		},
+		"agent-authoring": {
+			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "5fb1c57c541cc5a0d808338bd64bd434771065aa173322bab0b53e9f9c0163dd"
+		},
+		"architecture-review": {
+			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "d7e1b62c50c48d13280d278975b471cbf707afdab34f6865f3a457c1cd2ec6e0"
+		},
+		"brainstorming": {
+			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "36ffea1b1ee25af5e97351871018eae10b5938bfd639c5d0b6f7b61cc8243c3c"
+		},
+		"code-review-protocol": {
+			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "6591b85a2e4cfbfdf9222bad8a7dc9cae74f143c0eaf91d4ec72c1b6cccdb327"
+		},
+		"codebase-documentation": {
+			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "cce3eec3a392dfb29e2418a1325bd65dc6f5ebee74e989073cf1ade78e5c6036"
+		},
+		"commit-conventions": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "378440993db31da9a54c253286a789442d11a5642fd52720db677f046a5efab8"
+		},
+		"create-skill": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "e366c32c32b3415ff4625b47e23ea8555684a479e684ba2f71e5ee1ce853a35f"
+		},
+		"executing-plans": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "74f7b393ab2b1bda318ce55441b79bbd3b378e7d1cb792c434a18b8d5d172684"
+		},
+		"finishing-work": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "8ff79a7250923ad39f00defbe634b1d1686896a7921019f0973bcce2f20993e1"
+		},
+		"hexagonal-architecture": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "c57c2515757d3c116f68a61220a655c78b2abd2b1fed16e2ab685ba4e9fbe2b6"
+		},
+		"plannotator-usage": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "e493e7431caf2fbaff8b96eb4e54710d5c4d97d68e10cc92099966b41b840818"
+		},
+		"receiving-code-review": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "3e65ef2f52650f32f9d0ab8835965a728e3394f8bd3428f8ac9e3b914cabf195"
+		},
+		"report-issue": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "b774ade8e5ce31b9bd3358fea79b62ab28bc36578d8e43c4e5f9812c5083af96"
+		},
+		"security-review": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "a355532a47b690f549ed7248900bd1270252b6f93cdcc8bc9922a53f85886caf"
+		},
+		"skill-authoring": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "7c37a8a65c5a7ce17af8719af3f10c3522f3b641d07c8abb15918879ed9305aa"
+		},
+		"stress-testing-specs": {
+			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "12aff271b45e48d00f40639c7007a83ddcfb495be5039c452d1c210dbcb8799c"
+		},
+		"systematic-debugging": {
+			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "013358fcdc140f10aed71d488a8266d349b954c5d15b0ea6044f3cbafa93dd1b"
+		},
+		"test-driven-development": {
+			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "214c93df5a59492e39fcc1c1940dab22c06959f127dff7ed074ba6ae1eb27c85"
+		},
+		"verification-before-completion": {
+			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "d49eae1e40e6f6291ad0fbafa43372693e2e85c046f69b525a806e8dc9b3b5d7"
+		},
+		"writing-plans": {
+			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "28ae3399ced8b30a67b71bb569af7118f64729bf5d7dab8338c4c0795ec39d50"
+		}
+	},
+	"workflows": {
+		"audit-milestone": {
+			"approvedAt": "2026-05-10T00:23:37.746Z",
+			"sha256": "5f70df5f360667d156d98cd96d3e1b93fe1d01833c99789922c2c7ff72883c98"
+		},
+		"complete-milestone": {
+			"approvedAt": "2026-05-10T00:36:05.730Z",
+			"sha256": "e83b58a83e24baac1e4d3a815a3fcb1bf04702ec608485157bf8fc87e2198b29"
+		},
+		"compose-skills": {
+			"approvedAt": "2026-05-10T00:36:05.730Z",
+			"sha256": "cc2df7fe1b4cc0439ff95a12a1783358f3e14577f539f996795148ce7ba6dad9"
+		},
+		"create-skill": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "d82108c76dd0115f8a5b60736ad6c33ce6fc7674513a1096995dc607e09e28cc"
+		},
+		"debug": {
+			"approvedAt": "2026-05-10T08:40:31.855Z",
+			"sha256": "baa901bb71203bf22ef5bfb70d9ed800b46e0a06f63d53c5239313d3a40798f8"
+		},
+		"detect-patterns": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "12cc9ac69570ea2eb189d8d40aa59360ed7f64496618440620424e7704b4843f"
+		},
+		"discuss-slice": {
+			"approvedAt": "2026-05-10T08:40:31.856Z",
+			"sha256": "cbb1a81409dd17849143ed9533d810d45a228113723319daf1161f8c360a0545"
+		},
+		"execute-slice": {
+			"approvedAt": "2026-05-10T08:40:31.856Z",
+			"sha256": "0fce019789be802ed90e0cd5b3eb15de876b34038d84d220d0ecec2832036606"
+		},
+		"health": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "c4c8ded7bda6d7223b01639e5a13f2714b242c6b9fc1d583393bef76b4eeea08"
+		},
+		"help": {
+			"approvedAt": "2026-05-10T00:23:37.748Z",
+			"sha256": "829a8541ed0e948bfe9c7c4b5bc5c690f0c388787fc019cdd450fa0e93353703"
+		},
+		"learn-skills": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "d3d8569920dffacaffaf9697d6a7cf1cbdd6bfb72e5a30c4ec7dfb9af264c3bc"
+		},
+		"map-codebase": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "05d5a794b67079479ace7c5a163a695eefeedce96bd72912c01744c71e0728d3"
+		},
+		"new-milestone": {
+			"approvedAt": "2026-05-10T00:36:05.731Z",
+			"sha256": "5f63e6a464f564aeb754784c430df536c526ed12aeaafe2dacb0073d580d49c5"
+		},
+		"new-project": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "10033a641b6b3276bdb76a7d6038e1aba7d98d108a134b2de57a4d71a9a0e2ce"
+		},
+		"plan-slice": {
+			"approvedAt": "2026-05-10T08:40:31.857Z",
+			"sha256": "a9afcac6bb1651038688c2022667bb547861915be7aa2af8388849714bec8272"
+		},
+		"progress": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "b118d1b0a6bf86f38720f8260a009683db41d342086da867854e5c369a769b0f"
+		},
+		"quick": {
+			"approvedAt": "2026-05-10T08:40:31.857Z",
+			"sha256": "65a45647df96e5ab4f586fe6f7093e3e47b4a0f82092929e2848dace87889896"
+		},
+		"research-slice": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "3e4f5027553bd224964382f50ec8b8b5296936c92c78edbb4b6ca05767f4e42c"
+		},
+		"rollback": {
+			"approvedAt": "2026-05-10T00:23:37.748Z",
+			"sha256": "a0a77738c219ba1b35e998a2005679b65f055b6afeda5624952bb6aacea1c6ed"
+		},
+		"settings": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "74c4a286a4a8b822dfdad61a62d818cb844231f4f7efb3fb2edc6d69969eeed8"
+		},
+		"ship-slice": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "1b83e21ab7ec6c22de19bb6911a0a2d1af6bf8051732d68cca38d8a285232f8e"
+		},
+		"suggest-skills": {
+			"approvedAt": "2026-05-10T00:36:05.732Z",
+			"sha256": "cb11b422a3c71eb8a1bf0f9f8fa1b6d538cda9924a60da44c6fe394b50b5ca05"
+		},
+		"verify-slice": {
+			"approvedAt": "2026-05-10T08:40:31.857Z",
+			"sha256": "fbea742bc29b31f1e9498c0c9c86814562f46543dc55c68942dfa3c13a34c8e9"
+		}
+	},
+	"protocols": {
+		"ABSTRACTIONS": {
+			"approvedAt": "2026-05-10T09:29:32.127Z",
+			"sha256": "19faac5fc6b1f45e1386a22d4ba8dd4beca7139da9f394678334c6585a653454"
+		},
+		"agent-status-protocol": {
+			"approvedAt": "2026-05-10T00:23:37.749Z",
+			"sha256": "4165e1c02c9e752c7e4cf13ed735b11b2ab58631a00f66475db0c1702fd487da"
+		},
+		"conventions": {
+			"approvedAt": "2026-05-10T08:40:31.857Z",
+			"sha256": "6c0e39670a9096335fd0185e137d93dda44d8738b64ed5d2e56d35ff327f008f"
+		},
+		"flag-naming-conventions": {
+			"approvedAt": "2026-05-10T00:23:37.749Z",
+			"sha256": "9933f1fd463c75b93a7d5b9583a04887adb21342fc481e3029889f31afaabb6a"
+		},
+		"model-profiles": {
+			"approvedAt": "2026-05-10T09:29:32.128Z",
+			"sha256": "d81b6f0dc40ce40c6108d5560dae9f8b70583eeb22df2ca2ca482833f2e0fd3c"
+		},
+		"next-steps": {
+			"approvedAt": "2026-05-10T09:29:32.129Z",
+			"sha256": "70edc1a5624ae67adca254a0d17ca5fa9e16910c4aa8fe4a08a2190a809cf4ea"
+		},
+		"orchestrator-pattern": {
+			"approvedAt": "2026-05-10T00:23:37.750Z",
+			"sha256": "86a6a9791c415f7ec94764d73aa438bb9b0ddb056e4d88a0bbd37967f63c0da9"
+		},
+		"review": {
+			"approvedAt": "2026-05-10T14:56:26.456Z",
+			"sha256": "39cf6897ee6abcb21579a84cba92c465fd4fa03b38e4eac470118b23dabb77d0"
+		},
+		"security-baseline": {
+			"approvedAt": "2026-05-10T00:23:37.750Z",
+			"sha256": "6e1e6f2074797f676fa3069f85a41813903be5ebcb212b264ef02d3e46d735df"
+		},
+		"settings-template": {
+			"approvedAt": "2026-05-10T08:40:31.858Z",
+			"sha256": "797c3df6c6c180082a575d621a457d19a91527c1c2751b5f51cb10e4826142fa"
+		},
+		"tff-tools-reference": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "866e19ea5fcb9d9632fcb9856e3cc5843f640c8bcaa9709be970635d36ebe1fc"
+		},
+		"verify": {
+			"approvedAt": "2026-05-10T14:56:26.457Z",
+			"sha256": "bffb1abf4e58c60dd5ba7cca67b9c7289f918a0c0112977c3c94d87baaec1e6c"
+		}
+	},
+	"commands": {
+		"add-slice": {
+			"approvedAt": "2026-05-10T14:56:26.457Z",
+			"sha256": "4b335cf010c8cfe64b50a129f1b1d102bd0f20d956e6fa98c82e4aa1767f70b1"
+		},
+		"audit-milestone": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "37367cfb5a546b8be0ca1be8b55bad3d9b141e21ac092c2dfb9c016e025e58da"
+		},
+		"complete-milestone": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "9f84b113f373c42458d2528dcb17449ff72466422238e8cf4bb5216118dac5f1"
+		},
+		"compose": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "520922727d5012b4fcd5915555bd5b7051d312160c864c9c09c4d8f5bab82247"
+		},
+		"create-skill": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "0e5cbd8a5fb7a3e14953ba90be935734ce4acb2e53b244565e03b6d6a7241bf2"
+		},
+		"debug": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "387277c6a9ea86741eb8430d519887d84d18a2c13a3009332efdc750c52ea117"
+		},
+		"detect-patterns": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "9bed1e3e26d38e640ca663a76156073f9afa01dbee2478b69e6e6828ec2056e8"
+		},
+		"discuss": {
+			"approvedAt": "2026-05-10T09:29:32.130Z",
+			"sha256": "5ea713f9826a0ee7359a6994d7ae464222b75e448d4bfdcf86d15862f121b115"
+		},
+		"execute": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "f3227161a6efd0eb6d4f8ff3de8f38ad314ce22233c6011ec05ca820d67d0e19"
+		},
+		"health": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "90a7a272a6280723f6be6a44afd403f00280d70e7cbd5df702b1e05ab832e6dd"
+		},
+		"help": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "4d6a5cbc1d8d2b20d7811ea5aee5b0024ca4b170220884b5b653b387d62d2a60"
+		},
+		"insert-slice": {
+			"approvedAt": "2026-05-10T14:56:26.457Z",
+			"sha256": "34ca40cf55e9c55659b50250f4e433f3c6248f275ceb58cf6bdc208ca0828fcf"
+		},
+		"judge": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "7c37d4e19f16ec9ae00c6907949e9c35cb31bcd9caedf3a56392ccd82c0eabca"
+		},
+		"learn": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "7042e23aec8afd750b2879f97f3f866a25c08b5c33f671c388ac6ce78413706c"
+		},
+		"map-codebase": {
+			"approvedAt": "2026-05-10T14:56:26.457Z",
+			"sha256": "965578eaa65cb5e0de4d54dab1d907a7bc8a2ce1f91be99b4a05bfa23a7914e9"
+		},
+		"new-milestone": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "cc45c2228e630cc9123ddd1dc70e35350d5e8ba9c9a8b2dbd0b090406a11feba"
+		},
+		"new": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "01f0cfb41fa29b0cd632539364e4c4fecb4db6be01d0dbca921ce540b780dd3c"
+		},
+		"pause": {
+			"approvedAt": "2026-05-10T14:56:26.458Z",
+			"sha256": "16161ff0a7a4e1954b3ae3ec1524c626fb116c8fa34499e540a88bf081e60d17"
+		},
+		"plan": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "8aaa2b88e52b34ffa323afa8b1aaccfff3778990d456b08f50c9156e45a0269c"
+		},
+		"progress": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "2b649fe54220c588522841707d26b0f94ad3b47b8fd4ae1ca5a584ec5bf9e723"
+		},
+		"quick": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "9db937c3ba0b2e58eb7ae9716fe38ae171ad14470ce4e838842ddd257a8b71c3"
+		},
+		"remove-slice": {
+			"approvedAt": "2026-05-10T14:56:26.458Z",
+			"sha256": "0feb02da3411cbe03bb2ca4006b2ea4184022ba8a290231d8798a09a47669a69"
+		},
+		"research": {
+			"approvedAt": "2026-05-10T09:29:32.131Z",
+			"sha256": "71bc7e2c8d62d404bd990f1787449e42b19c02434eb3cc894963c8ada042030f"
+		},
+		"resume": {
+			"approvedAt": "2026-05-10T14:56:26.458Z",
+			"sha256": "53881edf0924a72a42b2ed5f5746bae9c8cc43e848a2a88f9c558add0bdcac79"
+		},
+		"rollback": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "6de57a0fcfe7bb2222c796103fb75ba1e74a23a8c31f4947c8491a308d286168"
+		},
+		"settings": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "0a9f559ad3e968cb57141ee9b7511b916d007b9958215289aff2fa1f4fb76ae7"
+		},
+		"ship": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "72190afc430f840c0e32e82650af19bf23e30f68079d9549cd41029fece807de"
+		},
+		"status": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "277975159080d01a14231256d09a0656ebe07ca0d4d9578823974462ae296f22"
+		},
+		"suggest-skills": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "675a020713f5349997bafd3afc0f0ea1b639e50ac592d25d0e504f711de55fc3"
+		},
+		"sync": {
+			"approvedAt": "2026-05-10T14:56:26.458Z",
+			"sha256": "68b08a48d4219adcdb7c3fac22d30c25f4869d779aa846484ab0e2664e6ab78f"
+		},
+		"verify": {
+			"approvedAt": "2026-05-10T09:29:32.132Z",
+			"sha256": "f2a3150477a92b87d95276c7c8fa756313d7077fceed59ef22113027ff21aa4f"
+		}
+	},
+	"templates": {
+		"pr-body": {
+			"approvedAt": "2026-05-10T14:56:26.458Z",
+			"sha256": "937b53559588bb6df8a5d2af29509747ca7735ebd9e46c1556128bf8f5a8c2da"
+		}
+	}
+}
