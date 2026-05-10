@@ -42,9 +42,9 @@ describe("archive-fs", () => {
 	});
 
 	describe("archiveSliceFs (quick)", () => {
-		it("moves .tff-cc/quick/Q-01 to .tff-cc/archive/quick/Q-01", () => {
+		it("moves .tff/quick/Q-01 to .tff/archive/quick/Q-01", () => {
 			const slice = sliceFixture({ kind: "quick", number: 1 });
-			const src = join(cwd, ".tff-cc/quick/Q-01");
+			const src = join(cwd, ".tff/quick/Q-01");
 			mkdirSync(src, { recursive: true });
 			writeFileSync(join(src, "PLAN.md"), "plan");
 
@@ -52,14 +52,14 @@ describe("archive-fs", () => {
 
 			expect(result.ok).toBe(true);
 			expect(existsSync(src)).toBe(false);
-			const dst = join(cwd, ".tff-cc/archive/quick/Q-01");
+			const dst = join(cwd, ".tff/archive/quick/Q-01");
 			expect(existsSync(dst)).toBe(true);
 			expect(existsSync(join(dst, "PLAN.md"))).toBe(true);
 		});
 
 		it("is idempotent when src is missing AND dst already exists", () => {
 			const slice = sliceFixture({ kind: "quick", number: 7 });
-			const dst = join(cwd, ".tff-cc/archive/quick/Q-07");
+			const dst = join(cwd, ".tff/archive/quick/Q-07");
 			mkdirSync(dst, { recursive: true });
 			writeFileSync(join(dst, "PLAN.md"), "already archived");
 
@@ -77,8 +77,8 @@ describe("archive-fs", () => {
 
 		it("returns error when both src and dst exist", () => {
 			const slice = sliceFixture({ kind: "quick", number: 3 });
-			mkdirSync(join(cwd, ".tff-cc/quick/Q-03"), { recursive: true });
-			mkdirSync(join(cwd, ".tff-cc/archive/quick/Q-03"), { recursive: true });
+			mkdirSync(join(cwd, ".tff/quick/Q-03"), { recursive: true });
+			mkdirSync(join(cwd, ".tff/archive/quick/Q-03"), { recursive: true });
 
 			const result = archiveSliceFs(slice, cwd);
 
@@ -88,9 +88,9 @@ describe("archive-fs", () => {
 	});
 
 	describe("archiveSliceFs (debug)", () => {
-		it("moves .tff-cc/debug/D-02 to .tff-cc/archive/debug/D-02", () => {
+		it("moves .tff/debug/D-02 to .tff/archive/debug/D-02", () => {
 			const slice = sliceFixture({ kind: "debug", number: 2 });
-			const src = join(cwd, ".tff-cc/debug/D-02");
+			const src = join(cwd, ".tff/debug/D-02");
 			mkdirSync(src, { recursive: true });
 			writeFileSync(join(src, "REPRO.md"), "repro");
 
@@ -98,7 +98,7 @@ describe("archive-fs", () => {
 
 			expect(result.ok).toBe(true);
 			expect(existsSync(src)).toBe(false);
-			expect(existsSync(join(cwd, ".tff-cc/archive/debug/D-02"))).toBe(true);
+			expect(existsSync(join(cwd, ".tff/archive/debug/D-02"))).toBe(true);
 		});
 	});
 
@@ -112,9 +112,9 @@ describe("archive-fs", () => {
 	});
 
 	describe("archiveMilestoneFs", () => {
-		it("moves .tff-cc/milestones/M01 to .tff-cc/archive/milestones/M01", () => {
+		it("moves .tff/milestones/M01 to .tff/archive/milestones/M01", () => {
 			const ms = milestoneFixture({ number: 1 });
-			const src = join(cwd, ".tff-cc/milestones/M01");
+			const src = join(cwd, ".tff/milestones/M01");
 			mkdirSync(src, { recursive: true });
 			writeFileSync(join(src, "PLAN.md"), "plan");
 
@@ -122,14 +122,14 @@ describe("archive-fs", () => {
 
 			expect(result.ok).toBe(true);
 			expect(existsSync(src)).toBe(false);
-			const dst = join(cwd, ".tff-cc/archive/milestones/M01");
+			const dst = join(cwd, ".tff/archive/milestones/M01");
 			expect(existsSync(dst)).toBe(true);
 			expect(existsSync(join(dst, "PLAN.md"))).toBe(true);
 		});
 
 		it("is idempotent when src is missing AND dst already exists", () => {
 			const ms = milestoneFixture({ number: 5 });
-			mkdirSync(join(cwd, ".tff-cc/archive/milestones/M05"), { recursive: true });
+			mkdirSync(join(cwd, ".tff/archive/milestones/M05"), { recursive: true });
 
 			const result = archiveMilestoneFs(ms, cwd);
 
@@ -138,8 +138,8 @@ describe("archive-fs", () => {
 
 		it("returns error when both src and dst exist", () => {
 			const ms = milestoneFixture({ number: 1 });
-			mkdirSync(join(cwd, ".tff-cc/milestones/M01"), { recursive: true });
-			mkdirSync(join(cwd, ".tff-cc/archive/milestones/M01"), { recursive: true });
+			mkdirSync(join(cwd, ".tff/milestones/M01"), { recursive: true });
+			mkdirSync(join(cwd, ".tff/archive/milestones/M01"), { recursive: true });
 
 			const result = archiveMilestoneFs(ms, cwd);
 

@@ -40,7 +40,7 @@ tsconfig.base.json
 lefthook.yml
 ```
 
-Note: `.tff-cc/` at the repo root is a per-developer symlink into `~/.tff-cc/<projectId>/`. It is gitignored and created by `tff-tools project:init`.
+Note: `.tff/` at the repo root is a per-developer symlink into `~/.tff/<projectId>/`. It is gitignored and created by `tff-tools project:init`.
 
 ## Prerequisites
 

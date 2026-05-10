@@ -6,7 +6,7 @@ import {
 	type StateStores,
 } from "../infrastructure/adapters/sqlite/create-state-stores.js";
 import { acquireSyncLock } from "../infrastructure/locking/tff-lock.js";
-import { STATE_DB_FILE } from "../shared/paths.js";
+import { STATE_DB_FILE } from "@tff/core";
 
 export interface SyncLockResult {
 	ok: true;

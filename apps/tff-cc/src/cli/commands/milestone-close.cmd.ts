@@ -14,7 +14,7 @@ import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { resolvePluginRoot } from "../../infrastructure/plugin-root.js";
-import { milestoneDir } from "../../shared/paths.js";
+import { milestoneDir } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveRoutingPaths } from "../utils/routing-paths.js";
 
@@ -166,7 +166,7 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 			if (milestoneRow.ok && milestoneRow.data) {
 				const msLabel = `M${String(milestoneRow.data.number).padStart(2, "0")}`;
 				archivedSrcRel = milestoneDir(msLabel);
-				archivedDstRel = `.tff-cc/archive/milestones/${msLabel}`;
+				archivedDstRel = `.tff/archive/milestones/${msLabel}`;
 				const fsResult = archiveMilestoneFs(milestoneRow.data, projectRoot);
 				if (!fsResult.ok) {
 					fsArchiveError = fsResult.reason;

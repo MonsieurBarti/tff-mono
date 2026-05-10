@@ -34,7 +34,7 @@ export class FilesystemTierConfigReader implements TierConfigReader {
 
 	async readTierPolicy(): Promise<Result<Record<RiskLevel, ModelTier>, DomainError>> {
 		const MAX_SETTINGS_SIZE = 1024 * 1024; // 1 MB
-		const path = join(this.opts.projectRoot, ".tff-cc", "settings.yaml");
+		const path = join(this.opts.projectRoot, ".tff", "settings.yaml");
 		let raw = "";
 		try {
 			raw = await readFile(path, "utf8");

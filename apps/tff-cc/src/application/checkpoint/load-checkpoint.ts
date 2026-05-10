@@ -1,7 +1,7 @@
 import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
 import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { sliceDir } from "../../shared/paths.js";
+import { sliceDir } from "@tff/core";
 import type { CheckpointData } from "./save-checkpoint.js";
 
 interface LoadCheckpointDeps {

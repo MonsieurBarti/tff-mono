@@ -17,7 +17,7 @@
 		"lint": { "outputs": [] },
 		"format": { "cache": false },
 		"format:check": { "outputs": [] },
-		"typecheck": { "outputs": [] },
+		"typecheck": { "dependsOn": ["^build"], "outputs": [] },
 		"dev": { "cache": false, "persistent": true }
 	}
 }

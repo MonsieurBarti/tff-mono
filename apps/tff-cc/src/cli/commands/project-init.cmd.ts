@@ -42,7 +42,7 @@ export const projectInitCmd = async (args: string[]): Promise<string> => {
 
 	const repoRoot = resolveRepoRoot(process.cwd());
 	const projectRoot = resolveProjectRoot(process.cwd());
-	// Note: .tff-cc/ symlink is created by getProjectId() called from createStateStores()
+	// Note: .tff/ symlink is created by getProjectId() called from createStateStores()
 	const { projectStore } = createStateStores();
 	const artifactStore = new MarkdownArtifactAdapter(projectRoot);
 	const _gitOps = new GitCliAdapter(repoRoot);

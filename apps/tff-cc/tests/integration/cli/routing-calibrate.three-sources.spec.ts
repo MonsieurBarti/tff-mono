@@ -8,9 +8,9 @@ const SLICE = "M01-S02";
 const D1 = "00000000-0000-4000-8000-000000000001";
 
 const seed = (root: string) => {
-	mkdirSync(join(root, ".tff-cc", "logs"), { recursive: true });
+	mkdirSync(join(root, ".tff", "logs"), { recursive: true });
 	writeFileSync(
-		join(root, ".tff-cc", "settings.yaml"),
+		join(root, ".tff", "settings.yaml"),
 		`routing:
   enabled: true
   calibration:
@@ -22,7 +22,7 @@ const seed = (root: string) => {
 `,
 	);
 	writeFileSync(
-		join(root, ".tff-cc", "logs", "routing.jsonl"),
+		join(root, ".tff", "logs", "routing.jsonl"),
 		`${JSON.stringify({
 			kind: "route",
 			timestamp: "2026-04-20T09:00:00.000Z",
@@ -50,7 +50,7 @@ const seed = (root: string) => {
 		emitted_at: "2026-04-20T10:00:00.000Z",
 	});
 	writeFileSync(
-		join(root, ".tff-cc", "logs", "routing-outcomes.jsonl"),
+		join(root, ".tff", "logs", "routing-outcomes.jsonl"),
 		`${[
 			JSON.stringify(mkOutcome("00000000-0000-4000-8000-0000000000a1", "manual")),
 			JSON.stringify(mkOutcome("00000000-0000-4000-8000-0000000000a2", "debug-join")),
@@ -73,7 +73,7 @@ describe("routing:calibrate — three sources", () => {
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(true);
 
-		const reportPath = join(root, ".tff-cc", "logs", "routing-calibration.md");
+		const reportPath = join(root, ".tff", "logs", "routing-calibration.md");
 		const md = readFileSync(reportPath, "utf8");
 		expect(md).toContain("reviewer");
 		// effective_total on the reviewer agent cell:

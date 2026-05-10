@@ -35,7 +35,7 @@ describe("worktree:create — project id persistence", () => {
 	beforeEach(() => {
 		tmpDir = mkdtempSync(join(tmpdir(), "tff-worktree-roundtrip-"));
 		homeDir = mkdtempSync(join(tmpdir(), "tff-home-roundtrip-"));
-		worktreeDir = join(tmpDir, ".tff-cc", "worktrees", "M01-S01");
+		worktreeDir = join(tmpDir, ".tff", "worktrees", "M01-S01");
 
 		originalCwd = process.cwd();
 		originalTffCcHome = process.env.TFF_CC_HOME;
@@ -45,7 +45,7 @@ describe("worktree:create — project id persistence", () => {
 		// Write .tff-project-id in primary repo root
 		writeFileSync(join(tmpDir, ".tff-project-id"), `${PROJECT_UUID}\n`);
 
-		// Ensure the home dir structure exists so createTffCcSymlink can resolve target
+		// Ensure the home dir structure exists so createTffSymlink can resolve target
 		mkdirSync(join(homeDir, PROJECT_UUID), { recursive: true });
 
 		// Pre-create the worktree directory (git normally does this)
@@ -132,13 +132,13 @@ describe("worktree:create — project id persistence", () => {
 		expect(worktreeId).toBe(primaryId);
 	});
 
-	it(".tff-cc symlink in worktree points to the same project home as the primary", async () => {
+	it(".tff symlink in worktree points to the same project home as the primary", async () => {
 		const { worktreeCreateCmd } = await import("../../../src/cli/commands/worktree-create.cmd.js");
 
 		await worktreeCreateCmd(["--slice-id", "M01-S01"]);
 
 		const { readlinkSync } = await import("node:fs");
-		const symlinkPath = join(worktreeDir, ".tff-cc");
+		const symlinkPath = join(worktreeDir, ".tff");
 		expect(existsSync(symlinkPath)).toBe(true);
 		const target = readlinkSync(symlinkPath);
 		expect(target).toBe(join(homeDir, PROJECT_UUID));

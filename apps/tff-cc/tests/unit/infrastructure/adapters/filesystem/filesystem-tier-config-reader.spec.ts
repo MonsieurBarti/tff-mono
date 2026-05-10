@@ -25,7 +25,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("reads tier_policy block from settings.yaml", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(
 			join(tffDir, "settings.yaml"),
@@ -40,7 +40,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("returns defaults when routing block absent", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(join(tffDir, "settings.yaml"), `other_setting: true\n`);
 		const reader = new FilesystemTierConfigReader({ projectRoot: tmpDir, agentsDir: tmpDir });
@@ -51,7 +51,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("falls back per-level defaults for invalid tier values", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(
 			join(tffDir, "settings.yaml"),

@@ -6,7 +6,7 @@ import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js"
 import type { SliceStore } from "../../domain/ports/slice-store.port.js";
 
 import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { sliceDir as sliceDirPath } from "../../shared/paths.js";
+import { sliceDir as sliceDirPath } from "@tff/core";
 
 interface CreateSliceInput {
 	milestoneId: string;

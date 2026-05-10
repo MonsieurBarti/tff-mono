@@ -300,10 +300,7 @@ describe("approveSkill", () => {
 			refinementId: "refinement-42",
 		});
 		expect(r.ok).toBe(true);
-		const log = fs.readFileSync(
-			path.join(tmp, ".tff-cc/observations/skill-approvals.jsonl"),
-			"utf8",
-		);
+		const log = fs.readFileSync(path.join(tmp, ".tff/observations/skill-approvals.jsonl"), "utf8");
 		const entry = JSON.parse(log.trim());
 		expect(entry).toMatchObject({
 			skillId: "foo",
@@ -338,6 +335,6 @@ describe("approveSkill", () => {
 		});
 		expect(r.ok).toBe(true);
 		expect((r as { noop: boolean }).noop).toBe(true);
-		expect(fs.existsSync(path.join(tmp, ".tff-cc/observations/skill-approvals.jsonl"))).toBe(false);
+		expect(fs.existsSync(path.join(tmp, ".tff/observations/skill-approvals.jsonl"))).toBe(false);
 	});
 });

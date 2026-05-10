@@ -2,7 +2,7 @@
  * Home directory resolver for TFF-CC
  *
  * Provides functions for resolving and managing the centralized home directory
- * pattern (~/.tff-cc/{projectId}/) shared across all worktrees.
+ * pattern (~/.tff/{projectId}/) shared across all worktrees.
  */
 
 import { execFileSync } from "node:child_process";
@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { TFF_CC_DIR } from "../shared/paths.js";
+import { TFF_DIR } from "@tff/core";
 
 /** UUID v4 format validation regex */
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -69,7 +69,7 @@ export function resolveRepoRoot(cwd?: string): string {
 
 /**
  * Resolve the directory that owns tff-cc state files (`.tff-project-id`,
- * `.tff-cc` symlink, mutating-cli sentinel).
+ * `.tff` symlink, mutating-cli sentinel).
  *
  * - If `TFF_CC_HOME` is set, returns it. The override is the canonical store;
  *   the symlink/id-file/sentinel live there and cwd is never touched. This
@@ -88,7 +88,7 @@ let warnedStrayThisProcess = false;
 
 /**
  * Emit a one-time stderr warning if the launch cwd holds a stray
- * `.tff-project-id` or `.tff-cc` that isn't at the git toplevel.
+ * `.tff-project-id` or `.tff` that isn't at the git toplevel.
  * No-op when cwd === repoRoot, when no stray files exist, or after the
  * first call in the current process.
  */
@@ -98,18 +98,18 @@ export function warnOnStrayTffFiles(cwd: string, repoRoot: string): void {
 	try {
 		const strayId = existsSync(join(cwd, ".tff-project-id"));
 		let straySym = false;
-		// Use lstatSync rather than existsSync: a dangling .tff-cc symlink
+		// Use lstatSync rather than existsSync: a dangling .tff symlink
 		// (broken target) is exactly the stray state we want to warn about,
 		// and existsSync follows the link so it would miss that case.
 		try {
-			lstatSync(join(cwd, TFF_CC_DIR));
+			lstatSync(join(cwd, TFF_DIR));
 			straySym = true;
 		} catch {
 			// Entry does not exist — expected path.
 		}
 		if (!strayId && !straySym) return;
 		warnedStrayThisProcess = true;
-		const names = [strayId ? ".tff-project-id" : null, straySym ? ".tff-cc" : null]
+		const names = [strayId ? ".tff-project-id" : null, straySym ? ".tff" : null]
 			.filter((n): n is string => n !== null)
 			.join(" and ");
 		process.stderr.write(
@@ -127,10 +127,10 @@ function isValidUuidV4(id: string): boolean {
 
 /**
  * Get the TFF_CC_HOME directory.
- * Returns TFF_CC_HOME env var if set, otherwise ~/.tff-cc
+ * Returns TFF_CC_HOME env var if set, otherwise ~/.tff
  */
-export function getTffCcHome(): string {
-	return process.env.TFF_CC_HOME ?? join(homedir(), TFF_CC_DIR);
+export function getTffHome(): string {
+	return process.env.TFF_CC_HOME ?? join(homedir(), TFF_DIR);
 }
 
 /**
@@ -138,7 +138,7 @@ export function getTffCcHome(): string {
  * @param projectId - The project's unique identifier
  */
 export function getProjectHome(projectId: string): string {
-	return join(getTffCcHome(), projectId);
+	return join(getTffHome(), projectId);
 }
 
 /**
@@ -212,7 +212,7 @@ export function getProjectId(repoRoot: string): string {
 
 /**
  * Ensure the project home directory exists with required subdirectories.
- * Creates: ~/.tff-cc/{projectId}/, ~/.tff-cc/{projectId}/milestones/, ~/.tff-cc/{projectId}/worktrees/, ~/.tff-cc/{projectId}/journal/
+ * Creates: ~/.tff/{projectId}/, ~/.tff/{projectId}/milestones/, ~/.tff/{projectId}/worktrees/, ~/.tff/{projectId}/journal/
  * @param projectId - The project's unique identifier
  * @returns The project home directory path
  */
@@ -245,12 +245,12 @@ export function ensureProjectHomeDir(projectId: string): string {
 }
 
 /**
- * Create symlink from .tff-cc in repo root to project home directory.
+ * Create symlink from .tff in repo root to project home directory.
  * If a symlink already exists but points to the wrong target, repairs it.
- * Throws if .tff-cc/ exists as a real directory.
+ * Throws if .tff/ exists as a real directory.
  */
-export function createTffCcSymlink(repoRoot: string, projectId: string): void {
-	const symlinkPath = join(repoRoot, TFF_CC_DIR);
+export function createTffSymlink(repoRoot: string, projectId: string): void {
+	const symlinkPath = join(repoRoot, TFF_DIR);
 	const targetPath = getProjectHome(projectId);
 
 	if (existsSync(symlinkPath)) {
@@ -262,14 +262,14 @@ export function createTffCcSymlink(repoRoot: string, projectId: string): void {
 				return;
 			}
 			process.stderr.write(
-				`tff-cc: repairing .tff-cc symlink in ${repoRoot} — was ${currentTarget}, now ${targetPath}\n`,
+				`tff-cc: repairing .tff symlink in ${repoRoot} — was ${currentTarget}, now ${targetPath}\n`,
 			);
 			unlinkSync(symlinkPath);
 			symlinkSync(targetPath, symlinkPath);
 			return;
 		}
 		throw new Error(
-			`${TFF_CC_DIR}/ exists as a real directory. Remove or rename it before proceeding.`,
+			`${TFF_DIR}/ exists as a real directory. Remove or rename it before proceeding.`,
 		);
 	}
 

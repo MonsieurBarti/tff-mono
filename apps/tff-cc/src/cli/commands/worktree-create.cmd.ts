@@ -5,7 +5,7 @@ import { isOk } from "../../domain/result.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import {
-	createTffCcSymlink,
+	createTffSymlink,
 	getProjectId,
 	resolveRepoRoot,
 	writeProjectIdFile,
@@ -95,7 +95,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 		if (isOk(result)) {
 			const projectId = getProjectId(repoRoot);
 			const worktreePath = result.data.worktreePath;
-			createTffCcSymlink(worktreePath, projectId);
+			createTffSymlink(worktreePath, projectId);
 			// Persist the project id in the new worktree so subsequent tff-tools commands
 			// run inside it don't mint a fresh one (e.g. when the branch's HEAD predates
 			// the commit that added .tff-project-id).

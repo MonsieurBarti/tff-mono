@@ -3,7 +3,7 @@ import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js"
 import type { ExtractInput } from "../../domain/ports/signal-extractor.port.js";
 import type { SliceStore } from "../../domain/ports/slice-store.port.js";
 import { isOk } from "../../domain/result.js";
-import { sliceDir } from "../../shared/paths.js";
+import { sliceDir } from "@tff/core";
 
 const SLICE_LABEL_RE = /^M(\d+)-S(\d+)$/;
 

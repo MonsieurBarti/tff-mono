@@ -41,5 +41,5 @@ docs/plans/
 docs/research/
 .hippo/
 .superpowers/
-/.tff-cc
+/.tff
 build/

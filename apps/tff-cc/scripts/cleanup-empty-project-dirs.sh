@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prune empty project skeletons from ~/.tff-cc/ (or $TFF_CC_HOME).
+# Prune empty project skeletons from ~/.tff/ (or $TFF_CC_HOME).
 #
 # A "skeleton" is a UUID-named dir containing only the standard subdirs
 # (milestones/, worktrees/, journal/) with no state.db, no PROJECT.md,
@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-HOME_DIR="${TFF_CC_HOME:-$HOME/.tff-cc}"
+HOME_DIR="${TFF_CC_HOME:-$HOME/.tff}"
 APPLY=0
 if [[ "${1:-}" == "--apply" ]]; then
 	APPLY=1

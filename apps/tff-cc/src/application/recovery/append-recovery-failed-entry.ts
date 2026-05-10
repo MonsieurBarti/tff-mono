@@ -39,7 +39,7 @@ export async function appendRecoveryFailedEntry(homeDir: string, err: unknown): 
 		const st = await stat(homeDir);
 		if (!st.isDirectory()) return;
 	} catch {
-		// .tff-cc/ absent — skip silently per spec.
+		// .tff/ absent — skip silently per spec.
 		return;
 	}
 

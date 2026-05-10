@@ -11,7 +11,7 @@ let home: string;
 
 beforeEach(() => {
 	repo = mkdtempSync(join(tmpdir(), "tff-hsr-"));
-	home = join(repo, ".tff-cc");
+	home = join(repo, ".tff");
 	mkdirSync(home, { recursive: true });
 });
 afterEach(() => {
@@ -82,7 +82,7 @@ describe("handleStartupRecovery", () => {
 		expect(warnings).toHaveLength(1);
 	});
 
-	it("when .tff-cc/ does not exist and recover throws: marker written (dir auto-created), warning printed", async () => {
+	it("when .tff/ does not exist and recover throws: marker written (dir auto-created), warning printed", async () => {
 		// home does NOT exist on disk — simulate fresh/uninitialized project.
 		rmSync(home, { recursive: true, force: true });
 		const stderr = vi.spyOn(process.stderr, "write").mockReturnValue(true);

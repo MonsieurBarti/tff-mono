@@ -30,7 +30,7 @@ vi.mock("../../../src/common/worktree.js", () => ({
 	getWorktreePath: vi
 		.fn()
 		.mockImplementation((_root: string, sLabel: string) =>
-			join(tmpdir(), `.tff-cc/worktrees/${sLabel}`),
+			join(tmpdir(), `.tff/worktrees/${sLabel}`),
 		),
 }));
 
@@ -143,7 +143,7 @@ describe("verifyPhase", () => {
 		expect(cfg.sliceId).toBe(ctx.slice.id);
 		expect(cfg.tasks).toHaveLength(1);
 		expect(cfg.tasks[0]?.agent).toBe("tff-verifier");
-		expect(cfg.tasks[0]?.cwd).toContain(".tff-cc/worktrees/");
+		expect(cfg.tasks[0]?.cwd).toContain(".tff/worktrees/");
 	});
 
 	it("AC-3: empty-diff guard returns {success:false, retry:false} and emits phase_failed", async () => {

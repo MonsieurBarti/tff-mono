@@ -91,7 +91,7 @@ Claude asks for your project name and vision. You provide:
 - **Name:** my-saas-app
 - **Vision:** A multi-tenant SaaS platform with team management
 
-This creates `.tff-cc/PROJECT.md` and asks you to define requirements.
+This creates `.tff/PROJECT.md` and asks you to define requirements.
 
 **Next step suggested:** `/tff:new-milestone`
 
@@ -138,7 +138,7 @@ Complexity is auto-classified as **SS** (5 tasks, 2 modules, no external integra
 /tff:research M01-S01
 ```
 
-The agent investigates the technical approach: reads the existing codebase, checks what auth libraries are available, documents findings in `.tff-cc/milestones/M01/slices/M01-S01/RESEARCH.md`.
+The agent investigates the technical approach: reads the existing codebase, checks what auth libraries are available, documents findings in `.tff/milestones/M01/slices/M01-S01/RESEARCH.md`.
 
 **Next step suggested:** `/tff:plan M01-S01`
 
@@ -164,7 +164,7 @@ Waves detected:
 
 **Plannotator opens** in your browser. You annotate the plan, suggest changes, approve.
 
-A worktree is created at `.tff-cc/worktrees/M01-S01/` on branch `slice/M01-S01`.
+A worktree is created at `.tff/worktrees/M01-S01/` on branch `slice/M01-S01`.
 
 **Next step suggested:** `/tff:execute M01-S01`
 
@@ -447,7 +447,7 @@ Read-only and advisory commands (listers, getters, guards, workflows, patterns, 
 
 ## Configuration
 
-Project settings live in `.tff-cc/settings.yaml`. Generated automatically by `/tff:new` with inline comments. Manage interactively with `/tff:settings`.
+Project settings live in `.tff/settings.yaml`. Generated automatically by `/tff:new` with inline comments. Manage interactively with `/tff:settings`.
 
 ```yaml
 model-profiles:
@@ -488,7 +488,7 @@ Phase D closes the routing loop by measuring outcomes and recommending threshold
 
 - `tff-tools routing:event --kind debug --slice <id>` — emit a `/tff:debug` observability event (invoked automatically from `/tff:debug`).
 - `tff-tools routing:outcome --decision <uuid> --dimension {agent|tier|unknown} --verdict {ok|wrong|too-low|too-high} [--reason "..."]` — hand-label a past decision.
-- `tff-tools routing:calibrate [--n-min 5] [--implicit-weight 0.5]` — generate an advisory markdown report at `.tff-cc/logs/routing-calibration.md` with per-agent and per-tag accuracy cells and rule-based recommendations.
+- `tff-tools routing:calibrate [--n-min 5] [--implicit-weight 0.5]` — generate an advisory markdown report at `.tff/logs/routing-calibration.md` with per-agent and per-tag accuracy cells and rule-based recommendations.
 
 Phase D is read-only over `settings.yaml` — it never auto-applies. Rules fire only on cells with `effective_total ≥ n_min` (default 5). Auto-apply is Phase E.
 

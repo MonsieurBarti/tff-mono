@@ -1,7 +1,7 @@
 import { extractNgrams } from "../../application/patterns/extract-ngrams.js";
 import { isOk } from "../../domain/result.js";
 import { JsonlStoreAdapter } from "../../infrastructure/adapters/jsonl/jsonl-store.adapter.js";
-import { OBSERVATIONS_DIR } from "../../shared/paths.js";
+import { OBSERVATIONS_DIR } from "@tff/core";
 import type { CommandSchema } from "../utils/flag-parser.js";
 
 export const patternsExtractSchema: CommandSchema = {

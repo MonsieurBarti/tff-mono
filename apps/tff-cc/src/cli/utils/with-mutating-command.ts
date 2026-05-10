@@ -12,7 +12,7 @@ import { resolveProjectRoot } from "../../infrastructure/home-directory.js";
 
 export const WITH_MUTATING_COMMAND_TAG = Symbol("with-mutating-command");
 
-const SENTINEL_REL = ".tff-cc/observations/.mutating-cli-ran";
+const SENTINEL_REL = ".tff/observations/.mutating-cli-ran";
 
 export const touchMutatingSentinel = (root: string): void => {
 	try {

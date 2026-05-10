@@ -33,7 +33,7 @@ export const assertNotOnMilestoneBranch = async (
 	return Err(
 		createDomainError(
 			"REFUSED_ON_MILESTONE_BRANCH",
-			`Refusing to run "${command}" on milestone branch "${branch}" while ${openCount} slice(s) are still open. Switch to the slice worktree at .tff-cc/worktrees/<slice-id>/ before mutating state.`,
+			`Refusing to run "${command}" on milestone branch "${branch}" while ${openCount} slice(s) are still open. Switch to the slice worktree at .tff/worktrees/<slice-id>/ before mutating state.`,
 			{ command, branch, openSlices: openCount },
 		),
 	);

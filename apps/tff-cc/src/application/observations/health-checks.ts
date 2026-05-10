@@ -2,11 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { load as yamlLoad, CORE_SCHEMA } from "js-yaml";
 
-const OBS_DIR = ".tff-cc/observations";
+const OBS_DIR = ".tff/observations";
 const SESSIONS = `${OBS_DIR}/sessions.jsonl`;
 const DEAD_LETTER = `${OBS_DIR}/dead-letter.jsonl`;
 const MUTATING_SENTINEL = `${OBS_DIR}/.mutating-cli-ran`;
-const SETTINGS = ".tff-cc/settings.yaml";
+const SETTINGS = ".tff/settings.yaml";
 
 const MAX_TAIL_BYTES = 64 * 1024;
 

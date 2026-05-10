@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-describe("path contract: artifacts under .tff-cc/ only", () => {
+describe("path contract: artifacts under .tff/ only", () => {
 	let tmpRepo: string;
 	let tffCcHome: string;
 	const CLI = `${process.cwd()}/dist/cli/index.js`;
@@ -55,21 +55,21 @@ describe("path contract: artifacts under .tff-cc/ only", () => {
 		}
 	};
 
-	it("project:init creates .tff-cc/ symlink under TFF_CC_HOME (not in cwd)", () => {
+	it("project:init creates .tff/ symlink under TFF_CC_HOME (not in cwd)", () => {
 		cli('project:init --name "TestProject"');
 
 		// When TFF_CC_HOME is set, the symlink lives under TFF_CC_HOME — never
 		// in the surrounding worktree (issue #172).
-		const symlinkPath = join(tffCcHome, ".tff-cc");
+		const symlinkPath = join(tffCcHome, ".tff");
 		expect(existsSync(symlinkPath)).toBe(true);
 		expect(lstatSync(symlinkPath).isSymbolicLink()).toBe(true);
 
 		// And cwd stays untouched.
-		expect(existsSync(join(tmpRepo, ".tff-cc"))).toBe(false);
+		expect(existsSync(join(tmpRepo, ".tff"))).toBe(false);
 		expect(existsSync(join(tmpRepo, ".tff-project-id"))).toBe(false);
 	});
 
-	it("after milestone + slice + sync, state lands under .tff-cc/", () => {
+	it("after milestone + slice + sync, state lands under .tff/", () => {
 		cli('project:init --name "TestProject"');
 
 		const miRaw = cli('milestone:create --name "M1"');
@@ -80,7 +80,7 @@ describe("path contract: artifacts under .tff-cc/ only", () => {
 		cli('slice:create --title "S1"');
 		cli(`sync:state --milestone-id ${milestoneShortId}`);
 
-		const symlinkPath = join(tffCcHome, ".tff-cc");
+		const symlinkPath = join(tffCcHome, ".tff");
 		expect(existsSync(symlinkPath)).toBe(true);
 		expect(lstatSync(symlinkPath).isSymbolicLink()).toBe(true);
 	});

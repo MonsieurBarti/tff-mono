@@ -4,7 +4,7 @@
  * Two contracts under test:
  *
  * 1. When TFF_CC_HOME is set, project:init writes the `.tff-project-id` and
- *    `.tff-cc` symlink under TFF_CC_HOME exclusively. The surrounding worktree
+ *    `.tff` symlink under TFF_CC_HOME exclusively. The surrounding worktree
  *    (and any sub-directory it was invoked from) MUST be untouched. This is
  *    issue #172 — tests that set TFF_CC_HOME=<tmp> were leaking the symlink
  *    and id-file into the dogfood worktree, breaking subsequent tff-tools
@@ -63,13 +63,13 @@ describe("project:init isolation", () => {
 
 		// Files land under TFF_CC_HOME — the canonical store when overridden
 		expect(existsSync(join(tffHome, ".tff-project-id"))).toBe(true);
-		expect(existsSync(join(tffHome, ".tff-cc"))).toBe(true);
+		expect(existsSync(join(tffHome, ".tff"))).toBe(true);
 
 		// And NOWHERE else: not in the worktree, not in the cwd it was invoked from
 		expect(existsSync(join(repoRoot, ".tff-project-id"))).toBe(false);
-		expect(existsSync(join(repoRoot, ".tff-cc"))).toBe(false);
+		expect(existsSync(join(repoRoot, ".tff"))).toBe(false);
 		expect(existsSync(join(subDir, ".tff-project-id"))).toBe(false);
-		expect(existsSync(join(subDir, ".tff-cc"))).toBe(false);
+		expect(existsSync(join(subDir, ".tff"))).toBe(false);
 
 		// Git hooks must not be installed into the surrounding repo when sandboxed
 		expect(existsSync(join(repoRoot, ".git", "hooks", "post-checkout"))).toBe(false);
@@ -78,7 +78,7 @@ describe("project:init isolation", () => {
 	it("writes .tff-project-id at the repo toplevel when launched from a sub-directory (no TFF_CC_HOME)", () => {
 		const cliEntry = join(process.cwd(), "dist", "cli", "index.js");
 		// Drop TFF_CC_HOME and redirect HOME so the run still doesn't touch the
-		// user's real ~/.tff-cc. With TFF_CC_HOME unset, the meta files belong
+		// user's real ~/.tff. With TFF_CC_HOME unset, the meta files belong
 		// at the repo toplevel — that's the production contract this test guards.
 		const env = { ...process.env, HOME: join(tempDir, "fake-home") };
 		delete env.TFF_CC_HOME;
@@ -92,8 +92,8 @@ describe("project:init isolation", () => {
 		expect(existsSync(join(repoRoot, ".tff-project-id"))).toBe(true);
 		expect(existsSync(join(subDir, ".tff-project-id"))).toBe(false);
 
-		// .tff-cc symlink must be at the repo root, not in the sub-directory
-		expect(existsSync(join(repoRoot, ".tff-cc"))).toBe(true);
-		expect(existsSync(join(subDir, ".tff-cc"))).toBe(false);
+		// .tff symlink must be at the repo root, not in the sub-directory
+		expect(existsSync(join(repoRoot, ".tff"))).toBe(true);
+		expect(existsSync(join(subDir, ".tff"))).toBe(false);
 	});
 });

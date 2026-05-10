@@ -25,9 +25,9 @@ describe("checkLastObservation", () => {
 	});
 
 	it("returns stale: false when last entry is younger than staleAfterDays", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
-			path.join(tmp, ".tff-cc/observations/sessions.jsonl"),
+			path.join(tmp, ".tff/observations/sessions.jsonl"),
 			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}\n`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
@@ -40,9 +40,9 @@ describe("checkLastObservation", () => {
 	});
 
 	it("returns stale: true when last entry is older than staleAfterDays", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
-			path.join(tmp, ".tff-cc/observations/sessions.jsonl"),
+			path.join(tmp, ".tff/observations/sessions.jsonl"),
 			`${JSON.stringify({ ts: "2026-03-01T00:00:00Z", tool: "Read" })}\n`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
@@ -50,9 +50,9 @@ describe("checkLastObservation", () => {
 	});
 
 	it("swallows malformed JSONL into { ok: false, reason }", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
-			path.join(tmp, ".tff-cc/observations/sessions.jsonl"),
+			path.join(tmp, ".tff/observations/sessions.jsonl"),
 			"nope\nbad\nstill-bad\nwrong\nno-good\n",
 		);
 		const r = checkLastObservation(tmp, new Date(), 14);
@@ -60,9 +60,9 @@ describe("checkLastObservation", () => {
 	});
 
 	it("walks back past a truncated last line", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
-			path.join(tmp, ".tff-cc/observations/sessions.jsonl"),
+			path.join(tmp, ".tff/observations/sessions.jsonl"),
 			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}\n{"ts":"broken`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
@@ -75,16 +75,16 @@ describe("checkLastObservation", () => {
 	});
 
 	it("returns present: false when sessions.jsonl is empty", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/sessions.jsonl"), "");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/observations/sessions.jsonl"), "");
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
 		expect(r).toEqual({ ok: true, present: false, lastSeenAt: null, stale: false });
 	});
 
 	it("handles file with no trailing newline", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
-			path.join(tmp, ".tff-cc/observations/sessions.jsonl"),
+			path.join(tmp, ".tff/observations/sessions.jsonl"),
 			JSON.stringify({ ts: "2026-04-20T00:00:00Z" }),
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
@@ -109,9 +109,9 @@ describe("checkFirstObservationSentinel", () => {
 	});
 
 	it("warns when enabled + mutating sentinel exists + sessions.jsonl missing", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/settings.yaml"), "enabled: true\n");
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"), "");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/settings.yaml"), "enabled: true\n");
+		fs.writeFileSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"), "");
 		const r = checkFirstObservationSentinel(tmp);
 		expect(r).toMatchObject({
 			ok: true,
@@ -123,18 +123,18 @@ describe("checkFirstObservationSentinel", () => {
 	});
 
 	it("does not warn when sessions.jsonl exists", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/settings.yaml"), "enabled: true\n");
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"), "");
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/sessions.jsonl"), "");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/settings.yaml"), "enabled: true\n");
+		fs.writeFileSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"), "");
+		fs.writeFileSync(path.join(tmp, ".tff/observations/sessions.jsonl"), "");
 		const r = checkFirstObservationSentinel(tmp);
 		expect(r).toMatchObject({ ok: true, shouldWarn: false });
 	});
 
 	it("does not warn when enabled is commented out in settings.yaml", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/settings.yaml"), "# enabled: true\n");
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"), "");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/settings.yaml"), "# enabled: true\n");
+		fs.writeFileSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"), "");
 		const r = checkFirstObservationSentinel(tmp);
 		expect(r).toMatchObject({ ok: true, enabled: false, shouldWarn: false });
 	});
@@ -157,8 +157,8 @@ describe("auditDeadLetter", () => {
 	});
 
 	it("reports line count and bytes when non-empty", () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		const dl = path.join(tmp, ".tff-cc/observations/dead-letter.jsonl");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		const dl = path.join(tmp, ".tff/observations/dead-letter.jsonl");
 		fs.writeFileSync(dl, "line-a\nline-b\nline-c\n");
 		const r = auditDeadLetter(tmp);
 		expect(r).toMatchObject({ ok: true, present: true, entryCount: 3, entryCountTruncated: false });

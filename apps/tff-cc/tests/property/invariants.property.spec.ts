@@ -114,7 +114,7 @@ function assertStateConsistentOrWarned(
 	);
 	if (!rendered.ok) throw new Error(`render failed: ${rendered.error.message}`);
 
-	const stateMdPath = join(repoRoot, ".tff-cc", "STATE.md");
+	const stateMdPath = join(repoRoot, ".tff", "STATE.md");
 	const fileExists = existsSync(stateMdPath);
 
 	if (hasStateMdPartialSuccess(warnings)) {
@@ -134,7 +134,7 @@ let prevCwd: string;
 beforeEach(() => {
 	prevCwd = process.cwd();
 	repo = mkdtempSync(join(tmpdir(), "tff-invariants-"));
-	mkdirSync(join(repo, ".tff-cc"), { recursive: true });
+	mkdirSync(join(repo, ".tff"), { recursive: true });
 	process.chdir(repo);
 	mockCreateBranch.mockResolvedValue();
 });
@@ -313,7 +313,7 @@ describe("invariant 3: reconcile render failure on read has no PARTIAL_SUCCESS w
 		const { adapter } = seedProject();
 		installStores(adapter);
 
-		const stateMdPath = join(repo, ".tff-cc", "STATE.md");
+		const stateMdPath = join(repo, ".tff", "STATE.md");
 		const stashed = "STASHED STATE (should remain untouched on render failure)";
 		writeFileSync(stateMdPath, stashed);
 		const before = sha256(readFileSync(stateMdPath, "utf8"));

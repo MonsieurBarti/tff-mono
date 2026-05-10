@@ -98,7 +98,7 @@ afterEach(() => {
 });
 
 describe("auto-archive on milestone close", () => {
-	it("renames .tff-cc/milestones/M01 → .tff-cc/archive/milestones/M01 and sets archived_at", async () => {
+	it("renames .tff/milestones/M01 → .tff/archive/milestones/M01 and sets archived_at", async () => {
 		const adapter = setupAdapter();
 		installStores(adapter);
 
@@ -119,7 +119,7 @@ describe("auto-archive on milestone close", () => {
 		expect(adapter.clearPending(slice.data.id).ok).toBe(true);
 
 		// Pre-populate the milestone dir on disk so the archive rename has work.
-		const msDir = join(repo, ".tff-cc/milestones/M01");
+		const msDir = join(repo, ".tff/milestones/M01");
 		mkdirSync(msDir, { recursive: true });
 		writeFileSync(join(msDir, "PLAN.md"), "plan");
 
@@ -133,7 +133,7 @@ describe("auto-archive on milestone close", () => {
 
 		// FS: source gone, destination present.
 		expect(existsSync(msDir)).toBe(false);
-		const archivedDir = join(repo, ".tff-cc/archive/milestones/M01");
+		const archivedDir = join(repo, ".tff/archive/milestones/M01");
 		expect(existsSync(archivedDir)).toBe(true);
 		expect(existsSync(join(archivedDir, "PLAN.md"))).toBe(true);
 
@@ -177,8 +177,8 @@ describe("auto-archive on milestone close", () => {
 		expect(seedReview(adapter, slice.data.id, "code", "rev-c").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "security", "rev-s").ok).toBe(true);
 
-		// The milestone-bound slice dir is at .tff-cc/milestones/M01/slices/M01-S01.
-		const sliceDir = join(repo, ".tff-cc/milestones/M01/slices/M01-S01");
+		// The milestone-bound slice dir is at .tff/milestones/M01/slices/M01-S01.
+		const sliceDir = join(repo, ".tff/milestones/M01/slices/M01-S01");
 		mkdirSync(sliceDir, { recursive: true });
 		writeFileSync(join(sliceDir, "PLAN.md"), "plan");
 
@@ -224,7 +224,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 		expect(seedReview(adapter, slice.data.id, "code", "rev-c").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "security", "rev-s").ok).toBe(true);
 
-		const quickDir = join(repo, ".tff-cc/quick/Q-01");
+		const quickDir = join(repo, ".tff/quick/Q-01");
 		mkdirSync(quickDir, { recursive: true });
 		writeFileSync(join(quickDir, "PLAN.md"), "plan");
 
@@ -234,7 +234,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 		expect(result.ok).toBe(true);
 
 		expect(existsSync(quickDir)).toBe(false);
-		expect(existsSync(join(repo, ".tff-cc/archive/quick/Q-01"))).toBe(true);
+		expect(existsSync(join(repo, ".tff/archive/quick/Q-01"))).toBe(true);
 
 		const re = adapter.getSlice(slice.data.id);
 		expect(re.ok).toBe(true);
@@ -266,7 +266,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 		expect(seedReview(adapter, slice.data.id, "code", "rev-c").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "security", "rev-s").ok).toBe(true);
 
-		const debugDir = join(repo, ".tff-cc/debug/D-01");
+		const debugDir = join(repo, ".tff/debug/D-01");
 		mkdirSync(debugDir, { recursive: true });
 		writeFileSync(join(debugDir, "REPRO.md"), "repro");
 
@@ -276,7 +276,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 		expect(result.ok).toBe(true);
 
 		expect(existsSync(debugDir)).toBe(false);
-		expect(existsSync(join(repo, ".tff-cc/archive/debug/D-01"))).toBe(true);
+		expect(existsSync(join(repo, ".tff/archive/debug/D-01"))).toBe(true);
 	});
 });
 
