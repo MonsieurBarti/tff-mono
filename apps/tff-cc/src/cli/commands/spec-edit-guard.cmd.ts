@@ -25,7 +25,7 @@ function areGuardsDisabled(): boolean {
 }
 
 /**
- * Check if the project is initialized (has .tff-cc directory).
+ * Check if the project is initialized (has .tff directory).
  */
 function isProjectInitialized(): boolean {
 	const tffDir = path.join(process.cwd(), TFF_DIR);

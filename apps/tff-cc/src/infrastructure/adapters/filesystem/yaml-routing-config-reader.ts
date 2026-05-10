@@ -36,8 +36,8 @@ const RoutingConfigSchema = z
 		enabled: z.boolean().default(false),
 		confidence_threshold: z.number().default(0.5),
 		logging: z
-			.object({ path: z.string().default(".tff-cc/logs/routing.jsonl") })
-			.default({ path: ".tff-cc/logs/routing.jsonl" }),
+			.object({ path: z.string().default(".tff/logs/routing.jsonl") })
+			.default({ path: ".tff/logs/routing.jsonl" }),
 		calibration: CalibrationConfigSchema.optional(),
 	})
 	.passthrough();
@@ -45,7 +45,7 @@ const RoutingConfigSchema = z
 const DISABLED_DEFAULT: RoutingConfig = {
 	enabled: false,
 	confidence_threshold: 0.5,
-	logging: { path: ".tff-cc/logs/routing.jsonl" },
+	logging: { path: ".tff/logs/routing.jsonl" },
 };
 
 export interface YamlRoutingConfigReaderOpts {
@@ -63,7 +63,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 	constructor(private readonly opts: YamlRoutingConfigReaderOpts) {}
 
 	async readConfig(): Promise<Result<RoutingConfig, DomainError>> {
-		const path = join(this.opts.projectRoot, ".tff-cc", "settings.yaml");
+		const path = join(this.opts.projectRoot, ".tff", "settings.yaml");
 		let raw = "";
 		try {
 			raw = await readFile(path, "utf8");
@@ -191,7 +191,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 	private async readPoolFromSettings(
 		workflow_id: string,
 	): Promise<Result<string[] | undefined, DomainError>> {
-		const path = join(this.opts.projectRoot, ".tff-cc", "settings.yaml");
+		const path = join(this.opts.projectRoot, ".tff", "settings.yaml");
 		let raw: string;
 		try {
 			raw = await readFile(path, "utf8");

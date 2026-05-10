@@ -166,7 +166,7 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 			if (milestoneRow.ok && milestoneRow.data) {
 				const msLabel = `M${String(milestoneRow.data.number).padStart(2, "0")}`;
 				archivedSrcRel = milestoneDir(msLabel);
-				archivedDstRel = `.tff-cc/archive/milestones/${msLabel}`;
+				archivedDstRel = `.tff/archive/milestones/${msLabel}`;
 				const fsResult = archiveMilestoneFs(milestoneRow.data, projectRoot);
 				if (!fsResult.ok) {
 					fsArchiveError = fsResult.reason;

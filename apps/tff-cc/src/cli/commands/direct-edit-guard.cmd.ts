@@ -27,7 +27,7 @@ function areGuardsDisabled(repoRoot: string): boolean {
 }
 
 /**
- * Check if the project is initialized (has .tff-cc directory).
+ * Check if the project is initialized (has .tff directory).
  */
 function isProjectInitialized(repoRoot: string): boolean {
 	const tffDir = path.join(repoRoot, TFF_DIR);

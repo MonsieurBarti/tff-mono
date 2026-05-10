@@ -37,7 +37,7 @@ export const initProject = async (
 	await deps.artifactStore.mkdir(TFF_DIR);
 	await deps.artifactStore.mkdir(MILESTONES_DIR);
 
-	// Ensure .tff-cc/ and build/ are in .gitignore so artifacts never land on code branches
+	// Ensure .tff/ and build/ are in .gitignore so artifacts never land on code branches
 	await ensureGitignored(deps.artifactStore);
 
 	const projectMd = `# ${project.name}\n\n## Vision\n\n${project.vision}\n`;
@@ -46,11 +46,11 @@ export const initProject = async (
 	return Ok({ project: saveResult.data });
 };
 
-// Root-anchored, no trailing slash: matches the toplevel `.tff-cc` whether it
+// Root-anchored, no trailing slash: matches the toplevel `.tff` whether it
 // is the canonical symlink, a real dir, or a regular file. The trailing-slash
-// form (`/.tff-cc/`) only matches directories, so it would silently fail to
+// form (`/.tff/`) only matches directories, so it would silently fail to
 // ignore the symlink that `project:init` creates. Anchoring with `/` ensures
-// a stray `<some-dir>/.tff-cc/` (e.g., test pollution in a subdir) is NOT
+// a stray `<some-dir>/.tff/` (e.g., test pollution in a subdir) is NOT
 // hidden — it surfaces in `git status` instead of being masked.
 const REQUIRED_GITIGNORE_ENTRIES = [`/${TFF_DIR}`, "build/"];
 

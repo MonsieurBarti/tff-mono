@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const LOG_REL = ".tff-cc/observations/skill-approvals.jsonl";
+const LOG_REL = ".tff/observations/skill-approvals.jsonl";
 
 export interface SkillApprovalEntry {
 	readonly ts: string;

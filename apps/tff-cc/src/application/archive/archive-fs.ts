@@ -6,10 +6,10 @@ import { milestoneLabel, sliceLabelFor } from "../../domain/helpers/branch-namin
 import { milestoneDir, sliceDirFor, tffPath } from "@tff/core";
 
 /**
- * Repo-relative archive root: .tff-cc/archive
+ * Repo-relative archive root: .tff/archive
  *
  * Buckets are created lazily under this root by the FS helpers below
- * (.tff-cc/archive/{milestones,quick,debug}/<label>/).
+ * (.tff/archive/{milestones,quick,debug}/<label>/).
  */
 export const ARCHIVE_DIR = tffPath("archive");
 

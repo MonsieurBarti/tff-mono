@@ -13,7 +13,7 @@ import type { SliceStore } from "../../../domain/ports/slice-store.port.js";
 import type { TaskStore } from "../../../domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../../domain/ports/transaction-runner.port.js";
 import {
-	createTffCcSymlink,
+	createTffSymlink,
 	getProjectHome,
 	getProjectId,
 	resolveProjectRoot,
@@ -42,7 +42,7 @@ function getDerivedPaths(): { dbPath: string; journalPath: string; projectId: st
 	const cwd = process.cwd();
 	const repoRoot = resolveRepoRoot(cwd);
 	warnOnStrayTffFiles(cwd, repoRoot);
-	// State files (`.tff-project-id`, `.tff-cc` symlink) live at TFF_CC_HOME
+	// State files (`.tff-project-id`, `.tff` symlink) live at TFF_CC_HOME
 	// when set, otherwise at the repo toplevel. Routing through
 	// resolveProjectRoot keeps tests with TFF_CC_HOME=<tmp> from leaking the
 	// symlink and id-file into the surrounding worktree.
@@ -50,7 +50,7 @@ function getDerivedPaths(): { dbPath: string; journalPath: string; projectId: st
 	const projectId = getProjectId(projectRoot);
 	const home = getProjectHome(projectId);
 
-	createTffCcSymlink(projectRoot, projectId);
+	createTffSymlink(projectRoot, projectId);
 
 	return {
 		dbPath: path.join(home, "state.db"),

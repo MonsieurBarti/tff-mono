@@ -63,7 +63,7 @@ export const versionCmd = async (args: string[]): Promise<string> => {
 		binding = null;
 	}
 
-	const home = join(resolveRepoRoot(process.cwd()), ".tff-cc");
+	const home = join(resolveRepoRoot(process.cwd()), ".tff");
 	const marker = await readRecoveryMarker(home);
 	const lastRecovery: LastRecovery = marker
 		? {
