@@ -11,7 +11,7 @@ import { createClosableStateStoresUnchecked } from "../../infrastructure/adapter
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
 import { mkdirTracked } from "../../infrastructure/persistence/track-mkdir.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
-import { milestoneDir as milestoneDirPath } from "../../shared/paths.js";
+import { milestoneDir as milestoneDirPath } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
 export const milestoneCreateSchema: CommandSchema = {

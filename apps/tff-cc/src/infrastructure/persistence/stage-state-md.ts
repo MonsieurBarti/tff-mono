@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { STATE_FILE } from "../../shared/paths.js";
+import { STATE_FILE } from "@tff/core";
 import { mkdirTracked } from "./track-mkdir.js";
 
 export interface StagedStateMd {

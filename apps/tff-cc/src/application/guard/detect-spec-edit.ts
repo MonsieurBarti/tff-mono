@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
-import { SETTINGS_FILE } from "../../shared/paths.js";
+import { SETTINGS_FILE } from "@tff/core";
 
 export interface SpecEditWarning {
 	code: "SPEC_EDIT_DETECTED";

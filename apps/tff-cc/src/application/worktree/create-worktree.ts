@@ -4,7 +4,7 @@ import type { DomainError } from "../../domain/errors/domain-error.js";
 import { sliceLabelFor } from "../../domain/helpers/branch-naming.js";
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
 import { isOk, Ok, type Result } from "../../domain/result.js";
-import { worktreeDir } from "../../shared/paths.js";
+import { worktreeDir } from "@tff/core";
 
 interface CreateWorktreeInput {
 	slice: Slice;

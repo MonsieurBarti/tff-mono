@@ -6,7 +6,7 @@ import type {
 	SliceSpecResult,
 } from "../../../domain/ports/slice-spec-reader.port.js";
 import { Err, Ok, type Result } from "../../../domain/result.js";
-import { debugSliceDir, quickSliceDir, sliceDir } from "../../../shared/paths.js";
+import { debugSliceDir, quickSliceDir, sliceDir } from "@tff/core";
 
 const MILESTONE_SLICE_RE = /^M(\d+)-S\d+$/;
 const ADHOC_SLICE_RE = /^([QD])-\d+$/;

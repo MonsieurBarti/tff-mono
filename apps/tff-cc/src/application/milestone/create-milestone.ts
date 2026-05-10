@@ -6,7 +6,7 @@ import type { GitOps } from "../../domain/ports/git-ops.port.js";
 import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
 
 import { isOk, Ok, type Result } from "../../domain/result.js";
-import { milestoneDir as milestoneDirPath } from "../../shared/paths.js";
+import { milestoneDir as milestoneDirPath } from "@tff/core";
 
 interface CreateMilestoneInput {
 	name: string;

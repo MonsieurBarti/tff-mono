@@ -9,7 +9,7 @@ import { isValidOperation } from "../../application/index.js";
 import { isOk } from "../../domain/result.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { resolveRepoRoot } from "../../infrastructure/home-directory.js";
-import { SETTINGS_FILE, TFF_CC_DIR } from "../../shared/paths.js";
+import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { withSyncLock } from "../with-sync-lock.js";
 
@@ -36,7 +36,7 @@ function areGuardsDisabled(repoRoot: string): boolean {
  * Check if the project is initialized (has .tff-cc directory).
  */
 function isProjectInitialized(repoRoot: string): boolean {
-	const tffDir = path.join(repoRoot, TFF_CC_DIR);
+	const tffDir = path.join(repoRoot, TFF_DIR);
 	return existsSync(tffDir);
 }
 

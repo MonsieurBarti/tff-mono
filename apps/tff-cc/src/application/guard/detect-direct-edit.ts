@@ -3,7 +3,7 @@ import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
 import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { SETTINGS_FILE, TFF_CC_DIR } from "../../shared/paths.js";
+import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
 
 export interface DetectDirectEditDeps {
 	sessionStore: SessionStore;
@@ -49,7 +49,7 @@ function areGuardsDisabled(): boolean {
  * Check if the project is initialized (has .tff-cc directory).
  */
 function isProjectInitialized(): boolean {
-	const tffDir = path.join(process.cwd(), TFF_CC_DIR);
+	const tffDir = path.join(process.cwd(), TFF_DIR);
 	return existsSync(tffDir);
 }
 

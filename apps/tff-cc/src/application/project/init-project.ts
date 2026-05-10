@@ -5,7 +5,7 @@ import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
 import type { ProjectStore } from "../../domain/ports/project-store.port.js";
 
 import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { MILESTONES_DIR, PROJECT_FILE, TFF_CC_DIR } from "../../shared/paths.js";
+import { MILESTONES_DIR, PROJECT_FILE, TFF_DIR } from "@tff/core";
 
 interface InitProjectInput {
 	name: string;
@@ -34,7 +34,7 @@ export const initProject = async (
 	const saveResult = deps.projectStore.saveProject({ name: project.name, vision: project.vision });
 	if (!isOk(saveResult)) return saveResult;
 
-	await deps.artifactStore.mkdir(TFF_CC_DIR);
+	await deps.artifactStore.mkdir(TFF_DIR);
 	await deps.artifactStore.mkdir(MILESTONES_DIR);
 
 	// Ensure .tff-cc/ and build/ are in .gitignore so artifacts never land on code branches
@@ -52,7 +52,7 @@ export const initProject = async (
 // ignore the symlink that `project:init` creates. Anchoring with `/` ensures
 // a stray `<some-dir>/.tff-cc/` (e.g., test pollution in a subdir) is NOT
 // hidden — it surfaces in `git status` instead of being masked.
-const REQUIRED_GITIGNORE_ENTRIES = [`/${TFF_CC_DIR}`, "build/"];
+const REQUIRED_GITIGNORE_ENTRIES = [`/${TFF_DIR}`, "build/"];
 
 function gitignoreLineSatisfies(line: string, entry: string): boolean {
 	const trimmed = line.trim();

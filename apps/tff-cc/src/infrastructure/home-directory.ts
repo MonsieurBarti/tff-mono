@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { TFF_CC_DIR } from "../shared/paths.js";
+import { TFF_DIR } from "@tff/core";
 
 /** UUID v4 format validation regex */
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -102,7 +102,7 @@ export function warnOnStrayTffFiles(cwd: string, repoRoot: string): void {
 		// (broken target) is exactly the stray state we want to warn about,
 		// and existsSync follows the link so it would miss that case.
 		try {
-			lstatSync(join(cwd, TFF_CC_DIR));
+			lstatSync(join(cwd, TFF_DIR));
 			straySym = true;
 		} catch {
 			// Entry does not exist — expected path.
@@ -130,7 +130,7 @@ function isValidUuidV4(id: string): boolean {
  * Returns TFF_CC_HOME env var if set, otherwise ~/.tff-cc
  */
 export function getTffCcHome(): string {
-	return process.env.TFF_CC_HOME ?? join(homedir(), TFF_CC_DIR);
+	return process.env.TFF_CC_HOME ?? join(homedir(), TFF_DIR);
 }
 
 /**
@@ -250,7 +250,7 @@ export function ensureProjectHomeDir(projectId: string): string {
  * Throws if .tff-cc/ exists as a real directory.
  */
 export function createTffCcSymlink(repoRoot: string, projectId: string): void {
-	const symlinkPath = join(repoRoot, TFF_CC_DIR);
+	const symlinkPath = join(repoRoot, TFF_DIR);
 	const targetPath = getProjectHome(projectId);
 
 	if (existsSync(symlinkPath)) {
@@ -269,7 +269,7 @@ export function createTffCcSymlink(repoRoot: string, projectId: string): void {
 			return;
 		}
 		throw new Error(
-			`${TFF_CC_DIR}/ exists as a real directory. Remove or rename it before proceeding.`,
+			`${TFF_DIR}/ exists as a real directory. Remove or rename it before proceeding.`,
 		);
 	}
 

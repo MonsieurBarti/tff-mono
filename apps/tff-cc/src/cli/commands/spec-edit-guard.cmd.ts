@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { detectSpecEdit } from "../../application/guard/detect-spec-edit.js";
-import { SETTINGS_FILE, TFF_CC_DIR } from "../../shared/paths.js";
+import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
 /**
@@ -28,7 +28,7 @@ function areGuardsDisabled(): boolean {
  * Check if the project is initialized (has .tff-cc directory).
  */
 function isProjectInitialized(): boolean {
-	const tffDir = path.join(process.cwd(), TFF_CC_DIR);
+	const tffDir = path.join(process.cwd(), TFF_DIR);
 	return existsSync(tffDir);
 }
 
