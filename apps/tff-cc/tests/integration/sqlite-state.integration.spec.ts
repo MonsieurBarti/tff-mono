@@ -1,5 +1,8 @@
-import type Database from "better-sqlite3";
-import { beforeEach, describe, expect, it } from "vitest";
+import Database from "better-sqlite3";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { isErr, isOk } from "../../src/domain/result.js";
 import { SQLiteStateAdapter } from "../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
@@ -86,6 +89,39 @@ describe("SQLite integration", () => {
 		const result = adapterWithFutureSchema.init();
 		expect(isErr(result)).toBe(true);
 		if (isErr(result)) expect(result.error.code).toBe("VERSION_MISMATCH");
+	});
+
+	it("init() recovers file-backed db on VERSION_MISMATCH by wiping and recreating", () => {
+		const tempDir = mkdtempSync(join(tmpdir(), "tff-test-"));
+		const tempDbPath = join(tempDir, "state.db");
+		try {
+			const seedDb = new Database(tempDbPath);
+			seedDb.prepare("CREATE TABLE schema_version (version INTEGER PRIMARY KEY)").run();
+			seedDb.prepare("INSERT INTO schema_version (version) VALUES (9)").run();
+			seedDb.close();
+
+			const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+			const fileAdapter = SQLiteStateAdapter.createWithPath(tempDbPath);
+			const result = fileAdapter.init();
+
+			expect(isOk(result)).toBe(true);
+			expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("schema version mismatch"));
+			expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(tempDbPath));
+			warnSpy.mockRestore();
+
+			// Verify database is functional after recovery
+			const projectResult = fileAdapter.saveProject({ name: "P" });
+			expect(isOk(projectResult)).toBe(true);
+
+			// Verify schema was reset to current version (1)
+			const db = getDb(fileAdapter);
+			const versionRow = db.prepare("SELECT MAX(version) as version FROM schema_version").get() as {
+				version: number;
+			};
+			expect(versionRow.version).toBe(1);
+		} finally {
+			rmSync(tempDir, { recursive: true });
+		}
 	});
 
 	it("closeMilestone with open slices without spec approval returns MILESTONE_COMPLETENESS_VIOLATION", () => {
