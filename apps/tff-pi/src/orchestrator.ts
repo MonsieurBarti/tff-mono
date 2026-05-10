@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
 import { readArtifact } from "./common/artifacts.js";
@@ -24,6 +24,19 @@ export interface PhasePrompt {
 }
 
 export const RESOURCES_DIR = join(fileURLToPath(new URL(".", import.meta.url)), "resources");
+
+const CORE_PROTOCOLS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"protocols",
+);
 
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);
@@ -58,7 +71,17 @@ function loadResource(path: string): string {
 	try {
 		return readFileSync(path, "utf-8");
 	} catch {
-		return "";
+		// Fallback: shared protocols may have been migrated to core
+		const filename = basename(path);
+		const corePath = join(CORE_PROTOCOLS_DIR, filename);
+		try {
+			let content = readFileSync(corePath, "utf-8");
+			// Placeholder resolution for tff-pi context
+			content = content.replace(/\{\{project-dir\}\}/g, ".pi/.tff");
+			return content;
+		} catch {
+			return "";
+		}
 	}
 }
 

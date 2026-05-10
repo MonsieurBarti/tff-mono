@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const TFF_AGENT_NAMES = [
@@ -15,7 +15,22 @@ export function ensureProjectAgents(root: string, resourcesDir: string): void {
 	const dir = join(root, ".pi", "agents");
 	mkdirSync(dir, { recursive: true });
 	for (const name of TFF_AGENT_NAMES) {
-		const src = join(resourcesDir, "agents", `${name}.md`);
+		let src = join(resourcesDir, "agents", `${name}.md`);
+		if (!existsSync(src)) {
+			src = join(
+				resourcesDir,
+				"..",
+				"..",
+				"..",
+				"..",
+				"packages",
+				"core",
+				"src",
+				"content",
+				"agents",
+				`${name}.md`,
+			);
+		}
 		const dst = join(dir, `${name}.md`);
 		writeFileSync(dst, readFileSync(src));
 	}
