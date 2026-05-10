@@ -18,12 +18,14 @@ function sha256(content) {
 	return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
 
-let existing = { version: 1, agents: {}, skills: {} };
+let existing = { version: 1, agents: {}, skills: {}, workflows: {}, protocols: {} };
 if (fs.existsSync(baselinesPath)) {
 	existing = JSON.parse(fs.readFileSync(baselinesPath, "utf8"));
+	existing.workflows = existing.workflows || {};
+	existing.protocols = existing.protocols || {};
 }
 
-const baselines = { version: 1, agents: {}, skills: {} };
+const baselines = { version: 1, agents: {}, skills: {}, workflows: {}, protocols: {} };
 
 // Agents
 const agentsDir = path.join(contentRoot, "agents");
@@ -54,7 +56,37 @@ for (const dir of fs.readdirSync(skillsDir)) {
 	};
 }
 
+// Workflows
+const workflowsDir = path.join(contentRoot, "workflows");
+if (fs.existsSync(workflowsDir)) {
+	for (const file of fs.readdirSync(workflowsDir).filter((f) => f.endsWith(".md"))) {
+		const name = path.basename(file, ".md");
+		const content = fs.readFileSync(path.join(workflowsDir, file), "utf8");
+		const hash = sha256(normalize(content));
+		const prev = existing.workflows[name];
+		baselines.workflows[name] = {
+			approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+			sha256: hash,
+		};
+	}
+}
+
+// Protocols
+const protocolsDir = path.join(contentRoot, "protocols");
+if (fs.existsSync(protocolsDir)) {
+	for (const file of fs.readdirSync(protocolsDir).filter((f) => f.endsWith(".md"))) {
+		const name = path.basename(file, ".md");
+		const content = fs.readFileSync(path.join(protocolsDir, file), "utf8");
+		const hash = sha256(normalize(content));
+		const prev = existing.protocols[name];
+		baselines.protocols[name] = {
+			approvedAt: prev && prev.sha256 === hash ? prev.approvedAt : new Date().toISOString(),
+			sha256: hash,
+		};
+	}
+}
+
 fs.writeFileSync(baselinesPath, JSON.stringify(baselines, null, 2) + "\n");
 console.log(
-	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills`,
+	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills, ${Object.keys(baselines.workflows).length} workflows, ${Object.keys(baselines.protocols).length} protocols`,
 );
