@@ -47,7 +47,7 @@ workflow:
   # Enable guard hooks that detect workflow bypasses and inject advisory warnings.
   # When guards: true, both detection systems are active:
   #
-  # 1. Direct-edit detection (S02): Catches code changes made without /tff commands
+  # 1. Direct-edit detection (S02): Catches code changes made without {{command-prefix}} commands
   #    - Triggers on Bash {{pre-execution-hook}} events (file writes, command execution)
   #    - Suggests using {{command-prefix}}quick for tracked fixes instead of direct edits
   #
