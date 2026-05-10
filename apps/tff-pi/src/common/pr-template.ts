@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readArtifact, tffPath } from "./artifacts.js";
@@ -9,6 +9,19 @@ const BUILTIN_TEMPLATE_PATH = join(
 	"resources",
 	"templates",
 	"pr-body.md",
+);
+
+const CORE_TEMPLATES_DIR = join(
+	fileURLToPath(new URL(".", import.meta.url)),
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"templates",
 );
 
 export const PR_TEMPLATE_FIELDS = [
@@ -28,7 +41,10 @@ export function loadPrTemplate(root: string): string {
 	if (override && override.trim().length > 0) {
 		return override;
 	}
-	return readFileSync(BUILTIN_TEMPLATE_PATH, "utf-8");
+	if (existsSync(BUILTIN_TEMPLATE_PATH)) {
+		return readFileSync(BUILTIN_TEMPLATE_PATH, "utf-8");
+	}
+	return readFileSync(join(CORE_TEMPLATES_DIR, "pr-body.md"), "utf-8");
 }
 
 export function renderPrTemplate(template: string, values: PrTemplateValues): string {
