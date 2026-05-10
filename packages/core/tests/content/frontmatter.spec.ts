@@ -50,6 +50,19 @@ const SkillFrontmatterSchema = z
 	})
 	.strict();
 
+const CommandFrontmatterSchema = z.object({
+	name: z.string(),
+	description: z.string(),
+	version: z.string().optional(),
+	"argument-hint": z.string().optional(),
+	tools: z.array(z.string()),
+	routing: z
+		.object({
+			pool: z.array(z.string()),
+		})
+		.optional(),
+});
+
 function parseFrontmatter(filePath: string) {
 	const content = fs.readFileSync(filePath, "utf8");
 	const match = content.match(/^---\n([\s\S]*?)\n---\n/);
@@ -79,6 +92,19 @@ describe("content frontmatter validation", () => {
 			const skillFile = path.join(skillsDir, dir, "SKILL.md");
 			const frontmatter = parseFrontmatter(skillFile);
 			SkillFrontmatterSchema.parse(frontmatter);
+		}
+	});
+
+	it("validates all command files", () => {
+		const commandsDir = path.join(contentRoot, "commands");
+		const files = fs
+			.readdirSync(commandsDir)
+			.filter((f) => f.endsWith(".md"))
+			.map((f) => path.join(commandsDir, f));
+		expect(files.length).toBeGreaterThan(0);
+		for (const file of files) {
+			const frontmatter = parseFrontmatter(file);
+			CommandFrontmatterSchema.parse(frontmatter);
 		}
 	});
 

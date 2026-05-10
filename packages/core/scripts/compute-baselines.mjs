@@ -136,5 +136,5 @@ if (fs.existsSync(templatesDir)) {
 
 fs.writeFileSync(baselinesPath, JSON.stringify(baselines, null, 2) + "\n");
 console.log(
-	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills, ${Object.keys(baselines.workflows).length} workflows, ${Object.keys(baselines.protocols).length} protocols, ${Object.keys(baselines.commands).length} commands, ${Object.keys(baselines.templates).length} template`,
+	`Baselines computed: ${Object.keys(baselines.agents).length} agents, ${Object.keys(baselines.skills).length} skills, ${Object.keys(baselines.workflows).length} workflows, ${Object.keys(baselines.protocols).length} protocols, ${Object.keys(baselines.commands).length} commands, ${Object.keys(baselines.templates).length} templates`,
 );

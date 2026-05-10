@@ -24,7 +24,7 @@ Steps to test:
 
 ---
 
-## PR Checklist :white_check_mark:
+## PR Checklist
 
 - [ ] Tests added or updated
 - [ ] Docs updated if needed

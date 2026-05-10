@@ -18,5 +18,5 @@ Read orchestrator pattern: @references/orchestrator-pattern.md
 <execution_context>
 Execute map-codebase workflow from @workflows/map-codebase.md.
 
-If specific focus provided (e.g., `{{command-prefix}}map-codebase tech`), only run agent for that focus area. Otherwise, run all 3 ∈ parallel + conventions.
+If specific focus provided (e.g., `{{command-prefix}}map-codebase tech`), only run agent for that focus area. Otherwise, run all 4 ∈ parallel + conventions.
 </execution_context>
