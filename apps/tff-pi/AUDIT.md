@@ -38,6 +38,12 @@ Inventory of every file under `apps/tff-pi/src/resources/` categorized as `share
 | ----------------------- | ---------- | ------------------------------------------ |
 | `report-issue/SKILL.md` | deprecated | shared duplicate; already in core; deleted |
 
+## Skill Loading (runtime)
+
+| Capability    | Status | Note                                                                                         |
+| ------------- | ------ | -------------------------------------------------------------------------------------------- |
+| `loadSkill()` | added  | `orchestrator.ts` loads local skill first, falls back to `packages/core/src/content/skills/` |
+
 ## Templates (`apps/tff-pi/src/resources/templates/`)
 
 | File         | Status     | Note                                       |
@@ -49,4 +55,5 @@ Inventory of every file under `apps/tff-pi/src/resources/` categorized as `share
 - **App-specific**: 8 agents + 5 protocols = 13 files
 - **Shared**: 2 protocols migrated to core (tff-pi copies deleted after loadResource fallback)
 - **Deprecated**: 5 agents + 2 protocols + 1 skill + 1 template = 9 files deleted
+- **Skill loading**: `loadSkill()` added with core fallback
 - **Zero shared duplicates remain in tff-pi**.

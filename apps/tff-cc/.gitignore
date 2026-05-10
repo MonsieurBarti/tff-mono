@@ -50,7 +50,6 @@ coverage/
 /workflows/
 
 /skills/*
-!/skills/skill-authoring/
 
 /references/*
 !/references/release-checklist.md

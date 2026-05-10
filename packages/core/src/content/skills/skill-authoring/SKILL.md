@@ -46,6 +46,7 @@ skill-name/
 ```
 
 Split when:
+
 - SKILL.md > 100 lines
 - ∃ distinct domains in body (split per domain)
 - ∃ rarely-used advanced features (move out of SKILL.md)
@@ -55,6 +56,7 @@ Linking: SKILL.md -> REFERENCE.md only (one level deep). ¬ chains.
 ## Scripts
 
 Add scripts when:
+
 - Operation deterministic (validation, formatting, parsing)
 - Same code would be regenerated turn after turn
 - Errors need explicit handling, ¬ best-effort
@@ -109,11 +111,13 @@ LOAD @skills/<name>/SKILL.md
 ```
 
 **Use Cases:**
+
 - Layering methodology: base skill + domain-specific skill
 - Review injection: brainstorming loads code-review-protocol for spec review
 - Composition: executing-plans loads TDD + commit-conventions as baseline
 
 **Example:** Brainstorming skill loads code-review-protocol for spec document reviewer:
+
 ```
 # In brainstorming/SKILL.md review section:
 LOAD @skills/code-review-protocol/SKILL.md
@@ -123,17 +127,20 @@ LOAD @skills/code-review-protocol/SKILL.md
 ## Modes
 
 ### Draft New Skill
+
 1. Read `skills/` for format reference
 2. Analyze pattern -> identify workflow
 3. Write skill file: frontmatter + all required sections
 4. Save -> `drafts directory (e.g., drafts/<name>.md)`
 
 ### Refine Existing
+
 1. Read original skill + divergence evidence
 2. Propose bounded diff — max_drift <= 20% of original content
 3. Save -> `drafts directory`
 
 ### Compose Bundle
+
 1. Read each skill ∈ cluster
 2. co_activation >= 70% -> bundle (meta-skill with @skills/ refs)
 3. Save -> `drafts directory`

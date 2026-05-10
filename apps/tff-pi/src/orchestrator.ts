@@ -38,6 +38,19 @@ const CORE_PROTOCOLS_DIR = join(
 	"protocols",
 );
 
+const CORE_SKILLS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"skills",
+);
+
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);
 	if (!project) return null;
@@ -85,6 +98,21 @@ function loadResource(path: string): string {
 	}
 }
 
+export function loadSkill(skillName: string): string {
+	validateResourceName(skillName);
+	const localPath = join(RESOURCES_DIR, "skills", skillName, "SKILL.md");
+	try {
+		return readFileSync(localPath, "utf-8");
+	} catch {
+		const corePath = join(CORE_SKILLS_DIR, skillName, "SKILL.md");
+		try {
+			return readFileSync(corePath, "utf-8");
+		} catch {
+			return "";
+		}
+	}
+}
+
 const PHASE_AGENT: Record<Phase, string> = {
 	discuss: "brainstormer",
 	research: "researcher",
@@ -119,7 +147,19 @@ export const PHASE_TOOLS: Record<Phase, string[]> = {
 	"ship-fix": ["tff_ask_user", "tff_ship_apply_done"],
 };
 
+function validateResourceName(name: string): void {
+	if (
+		!/^[a-z0-9-]{1,64}$/.test(name) ||
+		name.startsWith("-") ||
+		name.endsWith("-") ||
+		name.includes("--")
+	) {
+		throw new Error(`Invalid resource name: ${name}`);
+	}
+}
+
 export function loadAgentResource(agentName: string): string {
+	validateResourceName(agentName);
 	return loadResource(join(RESOURCES_DIR, "agents", `${agentName}.md`));
 }
 

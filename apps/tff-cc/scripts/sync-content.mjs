@@ -66,18 +66,6 @@ if (existsSync(releaseChecklist)) {
 	preserved[releaseChecklist] = readFileSync(releaseChecklist, "utf8");
 }
 
-// ── Preserve app-specific skill directories ────────────────────────
-const preservedSkills = {};
-const skillAuthoringDir = join(appRoot, "skills", "skill-authoring");
-if (existsSync(skillAuthoringDir)) {
-	for (const f of readdirSync(skillAuthoringDir, { recursive: true })) {
-		if (typeof f !== "string") continue;
-		const src = join(skillAuthoringDir, f);
-		if (!statSync(src).isFile()) continue;
-		preservedSkills[src] = readFileSync(src, "utf8");
-	}
-}
-
 // ── Clear & recreate legacy directories ────────────────────────────
 for (const { to } of mappings) {
 	const toPath = join(appRoot, to);
@@ -92,12 +80,6 @@ for (const [path, content] of Object.entries(preserved)) {
 	mkdirSync(dirname(path), { recursive: true });
 	writeFileSync(path, content);
 	manifest.push(`(preserved) ${path}`);
-}
-
-// ── Restore app-specific skill directories ───────────────────────
-for (const [path, content] of Object.entries(preservedSkills)) {
-	mkdirSync(dirname(path), { recursive: true });
-	writeFileSync(path, content);
 }
 
 // ── Copy core content ──────────────────────────────────────────────
@@ -139,20 +121,20 @@ for (const { from, to, ext, isDir, exclude } of mappings) {
 // ── Generate skill-baselines.json ──────────────────────────────────
 const coreBaselinesPath = join(coreContent, "content-baselines.json");
 const coreBaselines = JSON.parse(readFileSync(coreBaselinesPath, "utf8"));
-const skills = { ...coreBaselines.skills };
+const skills = {};
 
-// Merge app-specific skills not present in core
+// Compute hashes from actual app-surface files to match integrity test
 const appSkillsDir = join(appRoot, "skills");
 for (const id of readdirSync(appSkillsDir)) {
 	const skillPath = join(appSkillsDir, id, "SKILL.md");
 	if (!existsSync(skillPath)) continue;
-	if (skills[id]) continue;
 	const content = readFileSync(skillPath, "utf8");
 	const sha256 = createHash("sha256").update(content, "utf8").digest("hex");
+	const coreRow = coreBaselines.skills[id];
 	skills[id] = {
-		approvedAt: new Date().toISOString(),
-		originalCommitSha: null,
-		refinementId: null,
+		approvedAt: coreRow?.approvedAt || new Date().toISOString(),
+		originalCommitSha: coreRow?.originalCommitSha || null,
+		refinementId: coreRow?.refinementId || null,
 		sha256,
 	};
 }
