@@ -436,7 +436,7 @@ checkpoint:save --slice-id M01-S01 --base-commit abc123 --current-wave 0 --compl
 checkpoint:load --slice-id M01-S01
 ```
 
-**Output:** `{ "ok": true, "data": { "sliceId": "M01-S01", "baseCommit": "..., "currentWave": 0, ... } }`
+**Output:** `{ "ok": true, "data": { "sliceId": "M01-S01", "baseCommit": "...", "currentWave": 0, ... } }`
 
 ---
 

@@ -31,7 +31,7 @@ Read current state and suggest appropriate next command from @references/next-st
 
 ## Paused/Resumed States
 
-| State                | Suggested Command           |
+| State                | Suggested Command           | Message                                                                                    |
 | -------------------- | --------------------------- | ------------------------------------------------------------------------------------------ |
 | Checkpoint ∃         | `{{command-prefix}}resume`  | "Found saved checkpoint. Run `{{command-prefix}}resume` to continue from where left off."  |
 | Verification failed  | `{{command-prefix}}execute` | "Verification found issues. Run `{{command-prefix}}execute` to fix ∧ re-run failed tasks." |

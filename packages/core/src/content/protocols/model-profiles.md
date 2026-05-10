@@ -23,14 +23,15 @@ Default model: {{balanced-model}}
 
 ∈ `{{settings-path}}`:
 
+<!-- prettier-ignore -->
 ```yaml
 model-profiles:
   quality:
-    model: { { quality-model } }
+    model: {{quality-model}}
   balanced:
-    model: { { balanced-model } }
+    model: {{balanced-model}}
   budget:
-    model: { { balanced-model } }
+    model: {{balanced-model}}
 ```
 
 ## Agent → Profile Mapping
