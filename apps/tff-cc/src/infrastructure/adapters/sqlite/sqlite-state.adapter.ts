@@ -142,11 +142,19 @@ export class SQLiteStateAdapter
 				console.warn(
 					`[tff] Database schema version mismatch at ${this.dbPath}; wiping and recreating.`,
 				);
-				this.db.close();
-				unlinkSync(this.dbPath);
-				this.db = openDatabase(this.dbPath);
-				runMigrations(this.db, this.migrationsDir);
-				return Ok(undefined);
+				try {
+					this.db.close();
+					unlinkSync(this.dbPath);
+					this.db = openDatabase(this.dbPath);
+					runMigrations(this.db, this.migrationsDir);
+					return Ok(undefined);
+				} catch (recoveryErr) {
+					const recoveryMsg =
+						recoveryErr instanceof Error ? recoveryErr.message : String(recoveryErr);
+					return Err(
+						createDomainError("WRITE_FAILURE", `Schema wipe/recreate failed: ${recoveryMsg}`),
+					);
+				}
 			}
 			return Err(createDomainError("WRITE_FAILURE", `Migration failed: ${msg}`));
 		}
