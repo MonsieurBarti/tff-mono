@@ -66,3 +66,21 @@ export {
 	type TaskStatus,
 	TASK_TRANSITIONS,
 } from "./domain/task/index.js";
+export {
+	TFF_DIR,
+	tffPath,
+	milestoneDir,
+	sliceDir,
+	worktreeDir,
+	OBSERVATIONS_DIR,
+	SETTINGS_FILE,
+	PROJECT_FILE,
+	STATE_FILE,
+	MILESTONES_DIR,
+	STATE_DB_FILE,
+	QUICK_DIR,
+	DEBUG_DIR,
+	quickSliceDir,
+	debugSliceDir,
+	sliceDirFor,
+} from "./shared/paths.js";
