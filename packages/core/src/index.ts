@@ -77,6 +77,7 @@ export {
 	type JudgeDimension,
 	type JudgeVerdictValue,
 } from "./domain/routing/index.js";
+export { Observation, type ObservationProps } from "./domain/observation/index.js";
 export {
 	TFF_DIR,
 	tffPath,
