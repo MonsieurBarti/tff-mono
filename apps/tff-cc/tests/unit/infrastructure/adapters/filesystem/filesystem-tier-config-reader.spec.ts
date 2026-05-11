@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_TIER_POLICY } from "../../../../../src/domain/ports/tier-config-reader.port.js";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { FilesystemTierConfigReader } from "../../../../../src/infrastructure/adapters/filesystem/filesystem-tier-config-reader.js";
 
 let tmpDir: string;

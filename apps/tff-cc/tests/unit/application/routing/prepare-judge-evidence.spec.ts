@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { prepareJudgeEvidenceUseCase } from "../../../../src/application/routing/prepare-judge-evidence.js";
-import type { DomainError } from "../../../../src/domain/errors/domain-error.js";
+import type { DomainError } from "../../src/infrastructure/errors/generic-domain-error.js";
 import type { DiffReader } from "../../../../src/domain/ports/diff-reader.port.js";
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { SliceMergeLookup } from "../../../../src/domain/ports/slice-merge-lookup.port.js";
 import type { SliceSpecReader } from "../../../../src/domain/ports/slice-spec-reader.port.js";
-import { Err, isErr, isOk, Ok } from "../../../../src/domain/result.js";
-import type { RoutingOutcome } from "../../../../src/domain/value-objects/routing-outcome.js";
+import { Err, isErr, isOk, Ok } from "@tff/core";
+import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
 
 const SLICE_ID = "00000000-0000-4000-8000-0000000000aa";
 const D1 = "00000000-0000-4000-8000-000000000001";

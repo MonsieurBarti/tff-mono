@@ -5,14 +5,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { JsonlRoutingOutcomeReader } from "../../../../../src/infrastructure/adapters/jsonl/routing-outcome-jsonl-reader.js";
 
 const validOutcome = {
-	outcome_id: "00000000-0000-4000-8000-000000000099",
-	decision_id: "00000000-0000-4000-8000-000000000001",
+	outcomeId: "00000000-0000-4000-8000-000000000099",
+	decisionId: "00000000-0000-4000-8000-000000000001",
 	dimension: "agent" as const,
 	verdict: "ok" as const,
 	source: "debug-join" as const,
-	slice_id: "M01-S01",
-	workflow_id: "tff:ship",
-	emitted_at: "2026-04-19T09:00:00.000Z",
+	sliceId: "M01-S01",
+	workflowId: "tff:ship",
+	emittedAt: "2026-04-19T09:00:00.000Z",
 };
 
 describe("JsonlRoutingOutcomeReader", () => {
@@ -55,8 +55,8 @@ describe("JsonlRoutingOutcomeReader", () => {
 				JSON.stringify({ wrong: "structure" }),
 				JSON.stringify({
 					...validOutcome,
-					outcome_id: "00000000-0000-4000-8000-000000000002",
-					decision_id: "00000000-0000-4000-8000-000000000003",
+					outcomeId: "00000000-0000-4000-8000-000000000002",
+					decisionId: "00000000-0000-4000-8000-000000000003",
 				}),
 			].join("\n")}\n`,
 			"utf8",

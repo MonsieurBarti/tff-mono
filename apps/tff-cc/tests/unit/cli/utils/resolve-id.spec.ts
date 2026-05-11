@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { resolveMilestoneId, resolveSliceId } from "../../../../src/cli/utils/resolve-id.js";
-import type { Milestone } from "../../../../src/domain/entities/milestone.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
+import type { Milestone } from "@tff/core";
+import type { Slice } from "@tff/core";
 import {
 	createMockMilestoneStore,
 	createMockSliceStore,

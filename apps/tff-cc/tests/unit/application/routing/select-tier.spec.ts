@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { selectTierUseCase } from "../../../../src/application/routing/select-tier.js";
-import type { DomainError } from "../../../../src/domain/errors/domain-error.js";
+import type { DomainError } from "../../src/infrastructure/errors/generic-domain-error.js";
 import type { RoutingDecisionLogger } from "../../../../src/domain/ports/routing-decision-logger.port.js";
 import {
 	DEFAULT_TIER_POLICY,
 	type TierConfigReader,
 } from "../../../../src/domain/ports/tier-config-reader.port.js";
-import { Err, isOk, Ok } from "../../../../src/domain/result.js";
-import type { Signals } from "../../../../src/domain/value-objects/signals.js";
-import type { ModelTier } from "../../../../src/domain/value-objects/tier-decision.js";
+import { Err, isOk, Ok } from "@tff/core";
+import type { Signals } from "../../src/shared/value-objects/signals.js";
+import type { ModelTier } from "../../src/shared/value-objects/tier-decision.js";
 
 const LOW_SIGNALS: Signals = { complexity: "low", risk: { level: "low", tags: [] } };
 const HIGH_SIGNALS: Signals = { complexity: "high", risk: { level: "high", tags: ["auth"] } };

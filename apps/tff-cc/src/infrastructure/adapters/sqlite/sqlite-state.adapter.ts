@@ -12,7 +12,7 @@ import {
 	milestoneBranchName,
 	runMigrations,
 } from "@tff/core";
-import { type DomainError } from "../../errors/generic-domain-error.js";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type {
 	DomainEvent,
 	Milestone,
@@ -23,6 +23,7 @@ import type {
 	ProjectProps,
 	ProjectStore,
 	Result,
+	ReviewState,
 	SliceProps,
 	SliceState,
 	SliceStatus,
@@ -384,9 +385,10 @@ export class SQLiteStateAdapter
 				}
 				if (missing.length > 0) {
 					return Err(
-						new PreconditionViolationError(
+						new GenericDomainError(
+							"MILESTONE_COMPLETENESS_VIOLATION",
 							`Milestone "${id}" cannot close — slices missing approved spec review: ${missing.join(", ")}`,
-							["MILESTONE_COMPLETENESS_VIOLATION"],
+							{ milestoneId: id, missing },
 						),
 					);
 				}
@@ -568,9 +570,10 @@ export class SQLiteStateAdapter
 					if (!approvedTypes.has("security")) missing.push("security");
 					if (missing.length > 0) {
 						return Err(
-							new PreconditionViolationError(
+							new GenericDomainError(
+								"SHIP_COMPLETENESS_VIOLATION",
 								`Slice "${id}" cannot close — missing approved review(s) of type: ${missing.join(", ")}`,
-								["SHIP_COMPLETENESS_VIOLATION"],
+								{ sliceId: id, missing },
 							),
 						);
 					}
@@ -582,7 +585,35 @@ export class SQLiteStateAdapter
 				if (!getResult.data) {
 					return Err(new SliceNotFoundError(`Slice "${id}" not found`, id));
 				}
-				const slice = Slice.reconstruct(getResult.data as unknown as SliceState);
+				// Load reviews for domain guards (e.g. verifying → reviewing)
+				const reviewRows = this.db
+					.prepare(
+						"SELECT id, slice_id, type, reviewer, verdict, commit_sha, notes, created_at FROM review WHERE slice_id = ?",
+					)
+					.all(id) as Array<{
+					id: number;
+					slice_id: string;
+					type: string;
+					reviewer: string;
+					verdict: string;
+					commit_sha: string;
+					notes: string | null;
+					created_at: string;
+				}>;
+				const reviews: ReviewState[] = reviewRows.map((r) => ({
+					id: r.id,
+					sliceId: r.slice_id,
+					type: r.type,
+					reviewer: r.reviewer,
+					verdict: r.verdict as ReviewState["verdict"],
+					commitSha: r.commit_sha,
+					notes: r.notes,
+					createdAt: new Date(r.created_at),
+				}));
+				const slice = Slice.reconstruct({
+					...(getResult.data as unknown as SliceState),
+					reviews,
+				});
 				slice.transition(target);
 				this.db
 					.prepare("UPDATE slice SET status = ?, updated_at = datetime('now') WHERE id = ?")
@@ -918,9 +949,10 @@ export class SQLiteStateAdapter
 			if (!executorsResult.ok) return executorsResult;
 			if (executorsResult.data.includes(review.reviewer)) {
 				return Err(
-					new PreconditionViolationError(
+					new GenericDomainError(
+						"FRESH_REVIEWER_VIOLATION",
 						`Agent "${review.reviewer}" cannot review slice "${review.sliceId}" — was the executor`,
-						["FRESH_REVIEWER_VIOLATION"],
+						{ sliceId: review.sliceId, reviewer: review.reviewer },
 					),
 				);
 			}

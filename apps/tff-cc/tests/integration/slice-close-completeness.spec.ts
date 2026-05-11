@@ -74,7 +74,7 @@ describe("slice-close completeness invariant", () => {
 		const r = stores.sliceStore.transitionSlice(sliceId, "closed");
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
-			expect(r.error.code).toBe("SHIP_COMPLETENESS_VIOLATION");
+			expect(r.error.errorLabel).toBe("SHIP_COMPLETENESS_VIOLATION");
 			expect(r.error.context).toMatchObject({
 				sliceId,
 				missingTypes: ["code", "security"],
@@ -87,7 +87,7 @@ describe("slice-close completeness invariant", () => {
 		const r = stores.sliceStore.transitionSlice(sliceId, "closed");
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
-			expect(r.error.code).toBe("SHIP_COMPLETENESS_VIOLATION");
+			expect(r.error.errorLabel).toBe("SHIP_COMPLETENESS_VIOLATION");
 			expect(r.error.context).toMatchObject({ missingTypes: ["security"] });
 		}
 	});

@@ -3,7 +3,7 @@ import {
 	nextWorkflow,
 	shouldAutoTransition,
 } from "../../src/application/lifecycle/chain-workflow.js";
-import { canTransition, type SliceStatus } from "../../src/domain/value-objects/slice-status.js";
+import { canTransition, type SliceStatus } from "../../src/shared/value-objects/slice-status.js";
 
 describe("autonomous flow - integration", () => {
 	it("should produce valid transitions from discussing to first gate", () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { recordOutcomeUseCase } from "../../../../src/application/routing/record-outcome.js";
 import type { OutcomeWriter } from "../../../../src/domain/ports/outcome-writer.port.js";
-import { isErr, isOk } from "../../../../src/domain/result.js";
-import type { RoutingOutcome } from "../../../../src/domain/value-objects/routing-outcome.js";
+import { isErr, isOk } from "@tff/core";
+import { RoutingOutcome } from "@tff/core";
 
 const makeWriter = () => {
 	const written: RoutingOutcome[] = [];
@@ -42,7 +42,7 @@ describe("recordOutcomeUseCase", () => {
 		expect(res.data.outcome_id).toBe("00000000-0000-4000-8000-000000000aaa");
 		expect(written).toHaveLength(1);
 		expect(written[0].source).toBe("manual");
-		expect(written[0].slice_id).toBe("M01-S01");
+		expect(written[0].sliceId).toBe("M01-S01");
 	});
 
 	it("rejects unknown decision_id with PRECONDITION_VIOLATION", async () => {
@@ -62,7 +62,7 @@ describe("recordOutcomeUseCase", () => {
 		);
 		expect(isErr(res)).toBe(true);
 		if (!isErr(res)) throw new Error("not err");
-		expect(res.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
 	it("rejects invalid dimension × verdict combo with PRECONDITION_VIOLATION", async () => {
@@ -78,6 +78,6 @@ describe("recordOutcomeUseCase", () => {
 		);
 		expect(isErr(res)).toBe(true);
 		if (!isErr(res)) throw new Error("not err");
-		expect(res.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 });

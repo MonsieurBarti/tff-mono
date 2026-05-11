@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { loadCheckpoint } from "../../../../src/application/checkpoint/load-checkpoint.js";
 import { saveCheckpoint } from "../../../../src/application/checkpoint/save-checkpoint.js";
-import { isErr, isOk } from "../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 
 describe("checkpoint", () => {

@@ -50,7 +50,7 @@ describe("recordReview fresh-reviewer invariant", () => {
 			createdAt: new Date().toISOString(),
 		});
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("FRESH_REVIEWER_VIOLATION");
+		if (!result.ok) expect(result.error.errorLabel).toBe("FRESH_REVIEWER_VIOLATION");
 	});
 
 	it("accepts when reviewer is not in the slice's executor list", () => {

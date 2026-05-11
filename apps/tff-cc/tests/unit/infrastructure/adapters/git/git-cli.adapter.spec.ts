@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { GitCliAdapter } from "../../../../../src/infrastructure/adapters/git/git-cli.adapter.js";
 
 describe("GitCliAdapter - caching", () => {

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { resolveMilestoneId } from "../../../../src/application/milestone/resolve-milestone-id.js";
-import type { Milestone } from "../../../../src/domain/entities/milestone.js";
-import type { DomainError } from "../../../../src/domain/errors/domain-error.js";
-import { createDomainError } from "../../../../src/domain/errors/domain-error.js";
-import type { MilestoneStore } from "../../../../src/domain/ports/milestone-store.port.js";
-import { Err, isErr, isOk, Ok, type Result } from "../../../../src/domain/result.js";
+import type { Milestone } from "@tff/core";
+import type { DomainError } from "../../../../src/infrastructure/errors/generic-domain-error.js";
+import { GenericDomainError } from "../../../../src/infrastructure/errors/generic-domain-error.js";
+import type { MilestoneStore } from "@tff/core";
+import { Err, isErr, isOk, Ok, type Result } from "@tff/core";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
 describe("resolveMilestoneId", () => {
@@ -76,10 +76,10 @@ describe("resolveMilestoneId", () => {
 
 	it("propagates a store listMilestones READ_FAILURE as READ_FAILURE", () => {
 		const failingStore: MilestoneStore = {
-			createMilestone: () => Err(createDomainError("WRITE_FAILURE", "not used")),
+			createMilestone: () => Err(new GenericDomainError("WRITE_FAILURE", "not used")),
 			getMilestone: () => Ok(null),
 			listMilestones: (): Result<Milestone[], DomainError> =>
-				Err(createDomainError("WRITE_FAILURE", "db unavailable")),
+				Err(new GenericDomainError("READ_FAILURE", "db unavailable")),
 			updateMilestone: () => Ok(undefined),
 			closeMilestone: () => Ok(undefined),
 		};
@@ -96,7 +96,7 @@ describe("resolveMilestoneId", () => {
 	it("does not call listMilestones when the input is already a UUID", () => {
 		let calls = 0;
 		const spyStore: MilestoneStore = {
-			createMilestone: () => Err(createDomainError("WRITE_FAILURE", "not used")),
+			createMilestone: () => Err(new GenericDomainError("WRITE_FAILURE", "not used")),
 			getMilestone: () => Ok(null),
 			listMilestones: (): Result<Milestone[], DomainError> => {
 				calls++;

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { calibrateUseCase } from "../../../../src/application/routing/calibrate.js";
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../../../src/domain/ports/outcome-writer.port.js";
-import type { RoutingDecision } from "../../../../src/domain/value-objects/routing-decision.js";
-import type { RoutingOutcome } from "../../../../src/domain/value-objects/routing-outcome.js";
+import type { RoutingDecision } from "../../src/shared/value-objects/routing-decision.js";
+import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
 
 const D1 = "00000000-0000-4000-8000-000000000001";
 

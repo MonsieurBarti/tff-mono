@@ -4,10 +4,10 @@ import {
 	buildRoutingExtractInput,
 	type GitRunner,
 } from "../../../../src/cli/utils/build-routing-extract-input.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
+import type { Slice } from "@tff/core";
 import type { MilestoneStore } from "../../../../src/domain/ports/milestone-store.port.js";
 import type { SliceStore } from "../../../../src/domain/ports/slice-store.port.js";
-import { Ok } from "../../../../src/domain/result.js";
+import { Ok } from "@tff/core";
 
 const stubMilestoneStore = (overrides: Partial<MilestoneStore> = {}): MilestoneStore => {
 	return {

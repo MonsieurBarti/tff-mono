@@ -40,7 +40,7 @@ describe("bin/tff-tools shim", () => {
 		expect(r.status).toBe(0);
 		const out = JSON.parse(r.stdout);
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("UNKNOWN_COMMAND");
+		expect(out.error.errorLabel).toBe("UNKNOWN_COMMAND");
 	});
 
 	it("resolves via PATH when bin/ is prepended — mirrors Claude Code plugin install", () => {

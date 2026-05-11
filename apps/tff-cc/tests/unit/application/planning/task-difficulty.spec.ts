@@ -4,7 +4,7 @@ import {
 	parseDifficultyOverride,
 	type TaskDifficultyInput,
 } from "../../../../src/application/planning/task-difficulty.js";
-import type { ComplexityTier } from "../../../../src/domain/value-objects/complexity-tier.js";
+import type { ComplexityTier } from "../../src/shared/value-objects/complexity-tier.js";
 
 describe("task-difficulty", () => {
 	describe("parseDifficultyOverride", () => {

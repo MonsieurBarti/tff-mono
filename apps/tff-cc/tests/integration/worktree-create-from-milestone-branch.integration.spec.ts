@@ -13,7 +13,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GitOps } from "../../src/domain/ports/git-ops.port.js";
 import type { JournalRepository } from "../../src/domain/ports/journal-repository.port.js";
-import { Ok } from "../../src/domain/result.js";
+import { Ok } from "@tff/core";
 import type { ClosableStateStores } from "../../src/infrastructure/adapters/sqlite/create-state-stores.js";
 import { SQLiteStateAdapter } from "../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
@@ -134,7 +134,7 @@ describe("worktree:create on milestone branch", () => {
 		// itself MUST NOT refuse this command. It's the only path to escape the
 		// milestone branch onto a slice worktree.
 		if (!out.ok) {
-			expect(out.error.code).not.toBe("REFUSED_ON_MILESTONE_BRANCH");
+			expect(out.error.errorLabel).not.toBe("REFUSED_ON_MILESTONE_BRANCH");
 		}
 	});
 });

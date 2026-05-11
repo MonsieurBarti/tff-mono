@@ -93,7 +93,7 @@ describe("slice:transition TOCTOU re-check", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(result.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 
 		// DB must not have been mutated — the tx rolled back.
 		const sliceResult = adapter.getSlice(sliceId);

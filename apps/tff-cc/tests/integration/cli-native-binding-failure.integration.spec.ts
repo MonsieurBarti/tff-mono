@@ -56,7 +56,7 @@ describe("CLI emits structured JSON when native binding fails", () => {
 			expect(out.status).toBe(1);
 			const payload = JSON.parse(out.stdout);
 			expect(payload.ok).toBe(false);
-			expect(payload.error.code).toBe("NATIVE_BINDING_FAILED");
+			expect(payload.error.errorLabel).toBe("NATIVE_BINDING_FAILED");
 			expect(payload.error.details.platform).toBe(process.platform);
 			expect(payload.error.details.arch).toBe(process.arch);
 			expect(payload.error.details.nodeAbi).toBe(process.versions.modules);

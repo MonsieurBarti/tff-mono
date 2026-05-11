@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
 import type { JournalRepository } from "../../../../src/domain/ports/journal-repository.port.js";
-import { Ok } from "../../../../src/domain/result.js";
+import { Ok } from "@tff/core";
 import type { ClosableStateStores } from "../../../../src/infrastructure/adapters/sqlite/create-state-stores.js";
 import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 

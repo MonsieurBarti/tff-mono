@@ -53,7 +53,7 @@ describe("fresh-reviewer defense in depth", () => {
 			createdAt: new Date().toISOString(),
 		});
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("FRESH_REVIEWER_VIOLATION");
+		if (!result.ok) expect(result.error.errorLabel).toBe("FRESH_REVIEWER_VIOLATION");
 	});
 
 	it("app-layer preflight catches the violation even when adapter invariant is stubbed away", async () => {
@@ -68,7 +68,7 @@ describe("fresh-reviewer defense in depth", () => {
 			{ taskStore: stores.taskStore, reviewStore: stores.reviewStore },
 		);
 		expect(preflight.ok).toBe(false);
-		if (!preflight.ok) expect(preflight.error.code).toBe("FRESH_REVIEWER_VIOLATION");
+		if (!preflight.ok) expect(preflight.error.errorLabel).toBe("FRESH_REVIEWER_VIOLATION");
 
 		spy.mockRestore();
 	});

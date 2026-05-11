@@ -6,17 +6,20 @@ describe("slice-close completeness invariant is wired", () => {
 	let stores: ClosableStateStores;
 	let sliceId: string;
 
-	const driveToCompleting = (id: string) => {
+	const driveToShipping = (id: string) => {
 		const path = [
 			"researching",
 			"planning",
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const;
 		for (const target of path) {
-			stores.sliceStore.transitionSlice(id, target);
+			const r = stores.sliceStore.transitionSlice(id, target);
+			if (!r.ok) {
+				console.log("transition failed to", target, r.error?.errorLabel, r.error?.message);
+			}
 		}
 	};
 
@@ -52,8 +55,21 @@ describe("slice-close completeness invariant is wired", () => {
 		const claimResult = stores.taskStore.claimTask(taskId, "exec-A");
 		if (!claimResult.ok) throw new Error("Failed to claim task");
 
-		// Drive the primary slice to `completing` so close is a legal next transition.
-		driveToCompleting(sliceId);
+		// Seed a review first so the verifying → reviewing transition guard passes.
+		const preReviewResult = stores.reviewStore.recordReview({
+			sliceId,
+			reviewer: "rev-pre",
+			type: "spec",
+			verdict: "approved",
+			commitSha: "abc",
+			createdAt: new Date().toISOString(),
+		});
+		if (!preReviewResult.ok) throw new Error("Failed to record pre-review");
+
+		// Drive the primary slice to `shipping` so close is a legal next transition.
+		driveToShipping(sliceId);
+		const check = stores.sliceStore.getSlice(sliceId);
+		console.log("after driveToShipping status:", check.data?.status);
 
 		// Seed both approved code + security reviews so close succeeds (so we observe the listReviews call).
 		const codeReviewResult = stores.reviewStore.recordReview({
@@ -131,11 +147,22 @@ describe("slice-close completeness invariant is wired", () => {
 		const claim2Result = stores.taskStore.claimTask(task2Result.data.id, "exec-B");
 		if (!claim2Result.ok) throw new Error("Failed to claim task for second slice");
 
-		// Drive to completing without seeding any reviews.
-		driveToCompleting(slice2Id);
+		// Seed a review so the verifying → reviewing transition guard passes.
+		const preReview2Result = stores.reviewStore.recordReview({
+			sliceId: slice2Id,
+			reviewer: "rev-pre",
+			type: "spec",
+			verdict: "approved",
+			commitSha: "abc",
+			createdAt: new Date().toISOString(),
+		});
+		if (!preReview2Result.ok) throw new Error("Failed to record pre-review for slice two");
+
+		// Drive to shipping without seeding code/security reviews.
+		driveToShipping(slice2Id);
 
 		const result = stores.sliceStore.transitionSlice(slice2Id, "closed");
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("SHIP_COMPLETENESS_VIOLATION");
+		if (!result.ok) expect(result.error.errorLabel).toBe("SHIP_COMPLETENESS_VIOLATION");
 	});
 });

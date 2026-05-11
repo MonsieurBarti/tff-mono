@@ -69,6 +69,10 @@ export class RoutingOutcome extends ValueObject<RoutingOutcomeProps> {
 		return this._props.emittedAt;
 	}
 
+	toJSON(): RoutingOutcomeProps {
+		return this._props;
+	}
+
 	equals(other: ValueObject<RoutingOutcomeProps>): boolean {
 		if (!(other instanceof RoutingOutcome)) return false;
 		return (

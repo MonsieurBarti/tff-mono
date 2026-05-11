@@ -3,7 +3,7 @@ import { reconcileOnRead } from "../../../../src/application/reconcile/reconcile
 import type { MilestoneStore } from "../../../../src/domain/ports/milestone-store.port.js";
 import type { SliceStore } from "../../../../src/domain/ports/slice-store.port.js";
 import type { TaskStore } from "../../../../src/domain/ports/task-store.port.js";
-import { Err, Ok } from "../../../../src/domain/result.js";
+import { Err, Ok } from "@tff/core";
 
 function makeMilestoneStore(
 	listResult: ReturnType<MilestoneStore["listMilestones"]>,

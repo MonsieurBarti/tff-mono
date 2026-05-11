@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { assertNotOnDefaultBranch } from "../../../../src/application/guards/branch-guard.js";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
-import { Err, Ok } from "../../../../src/domain/result.js";
+import { Err, Ok } from "@tff/core";
 
 const makeGitOps = (overrides: Partial<GitOps> = {}): GitOps =>
 	({

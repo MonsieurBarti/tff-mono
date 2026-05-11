@@ -6,8 +6,8 @@ import {
 	archiveMilestoneFs,
 	archiveSliceFs,
 } from "../../../../src/application/archive/archive-fs.js";
-import type { Milestone } from "../../../../src/domain/entities/milestone.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
+import type { Milestone } from "@tff/core";
+import type { Slice } from "@tff/core";
 
 const sliceFixture = (overrides: Partial<Slice> = {}): Slice => ({
 	id: "11111111-1111-4111-8111-111111111111",

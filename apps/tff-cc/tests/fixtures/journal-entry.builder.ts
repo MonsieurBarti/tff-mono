@@ -9,7 +9,7 @@ import type {
 	TaskCompletedEntry,
 	TaskFailedEntry,
 	TaskStartedEntry,
-} from "../../src/domain/value-objects/journal-entry.js";
+} from "../src/shared/value-objects/journal-entry.js";
 import { sliceDir } from "@tff/core";
 
 export class JournalEntryBuilder {

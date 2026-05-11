@@ -4,7 +4,7 @@ import type {
 	OutcomeReadFilter,
 	OutcomeSource,
 } from "../../../src/domain/ports/outcome-source.port.js";
-import type { RoutingOutcome } from "../../../src/domain/value-objects/routing-outcome.js";
+import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
 
 const fakeSource = (outcomes: RoutingOutcome[]): OutcomeSource => ({
 	async *readOutcomes(filter: OutcomeReadFilter) {

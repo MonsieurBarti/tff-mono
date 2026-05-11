@@ -9,7 +9,7 @@ import {
 	difficultyToProfile,
 	resolveModelFromProfile,
 } from "../../../../src/application/classification/difficulty-classifier.js";
-import type { ComplexityTier } from "../../../../src/domain/value-objects/complexity-tier.js";
+import type { ComplexityTier } from "../../src/shared/value-objects/complexity-tier.js";
 
 describe("difficulty-classifier", () => {
 	describe("computeFileScopeScore", () => {

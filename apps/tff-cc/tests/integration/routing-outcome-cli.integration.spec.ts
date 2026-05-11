@@ -79,7 +79,7 @@ describe("routing:outcome CLI integration", () => {
 		]);
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(parsed.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
 	it("rejects invalid dimension × verdict combo", async () => {

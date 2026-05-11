@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { isErr, isOk } from "../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { SQLiteStateAdapter } from "../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
 // Integration tests access the private `db` field for direct SQL operations.
@@ -88,7 +88,7 @@ describe("SQLite integration", () => {
 		) => SQLiteStateAdapter)(db);
 		const result = adapterWithFutureSchema.init();
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("VERSION_MISMATCH");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("VERSION_MISMATCH");
 	});
 
 	it("init() recovers file-backed db on VERSION_MISMATCH by wiping and recreating", () => {
@@ -131,6 +131,6 @@ describe("SQLite integration", () => {
 		adapter.createSlice({ milestoneId, number: 1, title: "S" });
 		const result = adapter.closeMilestone(milestoneId);
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("MILESTONE_COMPLETENESS_VIOLATION");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("MILESTONE_COMPLETENESS_VIOLATION");
 	});
 });

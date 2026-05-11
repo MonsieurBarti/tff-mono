@@ -102,7 +102,7 @@ describe("milestone-create atomicity", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("TRANSACTION_ROLLBACK");
+		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
 		spy.mockRestore();
 
