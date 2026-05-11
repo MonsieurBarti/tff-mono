@@ -34,6 +34,10 @@ import type { Dependency } from "../../shared/value-objects/dependency.js";
 import type { ReviewRecord, ReviewType } from "../../shared/value-objects/review-record.js";
 import type { WorkflowSession } from "../../shared/value-objects/workflow-session.js";
 
+function mut<T>(obj: T): Record<string, unknown> {
+	return obj as unknown as Record<string, unknown>;
+}
+
 /**
  * Test-only in-memory implementation of the state ports. NOT intended for
  * production: `transaction()` uses `structuredClone` to snapshot every
@@ -108,9 +112,9 @@ export class InMemoryStateAdapter
 		const project: Project = {
 			id: "singleton",
 			name: props.name,
-			vision: props.vision,
+			vision: props.vision ?? "",
 			createdAt: this.project?.createdAt ?? new Date(),
-		};
+		} as unknown as Project;
 		this.project = project;
 		return Ok(project);
 	}
@@ -126,10 +130,10 @@ export class InMemoryStateAdapter
 			projectId: "singleton",
 			number: props.number,
 			name: props.name,
-			status: "open",
+			status: "open" as Milestone["status"],
 			branch,
 			createdAt: new Date(),
-		};
+		} as unknown as Milestone;
 		this.milestones.set(id, milestone);
 		return Ok(milestone);
 	}
@@ -158,8 +162,8 @@ export class InMemoryStateAdapter
 	updateMilestone(id: string, updates: MilestoneUpdateProps): Result<void, DomainError> {
 		const ms = this.milestones.get(id);
 		if (!ms) return Ok(undefined);
-		if (updates.name !== undefined) ms.name = updates.name;
-		if (updates.status !== undefined) ms.status = updates.status;
+		if (updates.name !== undefined) mut(ms).name = updates.name;
+		if (updates.status !== undefined) mut(ms).status = updates.status;
 		this.milestones.set(id, ms);
 		return Ok(undefined);
 	}
@@ -172,13 +176,13 @@ export class InMemoryStateAdapter
 			let slicesArchived = 0;
 			for (const slice of this.slices.values()) {
 				if (slice.milestoneId === id && slice.archivedAt === undefined) {
-					slice.archivedAt = now;
+					mut(slice).archivedAt = now;
 					this.slices.set(slice.id, slice);
 					slicesArchived += 1;
 				}
 			}
 			if (ms.archivedAt === undefined) {
-				ms.archivedAt = now;
+				mut(ms).archivedAt = now;
 				this.milestones.set(id, ms);
 			}
 			return Ok({ slicesArchived });
@@ -218,8 +222,8 @@ export class InMemoryStateAdapter
 					),
 				);
 			}
-			ms.status = "closed";
-			ms.closeReason = reason;
+			mut(ms).status = "closed";
+			mut(ms).closeReason = reason;
 			this.milestones.set(id, ms);
 			return Ok(undefined);
 		} catch (e) {
@@ -250,16 +254,16 @@ export class InMemoryStateAdapter
 		const id = props.id ?? crypto.randomUUID();
 		const slice: Slice = {
 			id,
-			milestoneId: props.milestoneId,
+			milestoneId: props.milestoneId ?? null,
 			kind,
 			number: props.number,
 			title: props.title,
 			status: "discussing",
-			tier: props.tier,
-			baseBranch: props.baseBranch,
-			branchName: props.branchName,
+			tier: props.tier ?? null,
+			baseBranch: props.baseBranch ?? "",
+			branchName: props.branchName ?? "",
 			createdAt: new Date(),
-		};
+		} as unknown as Slice;
 		this.slices.set(id, slice);
 		return Ok(slice);
 	}
@@ -316,8 +320,8 @@ export class InMemoryStateAdapter
 	updateSlice(id: string, updates: SliceUpdateProps): Result<void, DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
-		if (updates.title !== undefined) slice.title = updates.title;
-		if (updates.tier !== undefined) slice.tier = updates.tier;
+		if (updates.title !== undefined) mut(slice).title = updates.title;
+		if (updates.tier !== undefined) mut(slice).tier = updates.tier;
 		this.slices.set(id, slice);
 		return Ok(undefined);
 	}
@@ -327,7 +331,7 @@ export class InMemoryStateAdapter
 		if (!slice) {
 			return Err(new GenericDomainError("NOT_FOUND", `Slice "${id}" not found`));
 		}
-		if (target === "closed" && slice.status === "completing") {
+		if (target === "closed" && slice.status === "shipping") {
 			const approvedTypes = new Set(
 				this.reviews.filter((r) => r.sliceId === id && r.verdict === "approved").map((r) => r.type),
 			);
@@ -344,7 +348,7 @@ export class InMemoryStateAdapter
 				);
 			}
 		}
-		(slice as unknown as { status: SliceStatus }).status = target;
+		mut(slice).status = target;
 		return Ok([]);
 	}
 
@@ -352,7 +356,7 @@ export class InMemoryStateAdapter
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
 		if (slice.archivedAt !== undefined) return Ok(undefined);
-		slice.archivedAt = new Date();
+		mut(slice).archivedAt = new Date();
 		this.slices.set(id, slice);
 		return Ok(undefined);
 	}
@@ -365,11 +369,11 @@ export class InMemoryStateAdapter
 			sliceId: props.sliceId,
 			number: props.number,
 			title: props.title,
-			description: props.description,
+			description: props.description ?? "",
 			status: "open",
-			wave: props.wave,
+			wave: props.wave ?? null,
 			createdAt: new Date(),
-		};
+		} as unknown as Task;
 		this.tasks.set(id, task);
 		return Ok(task);
 	}
@@ -385,9 +389,9 @@ export class InMemoryStateAdapter
 	updateTask(id: string, updates: TaskUpdateProps): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		if (updates.title !== undefined) task.title = updates.title;
-		if (updates.description !== undefined) task.description = updates.description;
-		if (updates.wave !== undefined) task.wave = updates.wave;
+		if (updates.title !== undefined) mut(task).title = updates.title;
+		if (updates.description !== undefined) mut(task).description = updates.description;
+		if (updates.wave !== undefined) mut(task).wave = updates.wave;
 		this.tasks.set(id, task);
 		return Ok(undefined);
 	}
@@ -397,10 +401,10 @@ export class InMemoryStateAdapter
 		if (!task || task.status !== "open") {
 			return Err(new GenericDomainError("ALREADY_CLAIMED", `Task "${id}" is already claimed`));
 		}
-		task.status = "in_progress";
-		task.claimedAt = new Date();
+		mut(task).status = "in_progress";
+		mut(task).claimedAt = new Date();
 		if (claimedBy !== undefined) {
-			task.claimedBy = claimedBy;
+			mut(task).claimedBy = claimedBy;
 		}
 		this.tasks.set(id, task);
 		return Ok(undefined);
@@ -420,8 +424,8 @@ export class InMemoryStateAdapter
 	closeTask(id: string, reason?: string): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		task.status = "closed";
-		task.closedReason = reason;
+		mut(task).status = "closed";
+		mut(task).closedReason = reason;
 		this.tasks.set(id, task);
 		return Ok(undefined);
 	}
@@ -444,7 +448,7 @@ export class InMemoryStateAdapter
 	listStaleClaims(ttlMinutes: number): Result<Task[], DomainError> {
 		const cutoff = new Date(Date.now() - ttlMinutes * 60 * 1000);
 		const stale = [...this.tasks.values()].filter(
-			(t) => t.status === "in_progress" && t.claimedAt !== undefined && t.claimedAt < cutoff,
+			(t) => t.status === "in_progress" && t.claimedAt != null && t.claimedAt < cutoff,
 		);
 		return Ok(stale);
 	}
@@ -539,7 +543,7 @@ export class InMemoryStateAdapter
 			const id = `${sliceId}-executor-seed-${idx}`;
 			const existing = this.tasks.get(id);
 			if (existing) {
-				existing.claimedBy = agent;
+				mut(existing).claimedBy = agent;
 				this.tasks.set(id, existing);
 			} else {
 				const task: Task = {
@@ -551,7 +555,7 @@ export class InMemoryStateAdapter
 					claimedBy: agent,
 					claimedAt: new Date(),
 					createdAt: new Date(),
-				};
+				} as unknown as Task;
 				this.tasks.set(id, task);
 			}
 		});

@@ -207,7 +207,7 @@ export class SQLiteSalvage {
 				name: row.name,
 				vision: row.vision ?? "",
 				createdAt,
-			};
+			} as unknown as Project;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			metadata.corruptionNotes.push(`Project: Query failed - ${message}`);
@@ -269,9 +269,9 @@ export class SQLiteSalvage {
 						name: row.name,
 						status: (row.status as Milestone["status"]) ?? "open",
 						branch: row.branch ?? "",
-						closeReason: row.close_reason ?? undefined,
+						closeReason: row.close_reason ?? null,
 						createdAt,
-					});
+					} as unknown as Milestone);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Milestone row: ${message}`);
@@ -344,11 +344,11 @@ export class SQLiteSalvage {
 						number: row.number,
 						title: row.title,
 						status: (row.status as Slice["status"]) ?? "discussing",
-						tier: (row.tier as Slice["tier"]) ?? undefined,
-						baseBranch: row.base_branch ?? null,
-						branchName: row.branch_name ?? null,
+						tier: (row.tier as Slice["tier"]) ?? null,
+						baseBranch: row.base_branch ?? "",
+						branchName: row.branch_name ?? "",
 						createdAt,
-					});
+					} as unknown as Slice);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Slice row: ${message}`);
@@ -420,15 +420,15 @@ export class SQLiteSalvage {
 						createdAt = new Date();
 					}
 
-					let claimedAt: Date | undefined;
+					let claimedAt: Date | null = null;
 					if (row.claimed_at) {
 						try {
-							claimedAt = new Date(row.claimed_at);
-							if (Number.isNaN(claimedAt.getTime())) {
-								claimedAt = undefined;
+							const parsed = new Date(row.claimed_at);
+							if (!Number.isNaN(parsed.getTime())) {
+								claimedAt = parsed;
 							}
 						} catch {
-							claimedAt = undefined;
+							// keep null
 						}
 					}
 
@@ -444,7 +444,7 @@ export class SQLiteSalvage {
 						claimedBy: row.claimed_by ?? null,
 						closedReason: row.closed_reason ?? null,
 						createdAt,
-					});
+					} as unknown as Task);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Task row: ${message}`);
