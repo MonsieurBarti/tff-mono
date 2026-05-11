@@ -65,7 +65,7 @@ jobs:
       - name: Ensure base SHA is reachable
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git fetch --no-tags --depth=1 origin "$BASE_SHA" || git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+        run: git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
       - name: Lint commits
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
