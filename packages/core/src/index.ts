@@ -1,5 +1,6 @@
 export { runMigrations, getCurrentVersion } from "./db/run-migrations.js";
 
+export * from "./shared/index.js";
 export * from "./domain/shared/index.js";
 export * from "./domain/project/index.js";
 export {
