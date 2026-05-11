@@ -68,6 +68,23 @@ if (existsSync(localBinding)) {
 	}
 }
 
+const coreMigrationsDir = resolve(
+	rootDir,
+	"node_modules",
+	"@tff",
+	"core",
+	"dist",
+	"db",
+	"migrations",
+);
+const targetMigrationsDir = resolve(distCliDir, "migrations");
+if (existsSync(coreMigrationsDir)) {
+	mkdirSync(targetMigrationsDir, { recursive: true });
+	for (const file of readdirSync(coreMigrationsDir).filter((f) => f.endsWith(".sql"))) {
+		copyFileSync(resolve(coreMigrationsDir, file), resolve(targetMigrationsDir, file));
+	}
+}
+
 execSync("node scripts/add-cli-shebang.cjs", { cwd: rootDir, stdio: "inherit" });
 
 // --- Build manifest ---------------------------------------------------------
