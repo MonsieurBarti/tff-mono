@@ -9,7 +9,7 @@ import type { SliceDependencyStore } from "../../src/domain/ports/slice-dependen
 import type { SliceStore } from "../../src/domain/ports/slice-store.port.js";
 import type { TaskStore } from "../../src/domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../src/domain/ports/transaction-runner.port.js";
-import type { Result } from "../../src/domain/result.js";
+import type { Result } from "@tff/core";
 
 /**
  * Helper to create a mock result that satisfies the Result type

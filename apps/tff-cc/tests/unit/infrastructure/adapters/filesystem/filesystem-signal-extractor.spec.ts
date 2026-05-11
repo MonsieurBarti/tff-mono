@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { FilesystemSignalExtractor } from "../../../../../src/infrastructure/adapters/filesystem/filesystem-signal-extractor.js";
 
 const FIXTURE_ROOT = join(process.cwd(), "tests/fixtures/routing");

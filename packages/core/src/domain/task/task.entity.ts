@@ -209,10 +209,19 @@ export class Task extends AggregateRoot {
 
 	claim(actor: string, dateProvider: IDateProvider): void {
 		if (this._claimedBy !== null) {
-			throw new AlreadyClaimedError(this._id, this._claimedBy);
+			throw new AlreadyClaimedError(
+				`Task ${this._id} is already claimed by ${this._claimedBy}`,
+				this._id,
+				this._claimedBy,
+			);
 		}
 		if (this._status !== "open") {
-			throw new InvalidTransitionError(this._status, "in_progress", TASK_TRANSITIONS[this._status]);
+			throw new InvalidTransitionError(
+				`Invalid transition from ${this._status} to in_progress`,
+				this._status,
+				"in_progress",
+				TASK_TRANSITIONS[this._status],
+			);
 		}
 		this._claimedBy = actor;
 		this._claimedAt = dateProvider.now();
@@ -230,7 +239,12 @@ export class Task extends AggregateRoot {
 
 	close(reason: string, dateProvider: IDateProvider): void {
 		if (this._status !== "in_progress") {
-			throw new InvalidTransitionError(this._status, "closed", TASK_TRANSITIONS[this._status]);
+			throw new InvalidTransitionError(
+				`Invalid transition from ${this._status} to closed`,
+				this._status,
+				"closed",
+				TASK_TRANSITIONS[this._status],
+			);
 		}
 		const validated = closeReasonSchema.parse(reason);
 		this._closedReason = validated;
@@ -248,7 +262,12 @@ export class Task extends AggregateRoot {
 
 	unclaim(): void {
 		if (this._status !== "in_progress") {
-			throw new InvalidTransitionError(this._status, "open", TASK_TRANSITIONS[this._status]);
+			throw new InvalidTransitionError(
+				`Invalid transition from ${this._status} to open`,
+				this._status,
+				"open",
+				TASK_TRANSITIONS[this._status],
+			);
 		}
 		this._claimedBy = null;
 		this._claimedAt = null;

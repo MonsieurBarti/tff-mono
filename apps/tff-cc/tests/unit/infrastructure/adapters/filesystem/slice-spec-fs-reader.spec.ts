@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { SliceSpecFsReader } from "../../../../../src/infrastructure/adapters/filesystem/slice-spec-fs-reader.js";
 
 describe("SliceSpecFsReader", () => {

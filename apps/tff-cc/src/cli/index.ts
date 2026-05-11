@@ -2,6 +2,7 @@ import { realpathSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleStartupRecovery } from "../application/recovery/handle-startup-recovery.js";
+import { GenericDomainError } from "../infrastructure/errors/generic-domain-error.js";
 import { NativeBindingError } from "../infrastructure/adapters/sqlite/native-binding-error.js";
 import {
 	getProjectHome,
@@ -495,11 +496,11 @@ const main = async () => {
 		console.log(
 			JSON.stringify({
 				ok: false,
-				error: {
-					code: "UNKNOWN_COMMAND",
-					message: `Unknown command "${command}". Run --help for available commands.`,
-					availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema"),
-				},
+				error: new GenericDomainError(
+					"UNKNOWN_COMMAND",
+					`Unknown command "${command}". Run --help for available commands.`,
+					{ availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema") },
+				),
 			}),
 		);
 		return;
@@ -510,11 +511,11 @@ const main = async () => {
 		console.log(
 			JSON.stringify({
 				ok: false,
-				error: {
-					code: "UNKNOWN_COMMAND",
-					message: `Unknown command "${command}". Run --help for available commands.`,
-					availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema"),
-				},
+				error: new GenericDomainError(
+					"UNKNOWN_COMMAND",
+					`Unknown command "${command}". Run --help for available commands.`,
+					{ availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema") },
+				),
 			}),
 		);
 		return;

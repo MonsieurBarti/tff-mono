@@ -1,8 +1,7 @@
-import type { Task } from "../../domain/entities/task.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
 import { detectWavesFromStores } from "../waves/detect-waves.js";
+import type { Task, TaskStore } from "@tff/core";
 
 export interface GenerateReminderDeps {
 	sessionStore: SessionStore;
@@ -39,7 +38,7 @@ function determineCurrentWave(
  * the slice's ACTUAL status rather than a hardcoded default.
  *
  * Lifecycle: discussing → researching → planning → executing → verifying →
- *            reviewing → completing → closed
+ *            reviewing → shipping → closed
  */
 function getNextCommands(phase: string): string {
 	switch (phase) {
@@ -55,7 +54,7 @@ function getNextCommands(phase: string): string {
 			return "/tff:verify";
 		case "reviewing":
 			return "/tff:ship";
-		case "completing":
+		case "shipping":
 			return "/tff:complete-milestone";
 		case "closed":
 			// Current slice done — move to next slice, which starts in `discussing`.

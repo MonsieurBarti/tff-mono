@@ -3,7 +3,7 @@ import type {
 	CalibrationRecommendation,
 	CalibrationReport,
 	SkippedCell,
-} from "../../../domain/value-objects/calibration-report.js";
+} from "../../../shared/value-objects/calibration-report.js";
 
 const header = (r: CalibrationReport) =>
 	[

@@ -1,7 +1,7 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
-import type { Result } from "../../domain/result.js";
-import type { ReviewType } from "../../domain/value-objects/review-record.js";
+import type { ReviewType } from "../../shared/value-objects/review-record.js";
+import type { Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface RecordReviewInput {
 	sliceId: string;

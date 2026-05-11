@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createWorktreeUseCase } from "../../../../src/application/worktree/create-worktree.js";
-import type { Milestone } from "../../../../src/domain/entities/milestone.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
-import { isOk } from "../../../../src/domain/result.js";
+import type { Milestone } from "@tff/core";
+import type { Slice } from "@tff/core";
+import { isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("createWorktreeUseCase", () => {

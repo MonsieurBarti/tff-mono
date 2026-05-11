@@ -1,9 +1,9 @@
-import type { ComplexityTier } from "../../domain/value-objects/complexity-tier.js";
-import type { Difficulty, ModelProfile } from "../../domain/value-objects/difficulty.js";
+import type { ComplexityTier } from "../../shared/value-objects/complexity-tier.js";
+import type { Difficulty, ModelProfile } from "../../shared/value-objects/difficulty.js";
 import {
 	DIFFICULTY_THRESHOLDS,
 	DIFFICULTY_WEIGHTS,
-} from "../../domain/value-objects/difficulty.js";
+} from "../../shared/value-objects/difficulty.js";
 
 export interface DifficultySignals {
 	fileCount: number;

@@ -61,6 +61,6 @@ describe("project:init — .tff/ auto-creation", () => {
 		await projectInitCmd(["--name", "test-project"]);
 		const result = JSON.parse(await projectInitCmd(["--name", "test-project"]));
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("PROJECT_EXISTS");
+		expect(result.error.errorLabel).toBe("PROJECT_EXISTS");
 	});
 });

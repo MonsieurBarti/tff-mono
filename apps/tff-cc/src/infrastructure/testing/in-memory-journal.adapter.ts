@@ -1,8 +1,8 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
+import type { DomainError } from "../errors/generic-domain-error.js";
 import type { JournalRepository } from "../../domain/ports/journal-repository.port.js";
-import type { Result } from "../../domain/result.js";
-import { Ok } from "../../domain/result.js";
-import { type JournalEntry, JournalEntrySchema } from "../../domain/value-objects/journal-entry.js";
+import type { Result } from "@tff/core";
+import { Ok } from "@tff/core";
+import { type JournalEntry, JournalEntrySchema } from "../../shared/value-objects/journal-entry.js";
 
 export class InMemoryJournalAdapter implements JournalRepository {
 	private store = new Map<string, JournalEntry[]>();

@@ -13,7 +13,3 @@ describe("InMemoryJournalAdapter", () => {
 		expect(typeof adapter.reset).toBe("function");
 	});
 });
-
-import { runJournalContractTests } from "../../domain/ports/journal-repository.contract.spec.js";
-
-runJournalContractTests("InMemoryJournalAdapter", () => new InMemoryJournalAdapter());

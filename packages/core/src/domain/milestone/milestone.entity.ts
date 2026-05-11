@@ -154,7 +154,7 @@ export class Milestone extends AggregateRoot {
 
 	rename(name: string): void {
 		if (this.isArchived) {
-			throw new MilestoneAlreadyArchivedError(this._id);
+			throw new MilestoneAlreadyArchivedError(`Cannot rename archived milestone`, this._id);
 		}
 		const validated = renameSchema.parse(name);
 		this._name = validated;
@@ -163,11 +163,16 @@ export class Milestone extends AggregateRoot {
 
 	transition(to: MilestoneStatus): void {
 		if (this.isArchived) {
-			throw new MilestoneAlreadyArchivedError(this._id);
+			throw new MilestoneAlreadyArchivedError(`Cannot transition archived milestone`, this._id);
 		}
 		const allowed = MILESTONE_TRANSITIONS[this._status];
 		if (!allowed.includes(to)) {
-			throw new InvalidTransitionError(this._status, to, allowed);
+			throw new InvalidTransitionError(
+				`Invalid transition from ${this._status} to ${to}`,
+				this._status,
+				to,
+				allowed,
+			);
 		}
 		const from = this._status;
 		this._status = to;
@@ -183,7 +188,7 @@ export class Milestone extends AggregateRoot {
 
 	archive(dateProvider: IDateProvider): void {
 		if (this._archivedAt !== null) {
-			throw new MilestoneAlreadyArchivedError(this._id);
+			throw new MilestoneAlreadyArchivedError(`Milestone is already archived`, this._id);
 		}
 		this._archivedAt = dateProvider.now();
 		this._updatedAt = dateProvider.now();
@@ -197,7 +202,10 @@ export class Milestone extends AggregateRoot {
 
 	setCloseReason(reason: string): void {
 		if (this.isArchived) {
-			throw new MilestoneAlreadyArchivedError(this._id);
+			throw new MilestoneAlreadyArchivedError(
+				`Cannot set close reason on archived milestone`,
+				this._id,
+			);
 		}
 		const validated = closeReasonSchema.parse(reason);
 		this._closeReason = validated;

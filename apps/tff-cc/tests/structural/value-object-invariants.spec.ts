@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const voDir = path.resolve(repoRoot, "src/domain/value-objects");
+const voDir = path.resolve(repoRoot, "src/shared/value-objects");
 const files = readdirSync(voDir).filter((f) => f.endsWith(".ts") && !f.endsWith(".spec.ts"));
 
 interface ZodLike {

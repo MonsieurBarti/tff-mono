@@ -148,7 +148,7 @@ describe("milestone:close — pending-judgment gate", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			stores.sliceStore.transitionSlice(sliceUuid, target);
 		}

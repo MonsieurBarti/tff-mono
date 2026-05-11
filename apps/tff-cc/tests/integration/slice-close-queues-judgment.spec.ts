@@ -26,13 +26,25 @@ describe("slice transition to closed queues a pending judgment", () => {
 		if (!taskR.ok) throw new Error("Failed to create task");
 		stores.taskStore.claimTask(taskR.data.id, "exec-A");
 
+		// Seed a review so the verifying → reviewing transition succeeds.
+		expect(
+			stores.reviewStore.recordReview({
+				sliceId,
+				reviewer: "rev-spec",
+				type: "spec",
+				verdict: "approved",
+				commitSha: "abc",
+				createdAt: new Date().toISOString(),
+			}).ok,
+		).toBe(true);
+
 		for (const target of [
 			"researching",
 			"planning",
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			const r = stores.sliceStore.transitionSlice(sliceId, target);
 			if (!r.ok) throw new Error(`transition to ${target} failed`);
@@ -83,13 +95,23 @@ describe("slice transition to closed queues a pending judgment", () => {
 		const taskR = stores.taskStore.createTask({ sliceId: sId, number: 1, title: "Task One" });
 		if (!taskR.ok) throw new Error("createTask failed");
 		stores.taskStore.claimTask(taskR.data.id, "exec-A");
+		expect(
+			stores.reviewStore.recordReview({
+				sliceId: sId,
+				reviewer: "rev-spec",
+				type: "spec",
+				verdict: "approved",
+				commitSha: "abc",
+				createdAt: new Date().toISOString(),
+			}).ok,
+		).toBe(true);
 		for (const target of [
 			"researching",
 			"planning",
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			const r = stores.sliceStore.transitionSlice(sId, target);
 			if (!r.ok) throw new Error(`transition to ${target} failed`);

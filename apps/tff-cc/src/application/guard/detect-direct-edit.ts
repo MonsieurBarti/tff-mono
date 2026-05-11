@@ -2,8 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
+import { SETTINGS_FILE, TFF_DIR, type TaskStore } from "@tff/core";
 
 export interface DetectDirectEditDeps {
 	sessionStore: SessionStore;

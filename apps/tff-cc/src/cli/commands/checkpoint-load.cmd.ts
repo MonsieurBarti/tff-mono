@@ -1,5 +1,5 @@
 import { loadCheckpoint } from "../../application/checkpoint/load-checkpoint.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { MarkdownArtifactAdapter } from "../../infrastructure/adapters/filesystem/markdown-artifact.adapter.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 

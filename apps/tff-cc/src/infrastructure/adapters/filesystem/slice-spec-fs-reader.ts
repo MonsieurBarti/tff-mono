@@ -1,12 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { createDomainError, type DomainError } from "../../../domain/errors/domain-error.js";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type {
 	SliceSpecReader,
 	SliceSpecResult,
 } from "../../../domain/ports/slice-spec-reader.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
-import { debugSliceDir, quickSliceDir, sliceDir } from "@tff/core";
+import { debugSliceDir, Err, Ok, quickSliceDir, sliceDir, type Result } from "@tff/core";
 
 const MILESTONE_SLICE_RE = /^M(\d+)-S\d+$/;
 const ADHOC_SLICE_RE = /^([QD])-\d+$/;
@@ -44,7 +43,9 @@ export class SliceSpecFsReader implements SliceSpecReader {
 		const specPath = specPathFor(this.opts.projectRoot, sliceLabel);
 		if (specPath === null) {
 			return Err(
-				createDomainError("VALIDATION_ERROR", `invalid slice label: ${sliceLabel}`, { sliceLabel }),
+				new GenericDomainError("VALIDATION_ERROR", `invalid slice label: ${sliceLabel}`, {
+					sliceLabel,
+				}),
 			);
 		}
 

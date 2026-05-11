@@ -123,7 +123,7 @@ describe("slice-transition integration", () => {
 		);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("INVALID_TRANSITION");
+		expect(result.error.errorLabel).toBe("INVALID_TRANSITION");
 	});
 
 	it("includes validPredecessors in INVALID_TRANSITION error when jumping to reviewing from executing", async () => {
@@ -149,8 +149,8 @@ describe("slice-transition integration", () => {
 		);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("INVALID_TRANSITION");
-		expect(result.error.validPredecessors).toEqual(["verifying"]);
+		expect(result.error.errorLabel).toBe("INVALID_TRANSITION");
+		expect(result.error.context.expected).toEqual(["verifying"]);
 		expect(result.error.recoveryHint).toContain("verifying");
 	});
 });

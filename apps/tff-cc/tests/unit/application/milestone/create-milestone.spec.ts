@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMilestoneUseCase } from "../../../../src/application/milestone/create-milestone.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";

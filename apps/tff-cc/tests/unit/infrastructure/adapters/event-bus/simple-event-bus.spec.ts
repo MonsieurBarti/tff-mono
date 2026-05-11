@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createDomainEvent } from "../../../../../src/domain/events/domain-event.js";
+import { DomainEvent } from "@tff/core";
 import { SimpleEventBus } from "../../../../../src/infrastructure/adapters/event-bus/simple-event-bus.js";
 
 describe("SimpleEventBus", () => {
@@ -7,7 +7,7 @@ describe("SimpleEventBus", () => {
 		const bus = new SimpleEventBus();
 		const handler = vi.fn();
 		bus.subscribe("SLICE_STATUS_CHANGED", handler);
-		const event = createDomainEvent("SLICE_STATUS_CHANGED", {
+		const event = DomainEvent.create("SLICE_STATUS_CHANGED", {
 			sliceId: "M01-S04",
 			from: "planning",
 			to: "executing",
@@ -23,7 +23,7 @@ describe("SimpleEventBus", () => {
 		const h2 = vi.fn();
 		bus.subscribe("TASK_COMPLETED", h1);
 		bus.subscribe("TASK_COMPLETED", h2);
-		const event = createDomainEvent("TASK_COMPLETED", {
+		const event = DomainEvent.create("TASK_COMPLETED", {
 			taskId: "T01",
 			sliceId: "M01-S04",
 			executor: "opus",
@@ -37,7 +37,7 @@ describe("SimpleEventBus", () => {
 		const bus = new SimpleEventBus();
 		const handler = vi.fn();
 		bus.subscribe("TASK_COMPLETED", handler);
-		const event = createDomainEvent("SLICE_STATUS_CHANGED", {
+		const event = DomainEvent.create("SLICE_STATUS_CHANGED", {
 			sliceId: "M01-S04",
 			from: "a",
 			to: "b",
@@ -48,7 +48,7 @@ describe("SimpleEventBus", () => {
 
 	it("does not throw when publishing with no subscribers", () => {
 		const bus = new SimpleEventBus();
-		const event = createDomainEvent("SLICE_PLANNED", { sliceId: "x" });
+		const event = DomainEvent.create("SLICE_PLANNED", { sliceId: "x" });
 		expect(() => bus.publish(event)).not.toThrow();
 	});
 });

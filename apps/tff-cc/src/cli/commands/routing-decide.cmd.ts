@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { decideUseCase } from "../../application/routing/decide.js";
 import type { ExtractInput } from "../../domain/ports/signal-extractor.port.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { FilesystemSignalExtractor } from "../../infrastructure/adapters/filesystem/filesystem-signal-extractor.js";
 import { FilesystemTierConfigReader } from "../../infrastructure/adapters/filesystem/filesystem-tier-config-reader.js";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";

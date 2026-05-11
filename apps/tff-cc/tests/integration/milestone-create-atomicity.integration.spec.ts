@@ -102,7 +102,7 @@ describe("milestone-create atomicity", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("TRANSACTION_ROLLBACK");
+		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
 		spy.mockRestore();
 
@@ -158,12 +158,12 @@ describe("milestone-create atomicity", () => {
 		expect(result.data.milestone).toBeDefined();
 		expect(Array.isArray(result.warnings)).toBe(true);
 		const partial = result.warnings.find(
-			(w: { code?: string; message?: string }) =>
-				w?.code === "PARTIAL_SUCCESS" && String(w.message ?? "").includes("git branch"),
+			(w: { errorLabel?: string; message?: string }) =>
+				w?.errorLabel === "PARTIAL_SUCCESS" && String(w.message ?? "").includes("git branch"),
 		);
 		expect(partial).toBeDefined();
 		expect(String(partial.message ?? "")).toContain("git branch creation failed");
-		expect(String(partial.context?.pendingEffect ?? "")).toContain("git-branch:");
+		expect(String(partial.recoveryHint ?? "")).toContain("git-branch:");
 
 		// DB commit durable.
 		const ms = adapter.listMilestones();

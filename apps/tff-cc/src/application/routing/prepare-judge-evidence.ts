@@ -1,13 +1,12 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
 import type { DiffReader } from "../../domain/ports/diff-reader.port.js";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { SliceMergeLookup } from "../../domain/ports/slice-merge-lookup.port.js";
 import type { SliceSpecReader } from "../../domain/ports/slice-spec-reader.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import type { JudgeEvidence } from "../../domain/value-objects/judge-evidence.js";
-import type { Signals } from "../../domain/value-objects/signals.js";
-import type { ModelTier } from "../../domain/value-objects/tier-decision.js";
+import type { JudgeEvidence } from "../../shared/value-objects/judge-evidence.js";
+import type { Signals } from "../../shared/value-objects/signals.js";
+import type { ModelTier } from "../../shared/value-objects/tier-decision.js";
+import { Err, Ok, isOk, PreconditionViolationError, type Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 export interface PrepareJudgeEvidenceInput {
 	slice_id: string;
@@ -59,15 +58,15 @@ export const prepareJudgeEvidenceUseCase = async (
 ): Promise<Result<PrepareJudgeEvidenceResult, DomainError>> => {
 	if (!deps.modelJudgeEnabled) {
 		return Err(
-			preconditionViolationError([
-				{ code: "model_judge.enabled", expected: "true", actual: "false" },
+			new PreconditionViolationError("Precondition violated: model_judge.enabled", [
+				"model_judge.enabled: expected true, actual false",
 			]),
 		);
 	}
 	if (deps.sliceStatus !== "closed") {
 		return Err(
-			preconditionViolationError([
-				{ code: "slice.status", expected: "closed", actual: deps.sliceStatus },
+			new PreconditionViolationError("Precondition violated: slice.status", [
+				`slice.status: expected closed, actual ${deps.sliceStatus}`,
 			]),
 		);
 	}
@@ -84,7 +83,7 @@ export const prepareJudgeEvidenceUseCase = async (
 
 	const alreadyJudged = new Set<string>();
 	for await (const o of deps.outcomesSource.readOutcomes({ source: "model-judge" })) {
-		alreadyJudged.add(o.decision_id);
+		alreadyJudged.add(o.decisionId);
 	}
 	const unjudged = deps.decisions.filter((d) => !alreadyJudged.has(d.decision_id));
 	if (unjudged.length === 0) {

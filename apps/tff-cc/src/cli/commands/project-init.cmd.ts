@@ -1,5 +1,5 @@
 import { initProject } from "../../application/project/init-project.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { MarkdownArtifactAdapter } from "../../infrastructure/adapters/filesystem/markdown-artifact.adapter.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createStateStores } from "../../infrastructure/adapters/sqlite/create-state-stores.js";

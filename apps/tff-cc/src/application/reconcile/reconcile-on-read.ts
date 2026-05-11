@@ -1,9 +1,7 @@
 import { join } from "node:path";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
 import { renderStateMd } from "../sync/generate-state.js";
 import { reconcileState } from "./reconcile-state.js";
+import type { MilestoneStore, SliceStore, TaskStore } from "@tff/core";
 
 export interface ReconcileOnReadStores {
 	milestoneStore: MilestoneStore;

@@ -1,42 +1,41 @@
-import type { Milestone } from "../../domain/entities/milestone.js";
-import type { Project } from "../../domain/entities/project.js";
-import type { Slice } from "../../domain/entities/slice.js";
-import { transitionSlice } from "../../domain/entities/slice.js";
-import type { Task } from "../../domain/entities/task.js";
-import { alreadyClaimedError } from "../../domain/errors/already-claimed.error.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import { freshReviewerViolationError } from "../../domain/errors/fresh-reviewer-violation.error.js";
-import { hasOpenChildrenError } from "../../domain/errors/has-open-children.error.js";
-import { milestoneCompletenessViolationError } from "../../domain/errors/milestone-completeness-violation.error.js";
-import { shipCompletenessViolationError } from "../../domain/errors/ship-completeness-violation.error.js";
-import type { DomainEvent } from "../../domain/events/domain-event.js";
-import { milestoneBranchName } from "../../domain/helpers/branch-naming.js";
+import type {
+	Milestone,
+	MilestoneProps,
+	MilestoneStore,
+	MilestoneUpdateProps,
+	Project,
+	ProjectProps,
+	ProjectStore,
+	Result,
+	Slice,
+	SliceProps,
+	SliceStatus,
+	SliceStore,
+	SliceUpdateProps,
+	Task,
+	TaskProps,
+	TaskStore,
+	TaskUpdateProps,
+} from "@tff/core";
+import { DomainEvent, Err, Ok, milestoneBranchName, SLICE_TRANSITIONS } from "@tff/core";
+import type { DomainError } from "../errors/generic-domain-error.js";
+import { GenericDomainError } from "../errors/generic-domain-error.js";
 import type { DatabaseInit } from "../../domain/ports/database-init.port.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { ProjectStore } from "../../domain/ports/project-store.port.js";
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
 import type {
 	SliceDependency,
 	SliceDependencyStore,
 } from "../../domain/ports/slice-dependency-store.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../domain/ports/transaction-runner.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { Dependency } from "../../domain/value-objects/dependency.js";
-import type { MilestoneProps } from "../../domain/value-objects/milestone-props.js";
-import type { MilestoneUpdateProps } from "../../domain/value-objects/milestone-update-props.js";
-import type { ProjectProps } from "../../domain/value-objects/project-props.js";
-import type { ReviewRecord, ReviewType } from "../../domain/value-objects/review-record.js";
-import type { SliceProps } from "../../domain/value-objects/slice-props.js";
-import type { SliceStatus } from "../../domain/value-objects/slice-status.js";
-import type { SliceUpdateProps } from "../../domain/value-objects/slice-update-props.js";
-import type { TaskProps } from "../../domain/value-objects/task-props.js";
-import type { TaskUpdateProps } from "../../domain/value-objects/task-update-props.js";
-import type { WorkflowSession } from "../../domain/value-objects/workflow-session.js";
+import type { Dependency } from "../../shared/value-objects/dependency.js";
+import type { ReviewRecord, ReviewType } from "../../shared/value-objects/review-record.js";
+import type { WorkflowSession } from "../../shared/value-objects/workflow-session.js";
+
+function mut<T>(obj: T): Record<string, unknown> {
+	return obj as unknown as Record<string, unknown>;
+}
 
 /**
  * Test-only in-memory implementation of the state ports. NOT intended for
@@ -109,12 +108,13 @@ export class InMemoryStateAdapter
 	}
 
 	saveProject(props: ProjectProps): Result<Project, DomainError> {
+		// TODO(S04): Replace with Project.reconstruct() once in-memory adapter aligns with core entities
 		const project: Project = {
 			id: "singleton",
 			name: props.name,
-			vision: props.vision,
+			vision: props.vision ?? "",
 			createdAt: this.project?.createdAt ?? new Date(),
-		};
+		} as unknown as Project;
 		this.project = project;
 		return Ok(project);
 	}
@@ -125,15 +125,16 @@ export class InMemoryStateAdapter
 		const id = props.id ?? crypto.randomUUID();
 		// Use provided branch or compute from UUID
 		const branch = props.branch ?? milestoneBranchName(id);
+		// TODO(S04): Replace with Milestone.reconstruct() once in-memory adapter aligns with core entities
 		const milestone: Milestone = {
 			id,
 			projectId: "singleton",
 			number: props.number,
 			name: props.name,
-			status: "open",
+			status: "open" as Milestone["status"],
 			branch,
 			createdAt: new Date(),
-		};
+		} as unknown as Milestone;
 		this.milestones.set(id, milestone);
 		return Ok(milestone);
 	}
@@ -162,8 +163,8 @@ export class InMemoryStateAdapter
 	updateMilestone(id: string, updates: MilestoneUpdateProps): Result<void, DomainError> {
 		const ms = this.milestones.get(id);
 		if (!ms) return Ok(undefined);
-		if (updates.name !== undefined) ms.name = updates.name;
-		if (updates.status !== undefined) ms.status = updates.status;
+		if (updates.name !== undefined) mut(ms).name = updates.name;
+		if (updates.status !== undefined) mut(ms).status = updates.status;
 		this.milestones.set(id, ms);
 		return Ok(undefined);
 	}
@@ -176,13 +177,13 @@ export class InMemoryStateAdapter
 			let slicesArchived = 0;
 			for (const slice of this.slices.values()) {
 				if (slice.milestoneId === id && slice.archivedAt === undefined) {
-					slice.archivedAt = now;
+					mut(slice).archivedAt = now;
 					this.slices.set(slice.id, slice);
 					slicesArchived += 1;
 				}
 			}
 			if (ms.archivedAt === undefined) {
-				ms.archivedAt = now;
+				mut(ms).archivedAt = now;
 				this.milestones.set(id, ms);
 			}
 			return Ok({ slicesArchived });
@@ -204,18 +205,30 @@ export class InMemoryStateAdapter
 				if (!hasApprovedSpec) missing.push(slice.id);
 			}
 			if (missing.length > 0) {
-				return Err(milestoneCompletenessViolationError(id, missing));
+				return Err(
+					new GenericDomainError(
+						"MILESTONE_COMPLETENESS_VIOLATION",
+						`Milestone "${id}" missing approved spec reviews for slices: ${missing.join(", ")}`,
+						{ milestoneId: id, missing },
+					),
+				);
 			}
 			const openSlices = milestoneSlices.filter((s) => s.status !== "closed");
 			if (openSlices.length > 0) {
-				return Err(hasOpenChildrenError(id, openSlices.length));
+				return Err(
+					new GenericDomainError(
+						"HAS_OPEN_CHILDREN",
+						`Milestone "${id}" has ${openSlices.length} open slice(s)`,
+						{ milestoneId: id, openCount: openSlices.length },
+					),
+				);
 			}
-			ms.status = "closed";
-			ms.closeReason = reason;
+			mut(ms).status = "closed";
+			mut(ms).closeReason = reason;
 			this.milestones.set(id, ms);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
+			return Err(new GenericDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
 		}
 	}
 
@@ -225,28 +238,34 @@ export class InMemoryStateAdapter
 		if (kind === "milestone") {
 			if (!props.milestoneId) {
 				return Err(
-					createDomainError("VALIDATION_ERROR", "milestoneId is required for milestone slices"),
+					new GenericDomainError(
+						"VALIDATION_ERROR",
+						"milestoneId is required for milestone slices",
+					),
 				);
 			}
 			const milestone = this.milestones.get(props.milestoneId);
 			if (!milestone) {
-				return Err(createDomainError("NOT_FOUND", `Milestone "${props.milestoneId}" not found`));
+				return Err(
+					new GenericDomainError("NOT_FOUND", `Milestone "${props.milestoneId}" not found`),
+				);
 			}
 		}
 		// Use provided id or generate a new UUID
 		const id = props.id ?? crypto.randomUUID();
+		// TODO(S04): Replace with Slice.reconstruct() once in-memory adapter aligns with core entities
 		const slice: Slice = {
 			id,
-			milestoneId: props.milestoneId,
+			milestoneId: props.milestoneId ?? null,
 			kind,
 			number: props.number,
 			title: props.title,
 			status: "discussing",
-			tier: props.tier,
-			baseBranch: props.baseBranch,
-			branchName: props.branchName,
+			tier: props.tier ?? null,
+			baseBranch: props.baseBranch ?? "",
+			branchName: props.branchName ?? "",
 			createdAt: new Date(),
-		};
+		} as unknown as Slice;
 		this.slices.set(id, slice);
 		return Ok(slice);
 	}
@@ -303,18 +322,18 @@ export class InMemoryStateAdapter
 	updateSlice(id: string, updates: SliceUpdateProps): Result<void, DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
-		if (updates.title !== undefined) slice.title = updates.title;
-		if (updates.tier !== undefined) slice.tier = updates.tier;
+		if (updates.title !== undefined) mut(slice).title = updates.title;
+		if (updates.tier !== undefined) mut(slice).tier = updates.tier;
 		this.slices.set(id, slice);
 		return Ok(undefined);
 	}
 
-	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent[], DomainError> {
+	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent<unknown>[], DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) {
-			return Err(createDomainError("NOT_FOUND", `Slice "${id}" not found`));
+			return Err(new GenericDomainError("NOT_FOUND", `Slice "${id}" not found`));
 		}
-		if (target === "closed" && slice.status === "completing") {
+		if (target === "closed" && slice.status === "shipping") {
 			const approvedTypes = new Set(
 				this.reviews.filter((r) => r.sliceId === id && r.verdict === "approved").map((r) => r.type),
 			);
@@ -322,20 +341,37 @@ export class InMemoryStateAdapter
 			if (!approvedTypes.has("code")) missing.push("code");
 			if (!approvedTypes.has("security")) missing.push("security");
 			if (missing.length > 0) {
-				return Err(shipCompletenessViolationError(id, missing));
+				return Err(
+					new GenericDomainError(
+						"SHIP_COMPLETENESS_VIOLATION",
+						`Slice "${id}" missing required reviews: ${missing.join(", ")}`,
+						{ sliceId: id, missing },
+					),
+				);
 			}
 		}
-		const domainResult = transitionSlice(slice, target);
-		if (!domainResult.ok) return domainResult;
-		this.slices.set(id, domainResult.data.slice);
-		return Ok(domainResult.data.events);
+		const allowed = SLICE_TRANSITIONS[slice.status];
+		if (!allowed.includes(target)) {
+			return Err(
+				new GenericDomainError(
+					"INVALID_TRANSITION",
+					`Cannot transition slice "${id}" from "${slice.status}" to "${target}"`,
+					{ sliceId: id, from: slice.status, to: target, expected: allowed },
+				),
+			);
+		}
+		const from = slice.status;
+		mut(slice).status = target;
+		this.slices.set(id, slice);
+		const event = DomainEvent.create("slice.transitioned", { sliceId: id, from, to: target });
+		return Ok([event]);
 	}
 
 	archiveSlice(id: string): Result<void, DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
 		if (slice.archivedAt !== undefined) return Ok(undefined);
-		slice.archivedAt = new Date();
+		mut(slice).archivedAt = new Date();
 		this.slices.set(id, slice);
 		return Ok(undefined);
 	}
@@ -343,16 +379,17 @@ export class InMemoryStateAdapter
 	// TaskStore
 	createTask(props: TaskProps): Result<Task, DomainError> {
 		const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
+		// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
 		const task: Task = {
 			id,
 			sliceId: props.sliceId,
 			number: props.number,
 			title: props.title,
-			description: props.description,
+			description: props.description ?? "",
 			status: "open",
-			wave: props.wave,
+			wave: props.wave ?? null,
 			createdAt: new Date(),
-		};
+		} as unknown as Task;
 		this.tasks.set(id, task);
 		return Ok(task);
 	}
@@ -368,9 +405,9 @@ export class InMemoryStateAdapter
 	updateTask(id: string, updates: TaskUpdateProps): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		if (updates.title !== undefined) task.title = updates.title;
-		if (updates.description !== undefined) task.description = updates.description;
-		if (updates.wave !== undefined) task.wave = updates.wave;
+		if (updates.title !== undefined) mut(task).title = updates.title;
+		if (updates.description !== undefined) mut(task).description = updates.description;
+		if (updates.wave !== undefined) mut(task).wave = updates.wave;
 		this.tasks.set(id, task);
 		return Ok(undefined);
 	}
@@ -378,12 +415,12 @@ export class InMemoryStateAdapter
 	claimTask(id: string, claimedBy?: string): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task || task.status !== "open") {
-			return Err(alreadyClaimedError(id));
+			return Err(new GenericDomainError("ALREADY_CLAIMED", `Task "${id}" is already claimed`));
 		}
-		task.status = "in_progress";
-		task.claimedAt = new Date();
+		mut(task).status = "in_progress";
+		mut(task).claimedAt = new Date();
 		if (claimedBy !== undefined) {
-			task.claimedBy = claimedBy;
+			mut(task).claimedBy = claimedBy;
 		}
 		this.tasks.set(id, task);
 		return Ok(undefined);
@@ -403,8 +440,8 @@ export class InMemoryStateAdapter
 	closeTask(id: string, reason?: string): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		task.status = "closed";
-		task.closedReason = reason;
+		mut(task).status = "closed";
+		mut(task).closedReason = reason;
 		this.tasks.set(id, task);
 		return Ok(undefined);
 	}
@@ -427,7 +464,7 @@ export class InMemoryStateAdapter
 	listStaleClaims(ttlMinutes: number): Result<Task[], DomainError> {
 		const cutoff = new Date(Date.now() - ttlMinutes * 60 * 1000);
 		const stale = [...this.tasks.values()].filter(
-			(t) => t.status === "in_progress" && t.claimedAt !== undefined && t.claimedAt < cutoff,
+			(t) => t.status === "in_progress" && t.claimedAt != null && t.claimedAt < cutoff,
 		);
 		return Ok(stale);
 	}
@@ -489,7 +526,13 @@ export class InMemoryStateAdapter
 		const executorsResult = this.getExecutorsForSlice(review.sliceId);
 		if (!executorsResult.ok) return executorsResult;
 		if (executorsResult.data.includes(review.reviewer)) {
-			return Err(freshReviewerViolationError(review.sliceId, review.reviewer));
+			return Err(
+				new GenericDomainError(
+					"FRESH_REVIEWER_VIOLATION",
+					`Reviewer "${review.reviewer}" is an executor of slice "${review.sliceId}"`,
+					{ sliceId: review.sliceId, reviewer: review.reviewer },
+				),
+			);
 		}
 		this.reviews.push(review);
 		return Ok(undefined);
@@ -516,9 +559,10 @@ export class InMemoryStateAdapter
 			const id = `${sliceId}-executor-seed-${idx}`;
 			const existing = this.tasks.get(id);
 			if (existing) {
-				existing.claimedBy = agent;
+				mut(existing).claimedBy = agent;
 				this.tasks.set(id, existing);
 			} else {
+				// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
 				const task: Task = {
 					id,
 					sliceId,
@@ -528,7 +572,7 @@ export class InMemoryStateAdapter
 					claimedBy: agent,
 					claimedAt: new Date(),
 					createdAt: new Date(),
-				};
+				} as unknown as Task;
 				this.tasks.set(id, task);
 			}
 		});

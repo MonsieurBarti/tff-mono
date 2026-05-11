@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkStaleClaims } from "../../../../src/application/claims/check-stale-claims.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
 describe("InMemoryStateAdapter — claim + stale detection", () => {

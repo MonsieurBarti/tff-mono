@@ -76,9 +76,11 @@ const driveSliceToClosed = (adapter: SQLiteStateAdapter, sliceId: string): void 
 		"executing",
 		"verifying",
 		"reviewing",
-		"completing",
+		"shipping",
 	] as const) {
-		expect(adapter.transitionSlice(sliceId, state).ok).toBe(true);
+		const r = adapter.transitionSlice(sliceId, state);
+		if (!r.ok) console.error(`transition to ${state} failed:`, JSON.stringify(r.error));
+		expect(r.ok).toBe(true);
 	}
 	expect(seedReview(adapter, sliceId, "code", "rev-c").ok).toBe(true);
 	expect(seedReview(adapter, sliceId, "security", "rev-s").ok).toBe(true);
@@ -170,7 +172,7 @@ describe("auto-archive on milestone close", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}
@@ -192,7 +194,7 @@ describe("auto-archive on milestone close", () => {
 		// DB: archived_at still null on the slice.
 		const re = adapter.getSlice(slice.data.id);
 		expect(re.ok).toBe(true);
-		if (re.ok && re.data) expect(re.data.archivedAt).toBeUndefined();
+		if (re.ok && re.data) expect(re.data.archivedAt).toBeNull();
 	});
 });
 
@@ -209,6 +211,9 @@ describe("auto-archive on ad-hoc slice close", () => {
 		});
 		if (!slice.ok) throw new Error("slice");
 
+		// Seed a review before the loop so the verifying → reviewing transition succeeds.
+		expect(seedSpecApproval(adapter, slice.data.id, "plannotator-1").ok).toBe(true);
+
 		// Drive to closed manually (slice-close uses sliceStore.transitionSlice).
 		for (const state of [
 			"researching",
@@ -216,11 +221,10 @@ describe("auto-archive on ad-hoc slice close", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}
-		expect(seedSpecApproval(adapter, slice.data.id, "plannotator-1").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "code", "rev-c").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "security", "rev-s").ok).toBe(true);
 
@@ -252,17 +256,19 @@ describe("auto-archive on ad-hoc slice close", () => {
 		});
 		if (!slice.ok) throw new Error("slice");
 
+		// Seed a review before the loop so the verifying → reviewing transition succeeds.
+		expect(seedSpecApproval(adapter, slice.data.id, "plannotator-1").ok).toBe(true);
+
 		for (const state of [
 			"researching",
 			"planning",
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}
-		expect(seedSpecApproval(adapter, slice.data.id, "plannotator-1").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "code", "rev-c").ok).toBe(true);
 		expect(seedReview(adapter, slice.data.id, "security", "rev-s").ok).toBe(true);
 

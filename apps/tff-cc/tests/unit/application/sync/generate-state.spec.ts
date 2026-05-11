@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { generateState, renderStateMd } from "../../../../src/application/sync/generate-state.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
@@ -29,7 +29,7 @@ describe("generateState", () => {
 		adapter.transitionSlice(slice1Id, "planning");
 		adapter.transitionSlice(slice1Id, "executing");
 		adapter.transitionSlice(slice1Id, "reviewing");
-		adapter.transitionSlice(slice1Id, "completing");
+		adapter.transitionSlice(slice1Id, "shipping");
 		adapter.transitionSlice(slice1Id, "closed");
 		adapter.transitionSlice(slice2Id, "researching");
 		adapter.transitionSlice(slice2Id, "planning");
@@ -146,13 +146,13 @@ describe("generateState — kind scope", () => {
 		const q1Id = isOk(q1) ? q1.data.id : "";
 		const q2Id = isOk(q2) ? q2.data.id : "";
 
-		// q1 → completing (closed requires approved reviews — completing exercises mixed-status path)
+		// q1 → shipping (closed requires approved reviews — shipping exercises mixed-status path)
 		adapter.transitionSlice(q1Id, "researching");
 		adapter.transitionSlice(q1Id, "planning");
 		adapter.transitionSlice(q1Id, "executing");
 		adapter.transitionSlice(q1Id, "verifying");
 		adapter.transitionSlice(q1Id, "reviewing");
-		adapter.transitionSlice(q1Id, "completing");
+		adapter.transitionSlice(q1Id, "shipping");
 		// q2 → executing
 		adapter.transitionSlice(q2Id, "researching");
 		adapter.transitionSlice(q2Id, "planning");
@@ -174,7 +174,7 @@ describe("generateState — kind scope", () => {
 			expect(content.data).toContain("Q-02");
 			expect(content.data).toContain("Quick One");
 			expect(content.data).toContain("Quick Two");
-			expect(content.data).toContain("completing");
+			expect(content.data).toContain("shipping");
 			expect(content.data).toContain("executing");
 		}
 	});

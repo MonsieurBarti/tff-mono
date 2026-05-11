@@ -6,7 +6,7 @@ import type {
 	OutcomeReadFilter,
 	OutcomeSource,
 } from "../../../domain/ports/outcome-source.port.js";
-import type { RoutingOutcome } from "../../../domain/value-objects/routing-outcome.js";
+import { RoutingOutcome } from "@tff/core";
 
 interface ShipEvent {
 	timestamp: string;
@@ -121,16 +121,16 @@ export class DebugJoinOutcomeSource implements OutcomeSource {
 					if (filter.decision_id && decision_id !== filter.decision_id) continue;
 					const emitted_at = this.clock();
 					if (filter.since && emitted_at < filter.since) continue;
-					yield {
-						outcome_id: deterministicOutcomeId(decision_id, e.timestamp),
-						decision_id,
+					yield RoutingOutcome.create({
+						outcomeId: deterministicOutcomeId(decision_id, e.timestamp),
+						decisionId: decision_id,
 						dimension: "unknown",
 						verdict: "wrong",
 						source: "debug-join",
-						slice_id: e.slice_id,
-						workflow_id: ship.workflow_id,
-						emitted_at,
-					};
+						sliceId: e.slice_id,
+						workflowId: ship.workflow_id,
+						emittedAt: emitted_at,
+					});
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-import type { OutcomeSourceKind, RoutingOutcome } from "../value-objects/routing-outcome.js";
+import type { OutcomeSourceKind, RoutingOutcome } from "@tff/core";
 
 export interface OutcomeReadFilter {
 	since?: string;

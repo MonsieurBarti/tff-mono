@@ -10,7 +10,7 @@ import {
 	parseDifficultyOverride,
 	type TaskDifficultyInput,
 } from "../../src/application/planning/task-difficulty.js";
-import type { ComplexityTier } from "../../src/domain/value-objects/complexity-tier.js";
+import type { ComplexityTier } from "../src/shared/value-objects/complexity-tier.js";
 
 /**
  * Integration test for the full difficulty flow:
@@ -19,29 +19,25 @@ import type { ComplexityTier } from "../../src/domain/value-objects/complexity-t
 describe("difficulty flow integration", () => {
 	describe("AC4: Difficulty persists to task entity", () => {
 		it("task schema accepts difficulty field", async () => {
-			const { TaskSchema } = await import("../../src/domain/entities/task.js");
-			const task = {
-				id: "M01-S01-T01",
+			const { TaskPropsSchema } = await import("../../src/shared/value-objects/task-props.js");
+			const parsed = TaskPropsSchema.parse({
 				sliceId: "M01-S01",
 				number: 1,
 				title: "Test task",
-				status: "open",
-				createdAt: new Date(),
 				difficulty: "high",
-			};
-			const parsed = TaskSchema.parse(task);
+			});
 			expect(parsed.difficulty).toBe("high");
 		});
 
 		it("task can be created with difficulty", async () => {
-			const { createTask } = await import("../../src/domain/entities/task.js");
-			const task = createTask({
+			const { Task } = await import("@tff/core");
+			const task = Task.createNew({
 				sliceId: "M01-S01",
 				number: 1,
 				title: "Test task",
-				difficulty: "medium",
+				difficulty: 2,
 			});
-			expect(task.difficulty).toBe("medium");
+			expect(task.difficulty).toBe(2);
 		});
 	});
 
@@ -168,17 +164,12 @@ describe("difficulty flow integration", () => {
 
 	describe("AC10: Backward compatible", () => {
 		it("existing tasks without difficulty field continue to work", async () => {
-			const { TaskSchema } = await import("../../src/domain/entities/task.js");
-			const task = {
-				id: "M01-S01-T01",
+			const { TaskPropsSchema } = await import("../../src/shared/value-objects/task-props.js");
+			const parsed = TaskPropsSchema.parse({
 				sliceId: "M01-S01",
 				number: 1,
 				title: "Legacy task",
-				status: "open",
-				createdAt: new Date(),
-				// No difficulty field
-			};
-			const parsed = TaskSchema.parse(task);
+			});
 			expect(parsed.difficulty).toBeUndefined();
 		});
 

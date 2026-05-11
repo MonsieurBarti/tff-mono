@@ -54,6 +54,6 @@ describe("branch-guard refuses mutations on detached HEAD", () => {
 		const parsed = JSON.parse(result);
 
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("DETACHED_HEAD");
+		expect(parsed.error.errorLabel).toBe("DETACHED_HEAD");
 	});
 });

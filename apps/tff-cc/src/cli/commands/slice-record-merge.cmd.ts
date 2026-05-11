@@ -1,11 +1,11 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
+import { PreconditionViolationError } from "@tff/core";
 
 const execFileP = promisify(execFile);
 
@@ -91,25 +91,13 @@ export const sliceRecordMergeCmd = async (
 	if (inlinePartial) {
 		return JSON.stringify({
 			ok: false,
-			error: preconditionViolationError([
-				{
-					code: "merge-sha+base-ref",
-					expected: "both --merge-sha and --base-ref together",
-					actual: "only one provided",
-				},
-			]),
+			error: new PreconditionViolationError("Precondition violated", ["merge-sha+base-ref"]),
 		});
 	}
 	if (!inlineProvided && flags.pr == null) {
 		return JSON.stringify({
 			ok: false,
-			error: preconditionViolationError([
-				{
-					code: "merge-source",
-					expected: "--pr <n> or (--merge-sha + --base-ref)",
-					actual: "neither provided",
-				},
-			]),
+			error: new PreconditionViolationError("Precondition violated", ["merge-source"]),
 		});
 	}
 
@@ -124,16 +112,10 @@ export const sliceRecordMergeCmd = async (
 			const r = await ghPrView(flags.pr as number);
 			mergeSha = r.mergeSha;
 			baseRef = r.baseRef;
-		} catch (err) {
+		} catch {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError([
-					{
-						code: "gh.pr.view",
-						expected: "successful gh pr view with mergeCommit+baseRefName",
-						actual: err instanceof Error ? err.message : String(err),
-					},
-				]),
+				error: new PreconditionViolationError("Precondition violated", ["gh.pr.view"]),
 			});
 		}
 	}

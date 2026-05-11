@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
-import { Ok } from "../../../../src/domain/result.js";
+import { Ok } from "@tff/core";
 
 const makeGitOps = (currentBranch: string, defaultBranch: string): GitOps =>
 	({

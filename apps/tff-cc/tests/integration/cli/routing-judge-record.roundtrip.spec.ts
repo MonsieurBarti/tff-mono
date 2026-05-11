@@ -119,6 +119,6 @@ describe("routing:judge-record — roundtrip", () => {
 		});
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(parsed.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 });

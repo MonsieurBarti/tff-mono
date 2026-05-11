@@ -92,6 +92,6 @@ describe("milestone-close completeness invariant is wired", () => {
 		// No spec review seeded — close should be rejected.
 		const result = stores.milestoneStore.closeMilestone(newMilestoneId);
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("MILESTONE_COMPLETENESS_VIOLATION");
+		if (!result.ok) expect(result.error.errorLabel).toBe("MILESTONE_COMPLETENESS_VIOLATION");
 	});
 });

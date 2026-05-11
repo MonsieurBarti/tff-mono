@@ -4,7 +4,6 @@ import { ProjectCreatedEvent } from "../../src/domain/project/project-created.ev
 import { ProjectVisionUpdatedEvent } from "../../src/domain/project/project-vision-updated.event.js";
 import { ProjectNameUpdatedEvent } from "../../src/domain/project/project-name-updated.event.js";
 import { ProjectExistsError } from "../../src/domain/project/project.error.js";
-import { ProjectRepository } from "../../src/domain/project/project.repository.js";
 
 describe("Project aggregate root", () => {
 	describe("createNew", () => {
@@ -191,17 +190,11 @@ describe("ProjectNameUpdatedEvent", () => {
 });
 
 describe("ProjectExistsError", () => {
-	it("has the correct label and status", () => {
-		const error = new ProjectExistsError("singleton");
+	it("has the correct label, status, and message", () => {
+		const error = new ProjectExistsError("Project singleton already exists", "singleton");
 		expect(error.errorLabel).toBe("PROJECT_EXISTS");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ projectId: "singleton" });
-	});
-});
-
-describe("ProjectRepository", () => {
-	it("is an abstract class extending RepositoryPort", () => {
-		expect(typeof ProjectRepository).toBe("function");
-		expect(Object.getPrototypeOf(ProjectRepository).name).toBe("RepositoryPort");
+		expect(error.message).toBe("Project singleton already exists");
 	});
 });

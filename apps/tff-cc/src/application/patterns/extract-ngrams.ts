@@ -1,5 +1,5 @@
-import type { Observation } from "../../domain/value-objects/observation.js";
-import type { Pattern } from "../../domain/value-objects/pattern.js";
+import type { Observation } from "@tff/core";
+import type { Pattern } from "../../shared/value-objects/pattern.js";
 
 export const extractNgrams = (observations: Observation[], n: number): Pattern[] => {
 	if (observations.length < n) return [];

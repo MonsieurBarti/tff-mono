@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createSliceUseCase } from "../../../../src/application/slice/create-slice.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 

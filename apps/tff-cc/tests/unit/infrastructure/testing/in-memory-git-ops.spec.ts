@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("InMemoryGitOps — S03 extensions", () => {

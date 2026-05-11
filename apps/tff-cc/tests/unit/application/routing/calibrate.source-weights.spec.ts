@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { calibrateUseCase } from "../../../../src/application/routing/calibrate.js";
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../../../src/domain/ports/outcome-writer.port.js";
-import type { RoutingDecision } from "../../../../src/domain/value-objects/routing-decision.js";
-import type { RoutingOutcome } from "../../../../src/domain/value-objects/routing-outcome.js";
+import type { RoutingDecision } from "../../src/shared/value-objects/routing-decision.js";
+import { RoutingOutcome } from "@tff/core";
 
 const D1 = "00000000-0000-4000-8000-000000000001";
 
@@ -16,16 +16,18 @@ const decision: RoutingDecision = {
 	enriched: false,
 };
 
-const outcomes: RoutingOutcome[] = Array.from({ length: 5 }, (_, i) => ({
-	outcome_id: `00000000-0000-4000-8000-00000000010${i}`,
-	decision_id: D1,
-	dimension: "tier",
-	verdict: "too-low",
-	source: "model-judge",
-	slice_id: "M01-S01",
-	workflow_id: "tff:ship",
-	emitted_at: "2026-04-20T10:00:00.000Z",
-}));
+const outcomes: RoutingOutcome[] = Array.from({ length: 5 }, (_, i) =>
+	RoutingOutcome.create({
+		outcomeId: `00000000-0000-4000-8000-00000000010${i}`,
+		decisionId: D1,
+		dimension: "tier",
+		verdict: "too-low",
+		source: "model-judge",
+		sliceId: "M01-S01",
+		workflowId: "tff:ship",
+		emittedAt: "2026-04-20T10:00:00.000Z",
+	}),
+);
 
 const emptySource: OutcomeSource = { async *readOutcomes() {} };
 const outcomesSource: OutcomeSource = {
@@ -55,26 +57,26 @@ describe("calibrateUseCase — source_weights", () => {
 	});
 
 	it("merges partial source_weights over defaults instead of zeroing untouched sources", async () => {
-		const manualOutcome: RoutingOutcome = {
-			outcome_id: "00000000-0000-4000-8000-0000000000b1",
-			decision_id: D1,
+		const manualOutcome = RoutingOutcome.create({
+			outcomeId: "00000000-0000-4000-8000-0000000000b1",
+			decisionId: D1,
 			dimension: "tier",
 			verdict: "ok",
 			source: "manual",
-			slice_id: "M01-S01",
-			workflow_id: "tff:ship",
-			emitted_at: "2026-04-20T10:00:00.000Z",
-		};
-		const modelJudgeOutcome: RoutingOutcome = {
-			outcome_id: "00000000-0000-4000-8000-0000000000b2",
-			decision_id: D1,
+			sliceId: "M01-S01",
+			workflowId: "tff:ship",
+			emittedAt: "2026-04-20T10:00:00.000Z",
+		});
+		const modelJudgeOutcome = RoutingOutcome.create({
+			outcomeId: "00000000-0000-4000-8000-0000000000b2",
+			decisionId: D1,
 			dimension: "tier",
 			verdict: "too-low",
 			source: "model-judge",
-			slice_id: "M01-S01",
-			workflow_id: "tff:ship",
-			emitted_at: "2026-04-20T10:00:00.000Z",
-		};
+			sliceId: "M01-S01",
+			workflowId: "tff:ship",
+			emittedAt: "2026-04-20T10:00:00.000Z",
+		});
 		const mixedSource: OutcomeSource = {
 			async *readOutcomes() {
 				yield manualOutcome;

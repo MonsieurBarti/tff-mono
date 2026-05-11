@@ -69,6 +69,6 @@ describe("fresh-reviewer invariant is wired on recordReview", () => {
 			createdAt: new Date().toISOString(),
 		});
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("FRESH_REVIEWER_VIOLATION");
+		if (!result.ok) expect(result.error.errorLabel).toBe("FRESH_REVIEWER_VIOLATION");
 	});
 });

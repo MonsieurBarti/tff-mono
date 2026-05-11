@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { initProject } from "../../../../src/application/project/init-project.js";
-import { isErr, isOk } from "../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
@@ -113,7 +113,7 @@ describe("initProject", () => {
 			{ projectStore: adapter, artifactStore },
 		);
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("PROJECT_EXISTS");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("PROJECT_EXISTS");
 	});
 
 	it("should reject if PROJECT.md already exists", async () => {
@@ -123,6 +123,6 @@ describe("initProject", () => {
 			{ projectStore: adapter, artifactStore },
 		);
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("PROJECT_EXISTS");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("PROJECT_EXISTS");
 	});
 });

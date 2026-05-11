@@ -1,4 +1,4 @@
-import { type SliceStatus, validTransitionsFrom } from "../../domain/value-objects/slice-status.js";
+import { type SliceStatus, SLICE_TRANSITIONS } from "@tff/core";
 
 /**
  * Workflow operation names as they appear in /tff: commands
@@ -63,7 +63,7 @@ const OPERATION_PREREQUISITES: Record<WorkflowOperation, OperationPrerequisite> 
 	},
 	complete: {
 		operation: "complete",
-		requiredStatus: "completing",
+		requiredStatus: "shipping",
 		description: "Complete and close the slice",
 	},
 };
@@ -106,17 +106,18 @@ export function generateRecoveryHint(
 	}
 
 	// Get valid transitions from current status
-	const validNextStatuses = validTransitionsFrom(currentStatus);
+	const validNextStatuses = SLICE_TRANSITIONS[currentStatus];
 
 	// Map status to the command that reaches it
 	const statusToCommand: Record<SliceStatus, string> = {
+		created: "",
 		discussing: "/tff:discuss",
 		researching: "/tff:research",
 		planning: "/tff:plan",
 		executing: "/tff:execute",
 		verifying: "/tff:verify",
 		reviewing: "/tff:verify", // ship transitions from reviewing, but you get there via verify
-		completing: "/tff:complete",
+		shipping: "/tff:ship",
 		closed: "/tff:complete",
 	};
 

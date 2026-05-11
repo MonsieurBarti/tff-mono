@@ -1,4 +1,4 @@
-import type { SliceStatus } from "../../domain/value-objects/slice-status.js";
+import type { SliceStatus } from "@tff/core";
 import {
 	generateRecoveryHint,
 	getPrerequisite,

@@ -1,12 +1,11 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
+import { Ok, isOk, type BaseDomainError, type Result } from "@tff/core";
 import type {
 	RoutingConfig,
 	RoutingConfigReader,
 } from "../../domain/ports/routing-config-reader.port.js";
 import type { RoutingDecisionLogger } from "../../domain/ports/routing-decision-logger.port.js";
 import type { ExtractInput, SignalExtractor } from "../../domain/ports/signal-extractor.port.js";
-import { isOk, Ok, type Result } from "../../domain/result.js";
-import type { Signals } from "../../domain/value-objects/signals.js";
+import type { Signals } from "../../shared/value-objects/signals.js";
 
 interface ExtractSignalsInput {
 	workflow_id: string;
@@ -27,7 +26,7 @@ export interface ExtractSignalsOutcome {
 export const extractSignalsUseCase = async (
 	input: ExtractSignalsInput,
 	deps: ExtractSignalsDeps,
-): Promise<Result<ExtractSignalsOutcome, DomainError>> => {
+): Promise<Result<ExtractSignalsOutcome, BaseDomainError<unknown>>> => {
 	const started = Date.now();
 
 	const configRes = await deps.configReader.readConfig();

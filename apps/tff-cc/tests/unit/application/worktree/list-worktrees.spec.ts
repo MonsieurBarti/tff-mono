@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { listWorktreesUseCase } from "../../../../src/application/worktree/list-worktrees.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("listWorktreesUseCase", () => {

@@ -48,7 +48,7 @@ export const buildMilestoneScorecard = async (input: {
 	let okCount = 0;
 
 	for await (const outcome of input.outcomeSource.readOutcomes({ source: "model-judge" })) {
-		if (!sliceSet.has(outcome.slice_id)) continue;
+		if (!sliceSet.has(outcome.sliceId)) continue;
 		total++;
 		if (outcome.verdict === "ok") okCount++;
 		if (outcome.dimension === "agent") {

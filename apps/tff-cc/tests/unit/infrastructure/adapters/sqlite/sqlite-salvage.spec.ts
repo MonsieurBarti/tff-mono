@@ -3,7 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { isErr, isOk } from "../../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { SQLiteSalvage } from "../../../../../src/infrastructure/adapters/sqlite/sqlite-salvage.js";
 
 describe("SQLiteSalvage", () => {

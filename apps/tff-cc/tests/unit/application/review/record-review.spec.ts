@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { recordReviewUseCase } from "../../../../src/application/review/record-review.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
 describe("recordReviewUseCase", () => {

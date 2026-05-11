@@ -1,11 +1,16 @@
 import { randomUUID } from "node:crypto";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { resolveEffectiveTier, signalsToPolicyTier } from "../../domain/helpers/tier-resolver.js";
 import type { RoutingDecisionLogger } from "../../domain/ports/routing-decision-logger.port.js";
 import type { TierConfigReader } from "../../domain/ports/tier-config-reader.port.js";
-import { isOk, Ok, type Result } from "../../domain/result.js";
-import type { Signals } from "../../domain/value-objects/signals.js";
-import type { TierDecision } from "../../domain/value-objects/tier-decision.js";
+import type { Signals } from "../../shared/value-objects/signals.js";
+import type { TierDecision } from "../../shared/value-objects/tier-decision.js";
+import {
+	Ok,
+	isOk,
+	resolveEffectiveTier,
+	signalsToPolicyTier,
+	type BaseDomainError,
+	type Result,
+} from "@tff/core";
 
 interface SelectTierInput {
 	workflow_id: string;
@@ -22,7 +27,7 @@ interface SelectTierDeps {
 export const selectTierUseCase = async (
 	input: SelectTierInput,
 	deps: SelectTierDeps,
-): Promise<Result<TierDecision, DomainError>> => {
+): Promise<Result<TierDecision, BaseDomainError<unknown>>> => {
 	const policyRes = await deps.tierConfigReader.readTierPolicy();
 	if (!isOk(policyRes)) return policyRes;
 

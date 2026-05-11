@@ -1,8 +1,9 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { freshReviewerViolationError } from "../../domain/errors/fresh-reviewer-violation.error.js";
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, isOk, type Result, type TaskStore } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 interface EnforceFreshReviewerInput {
 	sliceId: string;
@@ -20,6 +21,12 @@ export const enforceFreshReviewer = async (
 	const executorsResult = deps.taskStore.getExecutorsForSlice(input.sliceId);
 	if (!isOk(executorsResult)) return executorsResult;
 	if (executorsResult.data.includes(input.reviewerAgent))
-		return Err(freshReviewerViolationError(input.sliceId, input.reviewerAgent));
+		return Err(
+			new GenericDomainError(
+				"FRESH_REVIEWER_VIOLATION",
+				`Reviewer "${input.reviewerAgent}" is not fresh for slice "${input.sliceId}".`,
+				{ sliceId: input.sliceId, reviewerAgent: input.reviewerAgent },
+			),
+		);
 	return Ok(undefined);
 };

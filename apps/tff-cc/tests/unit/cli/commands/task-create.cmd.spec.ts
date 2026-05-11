@@ -144,7 +144,7 @@ describe("task:create — persists tasks + regenerates STATE.md", () => {
 			await taskCreateCmd(["--slice-id", "M99-S99", "--number", "1", "--title", "Orphan"]),
 		);
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("NOT_FOUND");
+		expect(result.error.errorLabel).toBe("NOT_FOUND");
 	});
 
 	it("fails fast with MISSING_REQUIRED_FLAG when title is omitted", async () => {
