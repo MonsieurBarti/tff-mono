@@ -1,10 +1,14 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { partialSuccessWarning } from "../../domain/errors/partial-success.warning.js";
-import { isOk } from "../../domain/result.js";
-import type { TaskCompletedEntry } from "../../domain/value-objects/journal-entry.js";
+import { type BaseDomainError, isOk } from "@tff/core";
+import type { TaskCompletedEntry } from "../../shared/value-objects/journal-entry.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+
+const partialSuccessWarning = (message: string, effect: string) => ({
+	code: "PARTIAL_SUCCESS",
+	message,
+	recoveryHint: `Retry effect: ${effect}`,
+});
 
 export const taskCloseSchema: CommandSchema = {
 	name: "task:close",
@@ -53,7 +57,7 @@ export const taskCloseCmd = async (args: string[]): Promise<string> => {
 			error: { code: "TASK_NOT_FOUND", message: `Task ${taskId} not found` },
 		});
 
-	const task = taskResult.data;
+	const task = taskResult.data as { wave: number | null; sliceId: string };
 	const waveIndex = task.wave ?? 0;
 
 	// Calculate duration (for now use estimate of 0 since we don't track actual duration yet)
@@ -71,7 +75,7 @@ export const taskCloseCmd = async (args: string[]): Promise<string> => {
 
 	// Run the DB UPDATE inside a transaction. Business errors surface via a
 	// sentinel rather than a throw so public error codes are preserved.
-	let businessError: DomainError | null = null;
+	let businessError: BaseDomainError<unknown> | null = null;
 	const txResult = await withTransaction(db, () => {
 		const r = taskStore.closeTask(taskId, reason);
 		if (!r.ok) {
@@ -90,7 +94,7 @@ export const taskCloseCmd = async (args: string[]): Promise<string> => {
 	// DB close is durable. Append the journal entry AFTER commit.
 	// Journal-append failure is a PartialSuccessWarning: the close succeeded
 	// but the audit trail is incomplete (retryable).
-	const warnings: DomainError[] = [...txResult.warnings];
+	const warnings = [...txResult.warnings];
 	const journalResult = journalRepository.append(task.sliceId, journalEntry);
 	if (!isOk(journalResult)) {
 		warnings.push(

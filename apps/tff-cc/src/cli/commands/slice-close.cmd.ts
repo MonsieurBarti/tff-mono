@@ -1,7 +1,5 @@
 import { archiveSliceFs } from "../../application/archive/archive-fs.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import { checkTasksClosed } from "../../domain/state-machine/preconditions.js";
+import { type BaseDomainError, isOk, PreconditionViolationError } from "@tff/core";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
@@ -58,11 +56,22 @@ export const sliceCloseCmd = async (args: string[]): Promise<string> => {
 		// Precondition: all tasks under the slice must be closed before closing
 		// the slice. This makes the invariant explicit (vs. relying on whatever
 		// transition rules may or may not enforce it).
-		const precheck = checkTasksClosed(taskStore, sliceId);
-		if (!precheck.ok) {
+		const tasksResult = taskStore.listTasks(sliceId);
+		if (!isOk(tasksResult)) {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError(precheck.violations),
+				error: new PreconditionViolationError("Failed to look up tasks for slice", ["task_lookup"]),
+			});
+		}
+		const openTasks = (tasksResult.data as Array<{ status: string }>).filter(
+			(t) => t.status !== "closed",
+		);
+		if (openTasks.length > 0) {
+			return JSON.stringify({
+				ok: false,
+				error: new PreconditionViolationError(`${openTasks.length} task(s) not closed`, [
+					"all_tasks_closed",
+				]),
 			});
 		}
 
@@ -75,7 +84,7 @@ export const sliceCloseCmd = async (args: string[]): Promise<string> => {
 		const currentSlice = currentSliceResult.data;
 
 		// Transition to closed via the normal transition path.
-		let businessError: DomainError | null = null;
+		let businessError: BaseDomainError<unknown> | null = null;
 		const txResult = await withTransaction(db, () => {
 			const r = sliceStore.transitionSlice(sliceId, "closed");
 			if (!r.ok) businessError = r.error;

@@ -3,18 +3,20 @@ import { join } from "node:path";
 import { archiveMilestoneFs } from "../../application/archive/archive-fs.js";
 import { resolveMilestoneId } from "../../application/milestone/resolve-milestone-id.js";
 import { buildMilestoneScorecard } from "../../application/routing/build-milestone-scorecard.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import { sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { isOk } from "../../domain/result.js";
-import { checkMilestoneActive } from "../../domain/state-machine/preconditions.js";
+import {
+	type BaseDomainError,
+	isOk,
+	milestoneDir,
+	milestoneLabel,
+	PreconditionViolationError,
+	sliceLabelFor,
+} from "@tff/core";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";
 import { JsonlRoutingOutcomeReader } from "../../infrastructure/adapters/jsonl/routing-outcome-jsonl-reader.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { resolvePluginRoot } from "../../infrastructure/plugin-root.js";
-import { milestoneDir } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveRoutingPaths } from "../utils/routing-paths.js";
 
@@ -65,11 +67,23 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 		}
 
 		// Precondition: milestone must not already be closed.
-		const precheck = checkMilestoneActive(milestoneStore, resolved.data);
-		if (!precheck.ok) {
+		const milestoneResult = milestoneStore.getMilestone(resolved.data);
+		if (!isOk(milestoneResult)) {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError(precheck.violations),
+				error: new PreconditionViolationError("Failed to look up milestone", ["milestone_lookup"]),
+			});
+		}
+		if (!milestoneResult.data) {
+			return JSON.stringify({
+				ok: false,
+				error: new PreconditionViolationError("Milestone not found", ["milestone_exists"]),
+			});
+		}
+		if ((milestoneResult.data as { status: string }).status === "closed") {
+			return JSON.stringify({
+				ok: false,
+				error: new PreconditionViolationError("Milestone is already closed", ["milestone_active"]),
 			});
 		}
 
@@ -78,18 +92,25 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 		// decisions are graded post-merge per slice, and an unjudged slice means
 		// the merge-to-main aggregate would be incomplete. Drain via /tff:judge
 		// or judge:pending:clear before closing.
-		const pendingRes = pendingJudgmentStore.listPendingForMilestone(resolved.data);
+		const pendingRes = pendingJudgmentStore.listPendingForMilestone(resolved.data as string);
 		if (!pendingRes.ok) return JSON.stringify({ ok: false, error: pendingRes.error });
 		if (pendingRes.data.length > 0) {
 			const labels = pendingRes.data.map((p) => {
 				const s = sliceStore.getSlice(p.sliceId);
 				if (!s.ok || !s.data) return p.sliceId;
-				const milestone = s.data.milestoneId
-					? milestoneStore.getMilestone(s.data.milestoneId)
+				const sliceData = s.data as {
+					kind: "milestone" | "quick" | "debug";
+					number: number;
+					milestoneId: string | null;
+				};
+				const milestone = sliceData.milestoneId
+					? milestoneStore.getMilestone(sliceData.milestoneId)
 					: null;
-				const milestoneData = milestone?.ok ? (milestone.data ?? undefined) : undefined;
+				const milestoneData = milestone?.ok
+					? ((milestone.data as { number: number } | null) ?? undefined)
+					: undefined;
 				try {
-					return sliceLabelFor(s.data, milestoneData ?? undefined);
+					return sliceLabelFor(sliceData, milestoneData ?? undefined);
 				} catch {
 					return p.sliceId;
 				}
@@ -104,7 +125,7 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 			});
 		}
 
-		let businessError: DomainError | null = null;
+		let businessError: BaseDomainError<unknown> | null = null;
 		const txResult = await withTransaction(db, () => {
 			const r = milestoneStore.closeMilestone(resolved.data, reason);
 			if (!r.ok) businessError = r.error;
@@ -120,10 +141,12 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 		try {
 			const milestone = milestoneStore.getMilestone(resolved.data);
 			if (milestone.ok && milestone.data) {
-				const milestoneLabel = `M${String(milestone.data.number).padStart(2, "0")}`;
+				const msLabel = milestoneLabel((milestone.data as { number: number }).number);
 				const slices = sliceStore.listSlices(resolved.data);
 				const sliceLabels = slices.ok
-					? slices.data.map((s) => `${milestoneLabel}-S${String(s.number).padStart(2, "0")}`)
+					? (slices.data as Array<{ number: number }>).map(
+							(s) => `${msLabel}-S${String(s.number).padStart(2, "0")}`,
+						)
 					: [];
 
 				const configReader = new YamlRoutingConfigReader({
@@ -135,13 +158,13 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 					const { outcomesPath } = resolveRoutingPaths(projectRoot, configRes.data.logging.path);
 					const outcomeSource = new JsonlRoutingOutcomeReader(outcomesPath);
 					const scorecard = await buildMilestoneScorecard({
-						milestoneId: resolved.data,
-						milestoneLabel,
+						milestoneId: resolved.data as string,
+						milestoneLabel: msLabel,
 						sliceLabels,
 						outcomeSource,
 						now: () => new Date().toISOString(),
 					});
-					const targetDir = join(projectRoot, milestoneDir(milestoneLabel));
+					const targetDir = join(projectRoot, milestoneDir(msLabel));
 					mkdirSync(targetDir, { recursive: true });
 					const targetPath = join(targetDir, "routing-scorecard.json");
 					writeFileSync(targetPath, `${JSON.stringify(scorecard, null, 2)}\n`, "utf8");
@@ -164,7 +187,7 @@ export const milestoneCloseCmd = async (args: string[]): Promise<string> => {
 		if (archiveDbResult.ok) {
 			const milestoneRow = milestoneStore.getMilestone(resolved.data);
 			if (milestoneRow.ok && milestoneRow.data) {
-				const msLabel = `M${String(milestoneRow.data.number).padStart(2, "0")}`;
+				const msLabel = milestoneLabel((milestoneRow.data as { number: number }).number);
 				archivedSrcRel = milestoneDir(msLabel);
 				archivedDstRel = `.tff/archive/milestones/${msLabel}`;
 				const fsResult = archiveMilestoneFs(milestoneRow.data, projectRoot);

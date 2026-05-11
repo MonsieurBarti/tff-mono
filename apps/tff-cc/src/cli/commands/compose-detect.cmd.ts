@@ -1,9 +1,6 @@
-import type { z } from "zod";
 import { type Cluster, detectClusters } from "../../application/compose/detect-clusters.js";
-import type { ObservationSchema } from "../../domain/value-objects/observation.js";
+import type { Observation } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
-
-type Observation = z.infer<typeof ObservationSchema>;
 
 export const composeDetectSchema: CommandSchema = {
 	name: "compose:detect",
