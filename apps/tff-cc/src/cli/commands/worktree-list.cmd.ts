@@ -1,5 +1,5 @@
 import { listWorktreesUseCase } from "../../application/worktree/list-worktrees.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import type { CommandSchema } from "../utils/flag-parser.js";
 

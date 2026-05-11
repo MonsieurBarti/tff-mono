@@ -1,7 +1,4 @@
-import type { Milestone } from "../../domain/entities/milestone.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { Result } from "../../domain/result.js";
+import type { DomainError, Milestone, MilestoneStore, Result } from "@tff/core";
 
 interface ListMilestonesDeps {
 	milestoneStore: MilestoneStore;

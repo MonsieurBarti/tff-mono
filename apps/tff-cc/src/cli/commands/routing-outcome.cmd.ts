@@ -1,10 +1,9 @@
+import { isOk, sanitizeReason } from "@tff/core";
 import { randomUUID } from "node:crypto";
 import {
 	type KnownDecision,
 	recordOutcomeUseCase,
 } from "../../application/routing/record-outcome.js";
-import { sanitizeReason } from "../../domain/helpers/sanitize-reason.js";
-import { isOk } from "../../domain/result.js";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";
 import { JsonlRoutingDecisionReader } from "../../infrastructure/adapters/jsonl/jsonl-routing-decision-reader.js";
 import { JsonlRoutingOutcomeWriter } from "../../infrastructure/adapters/jsonl/routing-outcome-jsonl-writer.js";

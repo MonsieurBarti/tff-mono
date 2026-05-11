@@ -1,4 +1,5 @@
-import type { DomainError, Result } from "@tff/core";
+import type { Result } from "@tff/core";
+import type { DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import type { RoutingDecision } from "../../shared/value-objects/routing-decision.js";
 import type { Signals } from "../../shared/value-objects/signals.js";
 import type { TierDecision } from "../../shared/value-objects/tier-decision.js";

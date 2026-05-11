@@ -1,10 +1,8 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { partialSuccessWarning } from "../../domain/errors/partial-success.warning.js";
-import { isOk } from "../../domain/result.js";
-import type { TaskStartedEntry } from "../../domain/value-objects/journal-entry.js";
+import type { TaskStartedEntry } from "../../shared/value-objects/journal-entry.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { isOk, partialSuccessWarning, type DomainError } from "@tff/core";
 
 export const taskClaimSchema: CommandSchema = {
 	name: "task:claim",

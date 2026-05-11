@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { renderStateMd } from "../../application/sync/generate-state.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";

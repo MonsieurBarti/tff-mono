@@ -1,9 +1,8 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
+import type { DomainError, Result } from "@tff/core";
 import type {
 	AuditVerdict,
 	MilestoneAuditStore,
 } from "../../domain/ports/milestone-audit-store.port.js";
-import type { Result } from "../../domain/result.js";
 
 export interface RecordAuditInput {
 	milestoneId: string;

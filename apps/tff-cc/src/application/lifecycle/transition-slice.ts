@@ -1,11 +1,15 @@
-import type { Slice } from "../../domain/entities/slice.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import type { DomainEvent } from "../../domain/events/domain-event.js";
 import type { EventBus } from "../../domain/ports/event-bus.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import { Err, isOk, type Result } from "../../domain/result.js";
-import type { SliceStatus } from "../../domain/value-objects/slice-status.js";
+import type { SliceStatus } from "../../shared/value-objects/slice-status.js";
+import {
+	Err,
+	createDomainError,
+	isOk,
+	type DomainError,
+	type DomainEvent,
+	type Result,
+	type Slice,
+	type SliceStore,
+} from "@tff/core";
 
 interface TransitionInput {
 	sliceId: string;

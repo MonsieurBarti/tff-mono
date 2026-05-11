@@ -1,9 +1,6 @@
 import { join } from "node:path";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
 import type { ExtractInput } from "../../domain/ports/signal-extractor.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import { isOk } from "../../domain/result.js";
-import { sliceDir } from "@tff/core";
+import { isOk, sliceDir, type MilestoneStore, type SliceStore } from "@tff/core";
 
 const SLICE_LABEL_RE = /^M(\d+)-S(\d+)$/;
 

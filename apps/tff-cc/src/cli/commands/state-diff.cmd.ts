@@ -1,10 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderStateMd } from "../../application/sync/generate-state.js";
-import { isOk } from "../../domain/result.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
-import { STATE_FILE } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { STATE_FILE, isOk } from "@tff/core";
 
 export const stateDiffSchema: CommandSchema = {
 	name: "state:diff",

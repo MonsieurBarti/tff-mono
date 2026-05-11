@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { calibrateUseCase } from "../../application/routing/calibrate.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";
 import { DebugJoinOutcomeSource } from "../../infrastructure/adapters/jsonl/debug-join-outcome-source.js";
 import { JsonlRoutingDecisionReader } from "../../infrastructure/adapters/jsonl/jsonl-routing-decision-reader.js";

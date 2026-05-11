@@ -1,5 +1,4 @@
-import { groupOutcomes } from "../../domain/helpers/calibration-group.js";
-import { runAllRules } from "../../domain/helpers/calibration-rules.js";
+import { groupOutcomes, runAllRules, type RoutingDecision, type RoutingOutcome } from "@tff/core";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
 import type {
@@ -7,9 +6,7 @@ import type {
 	CalibrationRecommendation,
 	CalibrationReport,
 	SkippedCell,
-} from "../../domain/value-objects/calibration-report.js";
-import type { RoutingDecision } from "../../domain/value-objects/routing-decision.js";
-import type { RoutingOutcome } from "../../domain/value-objects/routing-outcome.js";
+} from "../../shared/value-objects/calibration-report.js";
 import { computeImplicitOutcomesUseCase } from "./compute-outcomes.js";
 
 export interface CalibrateConfig {

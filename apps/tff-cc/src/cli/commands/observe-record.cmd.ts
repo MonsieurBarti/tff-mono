@@ -1,8 +1,7 @@
-import { isOk } from "../../domain/result.js";
-import { ObservationSchema } from "../../domain/value-objects/observation.js";
+import { ObservationSchema } from "../../shared/value-objects/observation.js";
 import { JsonlStoreAdapter } from "../../infrastructure/adapters/jsonl/jsonl-store.adapter.js";
-import { OBSERVATIONS_DIR } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { OBSERVATIONS_DIR, isOk } from "@tff/core";
 
 export const observeRecordSchema: CommandSchema = {
 	name: "observe:record",

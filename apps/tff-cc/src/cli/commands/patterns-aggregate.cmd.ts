@@ -1,8 +1,7 @@
 import { aggregatePatterns } from "../../application/patterns/aggregate-patterns.js";
-import { isOk } from "../../domain/result.js";
 import { JsonlStoreAdapter } from "../../infrastructure/adapters/jsonl/jsonl-store.adapter.js";
-import { OBSERVATIONS_DIR } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { OBSERVATIONS_DIR, isOk } from "@tff/core";
 
 export const patternsAggregateSchema: CommandSchema = {
 	name: "patterns:aggregate",

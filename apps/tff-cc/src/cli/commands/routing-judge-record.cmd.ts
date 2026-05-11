@@ -1,9 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { recordJudgedOutcomesUseCase } from "../../application/routing/record-judged-outcomes.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import { sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { isOk } from "../../domain/result.js";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";
 import { JsonlRoutingDecisionReader } from "../../infrastructure/adapters/jsonl/jsonl-routing-decision-reader.js";
 import { JsonlRoutingOutcomeReader } from "../../infrastructure/adapters/jsonl/routing-outcome-jsonl-reader.js";
@@ -13,6 +10,7 @@ import { resolvePluginRoot } from "../../infrastructure/plugin-root.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
 import { resolveRoutingPaths } from "../utils/routing-paths.js";
+import { isOk, preconditionViolationError, sliceLabelFor } from "@tff/core";
 
 export const routingJudgeRecordSchema: CommandSchema = {
 	name: "routing:judge-record",

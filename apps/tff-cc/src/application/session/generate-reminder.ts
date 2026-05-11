@@ -1,8 +1,7 @@
-import type { Task } from "../../domain/entities/task.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
 import { detectWavesFromStores } from "../waves/detect-waves.js";
+import type { Task, TaskStore } from "@tff/core";
 
 export interface GenerateReminderDeps {
 	sessionStore: SessionStore;

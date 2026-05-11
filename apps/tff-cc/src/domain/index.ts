@@ -1,9 +1,6 @@
 // Re-export core domain types
 export * from "@tff/core";
 
-// Re-export app-specific value objects from shared
-export * from "../shared/value-objects/index.js";
-
 // Re-export local app-specific ports
 export type { ArtifactStore } from "./ports/artifact-store.port.js";
 export type { DatabaseInit } from "./ports/database-init.port.js";

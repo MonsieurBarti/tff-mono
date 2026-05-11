@@ -1,14 +1,9 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { prepareJudgeEvidenceUseCase } from "../../application/routing/prepare-judge-evidence.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import { sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { detectDefaultBranch } from "../../domain/helpers/default-branch.js";
-import { resolveBaseBranch } from "../../domain/helpers/slice-resolvers.js";
 import type { DiffReader } from "../../domain/ports/diff-reader.port.js";
 import type { SliceMergeLookup } from "../../domain/ports/slice-merge-lookup.port.js";
 import type { SliceSpecReader } from "../../domain/ports/slice-spec-reader.port.js";
-import { isOk } from "../../domain/result.js";
 import { SliceSpecFsReader } from "../../infrastructure/adapters/filesystem/slice-spec-fs-reader.js";
 import { YamlRoutingConfigReader } from "../../infrastructure/adapters/filesystem/yaml-routing-config-reader.js";
 import { GitDiffReader } from "../../infrastructure/adapters/git/git-diff-reader.js";
@@ -20,6 +15,13 @@ import { resolvePluginRoot } from "../../infrastructure/plugin-root.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
 import { resolveRoutingPaths } from "../utils/routing-paths.js";
+import {
+	detectDefaultBranch,
+	isOk,
+	preconditionViolationError,
+	resolveBaseBranch,
+	sliceLabelFor,
+} from "@tff/core";
 
 const execFileP = promisify(execFile);
 

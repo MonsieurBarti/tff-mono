@@ -1,13 +1,18 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
 import type { DiffReader } from "../../domain/ports/diff-reader.port.js";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { SliceMergeLookup } from "../../domain/ports/slice-merge-lookup.port.js";
 import type { SliceSpecReader } from "../../domain/ports/slice-spec-reader.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import type { JudgeEvidence } from "../../domain/value-objects/judge-evidence.js";
-import type { Signals } from "../../domain/value-objects/signals.js";
-import type { ModelTier } from "../../domain/value-objects/tier-decision.js";
+import type { JudgeEvidence } from "../../shared/value-objects/judge-evidence.js";
+import type { Signals } from "../../shared/value-objects/signals.js";
+import type { ModelTier } from "../../shared/value-objects/tier-decision.js";
+import {
+	Err,
+	Ok,
+	isOk,
+	preconditionViolationError,
+	type DomainError,
+	type Result,
+} from "@tff/core";
 
 export interface PrepareJudgeEvidenceInput {
 	slice_id: string;

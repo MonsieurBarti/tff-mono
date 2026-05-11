@@ -1,9 +1,8 @@
 import { recordAuditUseCase } from "../../application/milestone/record-audit.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import { isOk } from "../../domain/result.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveMilestoneId } from "../utils/resolve-id.js";
+import { createDomainError, isOk } from "@tff/core";
 
 const NOTES_MAX_LENGTH = 1000;
 // Zero-width and BOM characters that are invisible/dangerous.

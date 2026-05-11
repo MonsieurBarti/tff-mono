@@ -1,4 +1,5 @@
-import type { DomainError, Result } from "@tff/core";
+import type { Result } from "@tff/core";
+import type { DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 /**
  * Database initialization port. Narrow by design: only `init()`.

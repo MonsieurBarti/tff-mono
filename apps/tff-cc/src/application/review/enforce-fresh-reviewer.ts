@@ -1,8 +1,13 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { freshReviewerViolationError } from "../../domain/errors/fresh-reviewer-violation.error.js";
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
+import {
+	Err,
+	Ok,
+	freshReviewerViolationError,
+	isOk,
+	type DomainError,
+	type Result,
+	type TaskStore,
+} from "@tff/core";
 
 interface EnforceFreshReviewerInput {
 	sliceId: string;

@@ -1,6 +1,5 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
 import type { MilestoneAuditStore } from "../../domain/ports/milestone-audit-store.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, createDomainError, type DomainError, type Result } from "@tff/core";
 
 export const checkAuditPassed = (
 	milestoneId: string,

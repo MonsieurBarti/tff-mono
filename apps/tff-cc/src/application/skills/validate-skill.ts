@@ -1,5 +1,4 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, createDomainError, type DomainError, type Result } from "@tff/core";
 
 export type CompressionLevel = "off" | "lite" | "standard" | "ultra" | "symbolic";
 

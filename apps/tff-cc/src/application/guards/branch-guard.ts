@@ -1,7 +1,5 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { refusedOnDefaultBranchError } from "../../domain/errors/refused-on-default-branch.error.js";
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, refusedOnDefaultBranchError, type DomainError, type Result } from "@tff/core";
 
 export const assertNotOnDefaultBranch = async (
 	git: GitOps,

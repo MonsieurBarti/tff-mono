@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { SliceKindSchema } from "../../domain/entities/slice.js";
 import { ComplexityTierSchema } from "./complexity-tier.js";
+
+const SliceKindSchema = z.enum(["milestone", "quick", "debug"]);
 export const SlicePropsSchema = z.object({
 	milestoneId: z.string().min(1).optional(),
 	kind: SliceKindSchema.optional(),

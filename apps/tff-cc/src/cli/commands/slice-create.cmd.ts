@@ -3,16 +3,13 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { resolveMilestoneId } from "../../application/milestone/resolve-milestone-id.js";
 import { renderStateMd } from "../../application/sync/generate-state.js";
-import type { SliceKind } from "../../domain/entities/slice.js";
-import { milestoneLabel, sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { isOk } from "../../domain/result.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
 import { mkdirTracked } from "../../infrastructure/persistence/track-mkdir.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
-import { sliceDirFor } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { isOk, milestoneLabel, sliceDirFor, sliceLabelFor, type SliceKind } from "@tff/core";
 
 export const sliceCreateSchema: CommandSchema = {
 	name: "slice:create",

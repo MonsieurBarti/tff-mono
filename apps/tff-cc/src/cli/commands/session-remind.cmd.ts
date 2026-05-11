@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { generateReminder } from "../../application/session/generate-reminder.js";
-import { loadProjectSettings } from "../../domain/value-objects/project-settings.js";
+import { loadProjectSettings } from "../../shared/value-objects/project-settings.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { resolveRepoRoot } from "../../infrastructure/home-directory.js";
 import { SETTINGS_FILE, TFF_DIR } from "@tff/core";

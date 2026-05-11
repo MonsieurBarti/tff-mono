@@ -1,7 +1,5 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
-import type { Result } from "../../domain/result.js";
-import { worktreeDir } from "@tff/core";
+import { worktreeDir, type DomainError, type Result } from "@tff/core";
 
 interface DeleteWorktreeInput {
 	sliceId: string;

@@ -1,5 +1,5 @@
-import type { Candidate } from "../../domain/value-objects/candidate.js";
-import type { Pattern } from "../../domain/value-objects/pattern.js";
+import type { Candidate } from "../../shared/value-objects/candidate.js";
+import type { Pattern } from "../../shared/value-objects/pattern.js";
 
 interface ScoringWeights {
 	frequency?: number;

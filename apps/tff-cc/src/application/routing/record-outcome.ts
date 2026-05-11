@@ -1,7 +1,15 @@
-import type { BaseDomainError, OutcomeDimension, OutcomeVerdict, Result } from "@tff/core";
-import { PreconditionViolationError, RoutingOutcome, Err, Ok } from "@tff/core";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
 import type { KnownDecision } from "../../domain/ports/routing-decision-reader.port.js";
+import {
+	Err,
+	Ok,
+	PreconditionViolationError,
+	RoutingOutcome,
+	type BaseDomainError,
+	type OutcomeDimension,
+	type OutcomeVerdict,
+	type Result,
+} from "@tff/core";
 
 export type { KnownDecision };
 

@@ -1,5 +1,5 @@
 import { transitionSliceOrchestrator } from "../../application/slice/transition-slice.js";
-import { SliceStatusSchema } from "../../domain/value-objects/slice-status.js";
+import { SliceStatusSchema } from "../../shared/value-objects/slice-status.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 

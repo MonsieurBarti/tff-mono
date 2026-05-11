@@ -1,5 +1,5 @@
 import { type SkillInput, validateSkill } from "../../application/skills/validate-skill.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
 export const skillsValidateSchema: CommandSchema = {

@@ -1,8 +1,12 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import {
+	Err,
+	Ok,
+	createDomainError,
+	type DomainError,
+	type MilestoneStore,
+	type Result,
+	type SliceStore,
+} from "@tff/core";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MILESTONE_LABEL_RE = /^M(\d+)$/;

@@ -1,8 +1,13 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { Wave } from "../../domain/value-objects/wave.js";
+import type { Wave } from "../../shared/value-objects/wave.js";
+import {
+	Err,
+	Ok,
+	createDomainError,
+	type DomainError,
+	type Result,
+	type TaskStore,
+} from "@tff/core";
 
 interface TaskDep {
 	id: string;

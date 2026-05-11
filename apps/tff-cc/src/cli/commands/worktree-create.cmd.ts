@@ -1,7 +1,5 @@
+import { isOk, resolveBaseBranch, resolveBranchName, type Milestone } from "@tff/core";
 import { createWorktreeUseCase } from "../../application/worktree/create-worktree.js";
-import type { Milestone } from "../../domain/entities/milestone.js";
-import { resolveBaseBranch, resolveBranchName } from "../../domain/helpers/slice-resolvers.js";
-import { isOk } from "../../domain/result.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import {

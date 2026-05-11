@@ -1,11 +1,10 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
+import { preconditionViolationError, type DomainError } from "@tff/core";
 
 const execFileP = promisify(execFile);
 

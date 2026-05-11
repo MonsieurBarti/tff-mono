@@ -1,9 +1,14 @@
 import { existsSync, mkdirSync, renameSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import type { Milestone } from "../../domain/entities/milestone.js";
-import type { Slice } from "../../domain/entities/slice.js";
-import { milestoneLabel, sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { milestoneDir, sliceDirFor, tffPath } from "@tff/core";
+import {
+	milestoneDir,
+	milestoneLabel,
+	sliceDirFor,
+	sliceLabelFor,
+	tffPath,
+	type Milestone,
+	type Slice,
+} from "@tff/core";
 
 /**
  * Repo-relative archive root: .tff/archive

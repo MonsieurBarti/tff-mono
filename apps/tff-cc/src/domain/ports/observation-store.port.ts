@@ -1,6 +1,6 @@
-import type { DomainError, Result } from "@tff/core";
+import type { Observation, Result } from "@tff/core";
+import type { DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import type { Candidate } from "../../shared/value-objects/candidate.js";
-import type { Observation } from "../../shared/value-objects/observation.js";
 import type { Pattern } from "../../shared/value-objects/pattern.js";
 
 export interface ObservationStore {

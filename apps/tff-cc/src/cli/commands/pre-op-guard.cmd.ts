@@ -1,15 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { SETTINGS_FILE, TFF_DIR, isOk } from "@tff/core";
 import { parse as parseYaml } from "yaml";
 import {
 	OperationBlockedError,
 	validateOperation,
 } from "../../application/guard/validate-operation.js";
 import { isValidOperation } from "../../application/index.js";
-import { isOk } from "../../domain/result.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { resolveRepoRoot } from "../../infrastructure/home-directory.js";
-import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { withSyncLock } from "../with-sync-lock.js";
 

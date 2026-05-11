@@ -4,7 +4,7 @@ import {
 	difficultyToProfile,
 } from "../../application/classification/difficulty-classifier.js";
 import { detectWaves } from "../../application/waves/detect-waves.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
 export const wavesDetectSchema: CommandSchema = {
