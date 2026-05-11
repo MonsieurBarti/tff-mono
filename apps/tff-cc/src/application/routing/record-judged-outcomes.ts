@@ -97,7 +97,7 @@ export const recordJudgedOutcomesUseCase = async (
 
 	const alreadyJudged = new Set<string>();
 	for await (const o of deps.outcomesSource.readOutcomes({ source: "model-judge" })) {
-		alreadyJudged.add(o.decision_id);
+		alreadyJudged.add(o.decisionId);
 	}
 	const unjudgedIds = new Set(
 		deps.decisions.filter((d) => !alreadyJudged.has(d.decision_id)).map((d) => d.decision_id),
@@ -133,17 +133,7 @@ export const recordJudgedOutcomesUseCase = async (
 				),
 			);
 		}
-		await deps.writer.append({
-			outcome_id: outcome.outcomeId,
-			decision_id: outcome.decisionId,
-			dimension: outcome.dimension,
-			verdict: outcome.verdict,
-			source: outcome.source,
-			slice_id: outcome.sliceId,
-			workflow_id: outcome.workflowId,
-			reason: outcome.reason,
-			emitted_at: outcome.emittedAt,
-		});
+		await deps.writer.append(outcome);
 		emitted += 1;
 	}
 

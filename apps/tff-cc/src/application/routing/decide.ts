@@ -6,16 +6,11 @@ import type { TierConfigReader } from "../../domain/ports/tier-config-reader.por
 import type { Signals } from "../../shared/value-objects/signals.js";
 import type { ModelTier } from "../../shared/value-objects/tier-decision.js";
 import type { WorkflowPool } from "../../shared/value-objects/workflow-pool.js";
+import type { RoutingDecision } from "../../shared/value-objects/routing-decision.js";
 import { extractSignalsUseCase } from "./extract-signals.js";
 import { selectTierUseCase } from "./select-tier.js";
-import {
-	Ok,
-	isOk,
-	scoreAgents,
-	type DomainError,
-	type Result,
-	type RoutingDecision,
-} from "@tff/core";
+import { Ok, isOk, scoreAgents, type Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 export interface DecideInput {
 	workflow_id: string;

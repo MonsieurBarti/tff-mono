@@ -24,14 +24,7 @@ const STATUS_MAP: Record<string, number> = {
 	VERSION_MISMATCH: 500,
 };
 
-export type DomainError = {
-	code: string;
-	message: string;
-	context?: Record<string, unknown>;
-	recoveryHint?: string;
-	validPredecessors?: readonly string[];
-	validNext?: readonly string[];
-};
+export type DomainError = BaseDomainError<unknown>;
 
 export class GenericDomainError extends BaseDomainError<Record<string, unknown>> {
 	readonly errorLabel: string;

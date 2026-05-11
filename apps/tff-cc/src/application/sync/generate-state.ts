@@ -5,15 +5,17 @@ import {
 	Ok,
 	QUICK_DIR,
 	STATE_FILE,
-	createDomainError,
 	isOk,
 	sliceLabelFor,
-	type DomainError,
 	type MilestoneStore,
 	type Result,
 	type SliceStore,
 	type TaskStore,
 } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 export type GenerateStateInput =
 	| { scope: "milestone"; milestoneId: string }
@@ -125,7 +127,9 @@ export const renderStateMd = (
 		const milestoneResult = deps.milestoneStore.getMilestone(normalized.milestoneId);
 		if (!isOk(milestoneResult)) return milestoneResult;
 		if (!milestoneResult.data) {
-			return Err(createDomainError("NOT_FOUND", `Milestone "${normalized.milestoneId}" not found`));
+			return Err(
+				new GenericDomainError("NOT_FOUND", `Milestone "${normalized.milestoneId}" not found`),
+			);
 		}
 		const milestone = milestoneResult.data;
 

@@ -4,11 +4,11 @@ import {
 	isOk,
 	sliceLabelFor,
 	worktreeDir,
-	type DomainError,
 	type Milestone,
 	type Result,
 	type Slice,
 } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface CreateWorktreeInput {
 	slice: Slice;

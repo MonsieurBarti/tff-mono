@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
+	Slice,
 	type BaseDomainError,
 	PreconditionViolationError,
 	SliceInvalidTransitionError,
@@ -136,19 +137,32 @@ export const transitionSliceOrchestrator = async (
 	// Render STATE.md content (reflecting the post-transition state).
 	// We patch the slice status in-memory to simulate post-commit state; the
 	// renderer is pure so this is safe.
-	const projectedSlice = { ...currentSlice, status: targetStatus };
+	const projectedSlice = Slice.reconstruct({
+		id: currentSlice.id,
+		milestoneId: currentSlice.milestoneId,
+		kind: currentSlice.kind,
+		number: currentSlice.number,
+		title: currentSlice.title,
+		status: targetStatus,
+		tier: currentSlice.tier,
+		baseBranch: currentSlice.baseBranch,
+		branchName: currentSlice.branchName,
+		createdAt: currentSlice.createdAt,
+		updatedAt: currentSlice.updatedAt,
+		archivedAt: currentSlice.archivedAt,
+	});
 	const stateContent = renderStateMd(
 		{ milestoneId },
 		{
 			milestoneStore,
 			sliceStore: {
 				...sliceStore,
-				listSlices: (mid?: string) => {
-					const base = sliceStore.listSlices(mid);
+				listSlices: (
+					milestoneIdOrOptions?: string | { milestoneId?: string; includeArchived?: boolean },
+				) => {
+					const base = sliceStore.listSlices(milestoneIdOrOptions);
 					if (!base.ok) return base;
-					const swapped = base.data.map((s: { id: string }) =>
-						s.id === projectedSlice.id ? projectedSlice : s,
-					);
+					const swapped = base.data.map((s) => (s.id === projectedSlice.id ? projectedSlice : s));
 					return { ok: true as const, data: swapped };
 				},
 			},

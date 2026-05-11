@@ -28,7 +28,7 @@ interface InitProjectOutput {
 export const initProject = async (
 	input: InitProjectInput,
 	deps: InitProjectDeps,
-): Promise<Result<InitProjectOutput, BaseDomainError>> => {
+): Promise<Result<InitProjectOutput, BaseDomainError<unknown>>> => {
 	if (await deps.artifactStore.exists(PROJECT_FILE))
 		return Err(new ProjectExistsError("Project already exists", input.name));
 

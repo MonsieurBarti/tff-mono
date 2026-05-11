@@ -12,6 +12,7 @@ import {
 	milestoneBranchName,
 	runMigrations,
 } from "@tff/core";
+import { type DomainError } from "../../errors/generic-domain-error.js";
 import type {
 	DomainEvent,
 	Milestone,
@@ -151,7 +152,7 @@ export class SQLiteStateAdapter
 	}
 
 	// DatabaseInit
-	init(): Result<void, BaseDomainError<unknown>> {
+	init(): Result<void, DomainError> {
 		try {
 			runMigrations(this.db, this.migrationsDir);
 			return Ok(undefined);
@@ -207,7 +208,7 @@ export class SQLiteStateAdapter
 	}
 
 	// ProjectStore
-	getProject(): Result<Project | null, BaseDomainError<unknown>> {
+	getProject(): Result<Project | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(
@@ -235,7 +236,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	saveProject(props: ProjectProps): Result<Project, BaseDomainError<unknown>> {
+	saveProject(props: ProjectProps): Result<Project, DomainError> {
 		try {
 			const now = new Date().toISOString();
 			this.db
@@ -258,7 +259,7 @@ export class SQLiteStateAdapter
 	}
 
 	// MilestoneStore
-	createMilestone(props: MilestoneProps): Result<Milestone, BaseDomainError<unknown>> {
+	createMilestone(props: MilestoneProps): Result<Milestone, DomainError> {
 		try {
 			const id = props.id ?? crypto.randomUUID();
 			const branch = props.branch ?? milestoneBranchName(id);
@@ -286,7 +287,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getMilestone(id: string): Result<Milestone | null, BaseDomainError<unknown>> {
+	getMilestone(id: string): Result<Milestone | null, DomainError> {
 		try {
 			const row = this.db.prepare("SELECT * FROM milestone WHERE id = ?").get(id) as
 				| MilestoneRow
@@ -298,7 +299,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getMilestoneByNumber(number: number): Result<Milestone | null, BaseDomainError<unknown>> {
+	getMilestoneByNumber(number: number): Result<Milestone | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(
@@ -312,9 +313,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listMilestones(options?: {
-		includeArchived?: boolean;
-	}): Result<Milestone[], BaseDomainError<unknown>> {
+	listMilestones(options?: { includeArchived?: boolean }): Result<Milestone[], DomainError> {
 		try {
 			const includeArchived = options?.includeArchived === true;
 			const sql = includeArchived
@@ -327,10 +326,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	updateMilestone(
-		id: string,
-		updates: MilestoneUpdateProps,
-	): Result<void, BaseDomainError<unknown>> {
+	updateMilestone(id: string, updates: MilestoneUpdateProps): Result<void, DomainError> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -352,10 +348,8 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	archiveMilestoneCascade(
-		id: string,
-	): Result<{ slicesArchived: number }, BaseDomainError<unknown>> {
-		return this.db.transaction((): Result<{ slicesArchived: number }, BaseDomainError<unknown>> => {
+	archiveMilestoneCascade(id: string): Result<{ slicesArchived: number }, DomainError> {
+		return this.db.transaction((): Result<{ slicesArchived: number }, DomainError> => {
 			try {
 				const sliceInfo = this.db
 					.prepare(
@@ -374,8 +368,8 @@ export class SQLiteStateAdapter
 		})();
 	}
 
-	closeMilestone(id: string, reason?: string): Result<void, BaseDomainError<unknown>> {
-		return this.db.transaction((): Result<void, BaseDomainError<unknown>> => {
+	closeMilestone(id: string, reason?: string): Result<void, DomainError> {
+		return this.db.transaction((): Result<void, DomainError> => {
 			try {
 				const slicesResult = this.listSlices(id);
 				if (!slicesResult.ok) return slicesResult;
@@ -422,7 +416,7 @@ export class SQLiteStateAdapter
 	}
 
 	// SliceStore
-	createSlice(props: SliceProps): Result<Slice, BaseDomainError<unknown>> {
+	createSlice(props: SliceProps): Result<Slice, DomainError> {
 		try {
 			const id = props.id ?? crypto.randomUUID();
 			const kind = props.kind ?? "milestone";
@@ -463,7 +457,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getSlice(id: string): Result<Slice | null, BaseDomainError<unknown>> {
+	getSlice(id: string): Result<Slice | null, DomainError> {
 		try {
 			const row = this.db.prepare("SELECT * FROM slice WHERE id = ?").get(id) as
 				| SliceRow
@@ -478,7 +472,7 @@ export class SQLiteStateAdapter
 	getSliceByNumbers(
 		milestoneNumber: number,
 		sliceNumber: number,
-	): Result<Slice | null, BaseDomainError<unknown>> {
+	): Result<Slice | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(
@@ -498,7 +492,7 @@ export class SQLiteStateAdapter
 
 	listSlices(
 		milestoneIdOrOptions?: string | { milestoneId?: string; includeArchived?: boolean },
-	): Result<Slice[], BaseDomainError<unknown>> {
+	): Result<Slice[], DomainError> {
 		try {
 			const opts =
 				typeof milestoneIdOrOptions === "string"
@@ -523,7 +517,7 @@ export class SQLiteStateAdapter
 	listSlicesByKind(
 		kind: Slice["kind"],
 		options?: { includeArchived?: boolean },
-	): Result<Slice[], BaseDomainError<unknown>> {
+	): Result<Slice[], DomainError> {
 		try {
 			const includeArchived = options?.includeArchived === true;
 			const sql = includeArchived
@@ -536,7 +530,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	updateSlice(id: string, updates: SliceUpdateProps): Result<void, BaseDomainError<unknown>> {
+	updateSlice(id: string, updates: SliceUpdateProps): Result<void, DomainError> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -558,11 +552,8 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	transitionSlice(
-		id: string,
-		target: SliceStatus,
-	): Result<DomainEvent<unknown>[], BaseDomainError<unknown>> {
-		return this.db.transaction((): Result<DomainEvent<unknown>[], BaseDomainError<unknown>> => {
+	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent<unknown>[], DomainError> {
+		return this.db.transaction((): Result<DomainEvent<unknown>[], DomainError> => {
 			if (target === "closed") {
 				const currentResult = this.getSlice(id);
 				if (!currentResult.ok) return currentResult;
@@ -614,7 +605,7 @@ export class SQLiteStateAdapter
 		})();
 	}
 
-	archiveSlice(id: string): Result<void, BaseDomainError<unknown>> {
+	archiveSlice(id: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare(
@@ -628,7 +619,7 @@ export class SQLiteStateAdapter
 	}
 
 	// TaskStore
-	createTask(props: TaskProps): Result<Task, BaseDomainError<unknown>> {
+	createTask(props: TaskProps): Result<Task, DomainError> {
 		try {
 			const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
 			const now = new Date().toISOString();
@@ -667,7 +658,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getTask(id: string): Result<Task | null, BaseDomainError<unknown>> {
+	getTask(id: string): Result<Task | null, DomainError> {
 		try {
 			const row = this.db.prepare("SELECT * FROM task WHERE id = ?").get(id) as TaskRow | undefined;
 			if (!row) return Ok(null);
@@ -677,7 +668,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listTasks(sliceId: string): Result<Task[], BaseDomainError<unknown>> {
+	listTasks(sliceId: string): Result<Task[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare("SELECT * FROM task WHERE slice_id = ? ORDER BY number")
@@ -688,7 +679,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	updateTask(id: string, updates: TaskUpdateProps): Result<void, BaseDomainError<unknown>> {
+	updateTask(id: string, updates: TaskUpdateProps): Result<void, DomainError> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -714,7 +705,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	claimTask(id: string, claimedBy?: string): Result<void, BaseDomainError<unknown>> {
+	claimTask(id: string, claimedBy?: string): Result<void, DomainError> {
 		try {
 			const info =
 				claimedBy !== undefined
@@ -739,7 +730,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	closeTask(id: string, reason?: string): Result<void, BaseDomainError<unknown>> {
+	closeTask(id: string, reason?: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare(
@@ -752,7 +743,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listReadyTasks(sliceId: string): Result<Task[], BaseDomainError<unknown>> {
+	listReadyTasks(sliceId: string): Result<Task[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -772,7 +763,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listStaleClaims(ttlMinutes: number): Result<Task[], BaseDomainError<unknown>> {
+	listStaleClaims(ttlMinutes: number): Result<Task[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -788,7 +779,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getExecutorsForSlice(sliceId: string): Result<string[], BaseDomainError<unknown>> {
+	getExecutorsForSlice(sliceId: string): Result<string[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -802,11 +793,7 @@ export class SQLiteStateAdapter
 	}
 
 	// DependencyStore
-	addDependency(
-		fromId: string,
-		toId: string,
-		type: "blocks",
-	): Result<void, BaseDomainError<unknown>> {
+	addDependency(fromId: string, toId: string, type: "blocks"): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare("INSERT OR REPLACE INTO dependency (from_id, to_id, type) VALUES (?, ?, ?)")
@@ -817,7 +804,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	removeDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
+	removeDependency(fromId: string, toId: string): Result<void, DomainError> {
 		try {
 			this.db.prepare("DELETE FROM dependency WHERE from_id = ? AND to_id = ?").run(fromId, toId);
 			return Ok(undefined);
@@ -826,7 +813,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getDependencies(taskId: string): Result<Dependency[], BaseDomainError<unknown>> {
+	getDependencies(taskId: string): Result<Dependency[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare("SELECT from_id, to_id, type FROM dependency WHERE from_id = ? OR to_id = ?")
@@ -838,7 +825,7 @@ export class SQLiteStateAdapter
 	}
 
 	// SliceDependencyStore
-	addSliceDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
+	addSliceDependency(fromId: string, toId: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare("INSERT OR REPLACE INTO slice_dependency (from_id, to_id) VALUES (?, ?)")
@@ -849,7 +836,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	removeSliceDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
+	removeSliceDependency(fromId: string, toId: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare("DELETE FROM slice_dependency WHERE from_id = ? AND to_id = ?")
@@ -860,7 +847,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getSliceDependencies(sliceId: string): Result<SliceDependency[], BaseDomainError<unknown>> {
+	getSliceDependencies(sliceId: string): Result<SliceDependency[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare("SELECT from_id, to_id FROM slice_dependency WHERE from_id = ? OR to_id = ?")
@@ -872,7 +859,7 @@ export class SQLiteStateAdapter
 	}
 
 	// SessionStore
-	getSession(): Result<WorkflowSession | null, BaseDomainError<unknown>> {
+	getSession(): Result<WorkflowSession | null, DomainError> {
 		try {
 			const row = this.db.prepare("SELECT * FROM workflow_session WHERE id = 1").get() as
 				| {
@@ -896,7 +883,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	saveSession(session: WorkflowSession): Result<void, BaseDomainError<unknown>> {
+	saveSession(session: WorkflowSession): Result<void, DomainError> {
 		try {
 			this.db.pragma("foreign_keys = OFF");
 			try {
@@ -925,8 +912,8 @@ export class SQLiteStateAdapter
 	}
 
 	// ReviewStore
-	recordReview(review: ReviewRecord): Result<void, BaseDomainError<unknown>> {
-		return this.db.transaction((): Result<void, BaseDomainError<unknown>> => {
+	recordReview(review: ReviewRecord): Result<void, DomainError> {
+		return this.db.transaction((): Result<void, DomainError> => {
 			const executorsResult = this.getExecutorsForSlice(review.sliceId);
 			if (!executorsResult.ok) return executorsResult;
 			if (executorsResult.data.includes(review.reviewer)) {
@@ -959,10 +946,7 @@ export class SQLiteStateAdapter
 		})();
 	}
 
-	getLatestReview(
-		sliceId: string,
-		type: ReviewType,
-	): Result<ReviewRecord | null, BaseDomainError<unknown>> {
+	getLatestReview(sliceId: string, type: ReviewType): Result<ReviewRecord | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(
@@ -986,7 +970,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listReviews(sliceId: string): Result<ReviewRecord[], BaseDomainError<unknown>> {
+	listReviews(sliceId: string): Result<ReviewRecord[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare("SELECT * FROM review WHERE slice_id = ? ORDER BY created_at")
@@ -1006,7 +990,7 @@ export class SQLiteStateAdapter
 	}
 
 	// MilestoneAuditStore
-	upsertAudit(r: MilestoneAuditRecord): Result<void, BaseDomainError<unknown>> {
+	upsertAudit(r: MilestoneAuditRecord): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare(
@@ -1025,7 +1009,7 @@ export class SQLiteStateAdapter
 	}
 
 	// PendingJudgmentStore
-	insertPending(sliceId: string): Result<void, BaseDomainError<unknown>> {
+	insertPending(sliceId: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare(
@@ -1039,7 +1023,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	clearPending(sliceId: string): Result<void, BaseDomainError<unknown>> {
+	clearPending(sliceId: string): Result<void, DomainError> {
 		try {
 			this.db.prepare("DELETE FROM pending_judgments WHERE slice_id = ?").run(sliceId);
 			return Ok(undefined);
@@ -1048,7 +1032,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listPending(): Result<PendingJudgmentRecord[], BaseDomainError<unknown>> {
+	listPending(): Result<PendingJudgmentRecord[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -1075,9 +1059,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	listPendingForMilestone(
-		milestoneId: string,
-	): Result<PendingJudgmentRecord[], BaseDomainError<unknown>> {
+	listPendingForMilestone(milestoneId: string): Result<PendingJudgmentRecord[], DomainError> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -1107,7 +1089,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getPending(sliceId: string): Result<PendingJudgmentRecord | null, BaseDomainError<unknown>> {
+	getPending(sliceId: string): Result<PendingJudgmentRecord | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(
@@ -1135,11 +1117,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	recordMerge(
-		sliceId: string,
-		mergeSha: string,
-		baseRef: string,
-	): Result<void, BaseDomainError<unknown>> {
+	recordMerge(sliceId: string, mergeSha: string, baseRef: string): Result<void, DomainError> {
 		try {
 			this.db
 				.prepare(
@@ -1155,7 +1133,7 @@ export class SQLiteStateAdapter
 		}
 	}
 
-	getAudit(milestoneId: string): Result<MilestoneAuditRecord | null, BaseDomainError<unknown>> {
+	getAudit(milestoneId: string): Result<MilestoneAuditRecord | null, DomainError> {
 		try {
 			const row = this.db
 				.prepare(

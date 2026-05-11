@@ -1,15 +1,10 @@
 import type Database from "better-sqlite3";
-import type { Milestone } from "../../../domain/entities/milestone.js";
-import type { Project } from "../../../domain/entities/project.js";
-import type { Slice } from "../../../domain/entities/slice.js";
-import type { Task } from "../../../domain/entities/task.js";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
-import { createDomainError } from "../../../domain/errors/domain-error.js";
-import type { Result } from "../../../domain/result.js";
-import { Err, Ok } from "../../../domain/result.js";
-import type { Dependency } from "../../../domain/value-objects/dependency.js";
-import type { ReviewRecord } from "../../../domain/value-objects/review-record.js";
-import type { WorkflowSession } from "../../../domain/value-objects/workflow-session.js";
+import type { Milestone, Project, Result, Slice, Task } from "@tff/core";
+import { Err, Ok } from "@tff/core";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
+import type { Dependency } from "../../../shared/value-objects/dependency.js";
+import type { ReviewRecord } from "../../../shared/value-objects/review-record.js";
+import type { WorkflowSession } from "../../../shared/value-objects/workflow-session.js";
 import { openDatabase } from "./open-database.js";
 
 /**
@@ -87,7 +82,10 @@ export class SQLiteSalvage {
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			return Err(
-				createDomainError("CORRUPTED_STATE", `Failed to open database for salvage: ${message}`),
+				new GenericDomainError(
+					"CORRUPTED_STATE",
+					`Failed to open database for salvage: ${message}`,
+				),
 			);
 		}
 
@@ -147,7 +145,7 @@ export class SQLiteSalvage {
 			return Ok({ snapshot, metadata });
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			return Err(createDomainError("CORRUPTED_STATE", `Salvage operation failed: ${message}`));
+			return Err(new GenericDomainError("CORRUPTED_STATE", `Salvage operation failed: ${message}`));
 		} finally {
 			try {
 				db.close();
@@ -207,7 +205,7 @@ export class SQLiteSalvage {
 			return {
 				id: row.id,
 				name: row.name,
-				vision: row.vision ?? undefined,
+				vision: row.vision ?? "",
 				createdAt,
 			};
 		} catch (error) {
@@ -341,14 +339,14 @@ export class SQLiteSalvage {
 
 					slices.push({
 						id: row.id,
-						milestoneId: row.milestone_id ?? undefined,
+						milestoneId: row.milestone_id ?? null,
 						kind: (row.kind as Slice["kind"]) ?? "milestone",
 						number: row.number,
 						title: row.title,
 						status: (row.status as Slice["status"]) ?? "discussing",
 						tier: (row.tier as Slice["tier"]) ?? undefined,
-						baseBranch: row.base_branch ?? undefined,
-						branchName: row.branch_name ?? undefined,
+						baseBranch: row.base_branch ?? null,
+						branchName: row.branch_name ?? null,
 						createdAt,
 					});
 				} catch (rowError) {
@@ -439,12 +437,12 @@ export class SQLiteSalvage {
 						sliceId: row.slice_id,
 						number: row.number,
 						title: row.title,
-						description: row.description ?? undefined,
+						description: row.description ?? "",
 						status: (row.status as Task["status"]) ?? "open",
-						wave: row.wave ?? undefined,
+						wave: row.wave ?? null,
 						claimedAt,
-						claimedBy: row.claimed_by ?? undefined,
-						closedReason: row.closed_reason ?? undefined,
+						claimedBy: row.claimed_by ?? null,
+						closedReason: row.closed_reason ?? null,
 						createdAt,
 					});
 				} catch (rowError) {

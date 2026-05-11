@@ -1,7 +1,7 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { OutcomeWriter } from "../../../domain/ports/outcome-writer.port.js";
-import type { RoutingOutcome } from "../../../domain/value-objects/routing-outcome.js";
+import type { RoutingOutcome } from "@tff/core";
 import { warnIfOversize } from "./warn-if-oversize.js";
 import { withAppendLock } from "./with-append-lock.js";
 

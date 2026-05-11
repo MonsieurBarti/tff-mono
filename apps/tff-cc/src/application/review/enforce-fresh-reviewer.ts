@@ -1,13 +1,9 @@
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
+import { Err, Ok, isOk, type Result, type TaskStore } from "@tff/core";
 import {
-	Err,
-	Ok,
-	freshReviewerViolationError,
-	isOk,
+	GenericDomainError,
 	type DomainError,
-	type Result,
-	type TaskStore,
-} from "@tff/core";
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 interface EnforceFreshReviewerInput {
 	sliceId: string;
@@ -25,6 +21,12 @@ export const enforceFreshReviewer = async (
 	const executorsResult = deps.taskStore.getExecutorsForSlice(input.sliceId);
 	if (!isOk(executorsResult)) return executorsResult;
 	if (executorsResult.data.includes(input.reviewerAgent))
-		return Err(freshReviewerViolationError(input.sliceId, input.reviewerAgent));
+		return Err(
+			new GenericDomainError(
+				"FRESH_REVIEWER_VIOLATION",
+				`Reviewer "${input.reviewerAgent}" is not fresh for slice "${input.sliceId}".`,
+				{ sliceId: input.sliceId, reviewerAgent: input.reviewerAgent },
+			),
+		);
 	return Ok(undefined);
 };

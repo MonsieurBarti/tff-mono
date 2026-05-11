@@ -1,4 +1,4 @@
-import { Ok, isOk, type DomainError, type Result } from "@tff/core";
+import { Ok, isOk, type BaseDomainError, type Result } from "@tff/core";
 import type {
 	RoutingConfig,
 	RoutingConfigReader,
@@ -26,7 +26,7 @@ export interface ExtractSignalsOutcome {
 export const extractSignalsUseCase = async (
 	input: ExtractSignalsInput,
 	deps: ExtractSignalsDeps,
-): Promise<Result<ExtractSignalsOutcome, DomainError>> => {
+): Promise<Result<ExtractSignalsOutcome, BaseDomainError<unknown>>> => {
 	const started = Date.now();
 
 	const configRes = await deps.configReader.readConfig();

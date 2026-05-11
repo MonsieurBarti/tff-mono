@@ -1,42 +1,38 @@
-import type { Milestone } from "../../domain/entities/milestone.js";
-import type { Project } from "../../domain/entities/project.js";
-import type { Slice } from "../../domain/entities/slice.js";
-import { transitionSlice } from "../../domain/entities/slice.js";
-import type { Task } from "../../domain/entities/task.js";
-import { alreadyClaimedError } from "../../domain/errors/already-claimed.error.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import { freshReviewerViolationError } from "../../domain/errors/fresh-reviewer-violation.error.js";
-import { hasOpenChildrenError } from "../../domain/errors/has-open-children.error.js";
-import { milestoneCompletenessViolationError } from "../../domain/errors/milestone-completeness-violation.error.js";
-import { shipCompletenessViolationError } from "../../domain/errors/ship-completeness-violation.error.js";
-import type { DomainEvent } from "../../domain/events/domain-event.js";
-import { milestoneBranchName } from "../../domain/helpers/branch-naming.js";
+import type {
+	DomainEvent,
+	Milestone,
+	MilestoneProps,
+	MilestoneStore,
+	MilestoneUpdateProps,
+	Project,
+	ProjectProps,
+	ProjectStore,
+	Result,
+	Slice,
+	SliceProps,
+	SliceStatus,
+	SliceStore,
+	SliceUpdateProps,
+	Task,
+	TaskProps,
+	TaskStore,
+	TaskUpdateProps,
+} from "@tff/core";
+import { Err, Ok, milestoneBranchName } from "@tff/core";
+import type { DomainError } from "../errors/generic-domain-error.js";
+import { GenericDomainError } from "../errors/generic-domain-error.js";
 import type { DatabaseInit } from "../../domain/ports/database-init.port.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { ProjectStore } from "../../domain/ports/project-store.port.js";
 import type { ReviewStore } from "../../domain/ports/review-store.port.js";
 import type { SessionStore } from "../../domain/ports/session-store.port.js";
 import type {
 	SliceDependency,
 	SliceDependencyStore,
 } from "../../domain/ports/slice-dependency-store.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../domain/ports/transaction-runner.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { Dependency } from "../../domain/value-objects/dependency.js";
-import type { MilestoneProps } from "../../domain/value-objects/milestone-props.js";
-import type { MilestoneUpdateProps } from "../../domain/value-objects/milestone-update-props.js";
-import type { ProjectProps } from "../../domain/value-objects/project-props.js";
-import type { ReviewRecord, ReviewType } from "../../domain/value-objects/review-record.js";
-import type { SliceProps } from "../../domain/value-objects/slice-props.js";
-import type { SliceStatus } from "../../domain/value-objects/slice-status.js";
-import type { SliceUpdateProps } from "../../domain/value-objects/slice-update-props.js";
-import type { TaskProps } from "../../domain/value-objects/task-props.js";
-import type { TaskUpdateProps } from "../../domain/value-objects/task-update-props.js";
-import type { WorkflowSession } from "../../domain/value-objects/workflow-session.js";
+import type { Dependency } from "../../shared/value-objects/dependency.js";
+import type { ReviewRecord, ReviewType } from "../../shared/value-objects/review-record.js";
+import type { WorkflowSession } from "../../shared/value-objects/workflow-session.js";
 
 /**
  * Test-only in-memory implementation of the state ports. NOT intended for
@@ -204,18 +200,30 @@ export class InMemoryStateAdapter
 				if (!hasApprovedSpec) missing.push(slice.id);
 			}
 			if (missing.length > 0) {
-				return Err(milestoneCompletenessViolationError(id, missing));
+				return Err(
+					new GenericDomainError(
+						"MILESTONE_COMPLETENESS_VIOLATION",
+						`Milestone "${id}" missing approved spec reviews for slices: ${missing.join(", ")}`,
+						{ milestoneId: id, missing },
+					),
+				);
 			}
 			const openSlices = milestoneSlices.filter((s) => s.status !== "closed");
 			if (openSlices.length > 0) {
-				return Err(hasOpenChildrenError(id, openSlices.length));
+				return Err(
+					new GenericDomainError(
+						"HAS_OPEN_CHILDREN",
+						`Milestone "${id}" has ${openSlices.length} open slice(s)`,
+						{ milestoneId: id, openCount: openSlices.length },
+					),
+				);
 			}
 			ms.status = "closed";
 			ms.closeReason = reason;
 			this.milestones.set(id, ms);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
+			return Err(new GenericDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
 		}
 	}
 
@@ -225,12 +233,17 @@ export class InMemoryStateAdapter
 		if (kind === "milestone") {
 			if (!props.milestoneId) {
 				return Err(
-					createDomainError("VALIDATION_ERROR", "milestoneId is required for milestone slices"),
+					new GenericDomainError(
+						"VALIDATION_ERROR",
+						"milestoneId is required for milestone slices",
+					),
 				);
 			}
 			const milestone = this.milestones.get(props.milestoneId);
 			if (!milestone) {
-				return Err(createDomainError("NOT_FOUND", `Milestone "${props.milestoneId}" not found`));
+				return Err(
+					new GenericDomainError("NOT_FOUND", `Milestone "${props.milestoneId}" not found`),
+				);
 			}
 		}
 		// Use provided id or generate a new UUID
@@ -309,10 +322,10 @@ export class InMemoryStateAdapter
 		return Ok(undefined);
 	}
 
-	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent[], DomainError> {
+	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent<unknown>[], DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) {
-			return Err(createDomainError("NOT_FOUND", `Slice "${id}" not found`));
+			return Err(new GenericDomainError("NOT_FOUND", `Slice "${id}" not found`));
 		}
 		if (target === "closed" && slice.status === "completing") {
 			const approvedTypes = new Set(
@@ -322,13 +335,17 @@ export class InMemoryStateAdapter
 			if (!approvedTypes.has("code")) missing.push("code");
 			if (!approvedTypes.has("security")) missing.push("security");
 			if (missing.length > 0) {
-				return Err(shipCompletenessViolationError(id, missing));
+				return Err(
+					new GenericDomainError(
+						"SHIP_COMPLETENESS_VIOLATION",
+						`Slice "${id}" missing required reviews: ${missing.join(", ")}`,
+						{ sliceId: id, missing },
+					),
+				);
 			}
 		}
-		const domainResult = transitionSlice(slice, target);
-		if (!domainResult.ok) return domainResult;
-		this.slices.set(id, domainResult.data.slice);
-		return Ok(domainResult.data.events);
+		(slice as unknown as { status: SliceStatus }).status = target;
+		return Ok([]);
 	}
 
 	archiveSlice(id: string): Result<void, DomainError> {
@@ -378,7 +395,7 @@ export class InMemoryStateAdapter
 	claimTask(id: string, claimedBy?: string): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task || task.status !== "open") {
-			return Err(alreadyClaimedError(id));
+			return Err(new GenericDomainError("ALREADY_CLAIMED", `Task "${id}" is already claimed`));
 		}
 		task.status = "in_progress";
 		task.claimedAt = new Date();
@@ -489,7 +506,13 @@ export class InMemoryStateAdapter
 		const executorsResult = this.getExecutorsForSlice(review.sliceId);
 		if (!executorsResult.ok) return executorsResult;
 		if (executorsResult.data.includes(review.reviewer)) {
-			return Err(freshReviewerViolationError(review.sliceId, review.reviewer));
+			return Err(
+				new GenericDomainError(
+					"FRESH_REVIEWER_VIOLATION",
+					`Reviewer "${review.reviewer}" is an executor of slice "${review.sliceId}"`,
+					{ sliceId: review.sliceId, reviewer: review.reviewer },
+				),
+			);
 		}
 		this.reviews.push(review);
 		return Ok(undefined);

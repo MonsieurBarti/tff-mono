@@ -1,5 +1,9 @@
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
-import { Err, Ok, refusedOnDefaultBranchError, type DomainError, type Result } from "@tff/core";
+import { Err, Ok, type Result } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 export const assertNotOnDefaultBranch = async (
 	git: GitOps,
@@ -12,7 +16,13 @@ export const assertNotOnDefaultBranch = async (
 	if (!defaultR.ok) return defaultR;
 
 	if (currentR.data === defaultR.data) {
-		return Err(refusedOnDefaultBranchError(command, currentR.data));
+		return Err(
+			new GenericDomainError(
+				"REFUSED_ON_DEFAULT_BRANCH",
+				`Refusing to run "${command}" on default branch "${currentR.data}".`,
+				{ command, branch: currentR.data },
+			),
+		);
 	}
 
 	return Ok(undefined);

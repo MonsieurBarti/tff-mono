@@ -1,13 +1,9 @@
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
+import { Err, Ok, type MilestoneStore, type Result, type SliceStore } from "@tff/core";
 import {
-	Err,
-	Ok,
-	createDomainError,
+	GenericDomainError,
 	type DomainError,
-	type MilestoneStore,
-	type Result,
-	type SliceStore,
-} from "@tff/core";
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 const MILESTONE_BRANCH_RE = /^milestone\/([0-9a-f]{8})$/;
 
@@ -36,7 +32,7 @@ export const assertNotOnMilestoneBranch = async (
 	if (openCount === 0) return Ok(undefined);
 
 	return Err(
-		createDomainError(
+		new GenericDomainError(
 			"REFUSED_ON_MILESTONE_BRANCH",
 			`Refusing to run "${command}" on milestone branch "${branch}" while ${openCount} slice(s) are still open. Switch to the slice worktree at .tff/worktrees/<slice-id>/ before mutating state.`,
 			{ command, branch, openSlices: openCount },

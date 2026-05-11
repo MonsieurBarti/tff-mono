@@ -5,14 +5,11 @@ import type { DatabaseInit } from "../../../domain/ports/database-init.port.js";
 import type { DependencyStore } from "../../../domain/ports/dependency-store.port.js";
 import type { JournalRepository } from "../../../domain/ports/journal-repository.port.js";
 import type { MilestoneAuditStore } from "../../../domain/ports/milestone-audit-store.port.js";
-import type { MilestoneStore } from "../../../domain/ports/milestone-store.port.js";
+import type { MilestoneStore, ProjectStore, SliceStore, TaskStore } from "@tff/core";
 import type { PendingJudgmentStore } from "../../../domain/ports/pending-judgment-store.port.js";
-import type { ProjectStore } from "../../../domain/ports/project-store.port.js";
 import type { ReviewStore } from "../../../domain/ports/review-store.port.js";
 import type { SessionStore } from "../../../domain/ports/session-store.port.js";
 import type { SliceDependencyStore } from "../../../domain/ports/slice-dependency-store.port.js";
-import type { SliceStore } from "../../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../../domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../../domain/ports/transaction-runner.port.js";
 import {
 	createTffSymlink,

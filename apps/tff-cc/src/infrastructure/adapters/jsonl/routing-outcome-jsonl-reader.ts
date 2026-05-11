@@ -5,10 +5,7 @@ import type {
 	OutcomeReadFilter,
 	OutcomeSource,
 } from "../../../domain/ports/outcome-source.port.js";
-import {
-	type RoutingOutcome,
-	RoutingOutcomeSchema,
-} from "../../../domain/value-objects/routing-outcome.js";
+import { RoutingOutcome } from "@tff/core";
 
 export class JsonlRoutingOutcomeReader implements OutcomeSource {
 	constructor(private readonly path: string) {}
@@ -36,17 +33,18 @@ export class JsonlRoutingOutcomeReader implements OutcomeSource {
 				);
 				continue;
 			}
-			const result = RoutingOutcomeSchema.safeParse(parsed);
-			if (!result.success) {
+			let outcome: RoutingOutcome;
+			try {
+				outcome = RoutingOutcome.create(parsed as Parameters<typeof RoutingOutcome.create>[0]);
+			} catch (err) {
 				process.stderr.write(
-					`routing: skipped corrupt line in ${this.path}: ${result.error.issues[0]?.message ?? "schema validation failed"}\n`,
+					`routing: skipped corrupt line in ${this.path}: ${err instanceof Error ? err.message : "validation failed"}\n`,
 				);
 				continue;
 			}
-			const outcome = result.data;
 			if (filter.source && outcome.source !== filter.source) continue;
-			if (filter.decision_id && outcome.decision_id !== filter.decision_id) continue;
-			if (filter.since && outcome.emitted_at < filter.since) continue;
+			if (filter.decision_id && outcome.decisionId !== filter.decision_id) continue;
+			if (filter.since && outcome.emittedAt < filter.since) continue;
 			yield outcome;
 		}
 	}

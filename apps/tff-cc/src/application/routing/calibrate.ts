@@ -1,4 +1,9 @@
-import { groupOutcomes, runAllRules, type RoutingDecision, type RoutingOutcome } from "@tff/core";
+import {
+	groupOutcomes,
+	runAllRules,
+	type GroupOutcomesInput,
+	type RoutingDecision,
+} from "@tff/core";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
 import type {
@@ -45,8 +50,14 @@ export const calibrateUseCase = async (deps: CalibrateDeps): Promise<Calibration
 		writer: deps.writer,
 	});
 
-	const outcomes: RoutingOutcome[] = [];
-	for await (const o of deps.outcomesSource.readOutcomes({})) outcomes.push(o);
+	const outcomes: GroupOutcomesInput["outcomes"] = [];
+	for await (const o of deps.outcomesSource.readOutcomes({})) {
+		outcomes.push({
+			decision_id: o.decisionId,
+			verdict: o.verdict,
+			source: o.source,
+		});
+	}
 
 	const weights = resolveWeights(deps.config);
 

@@ -1,6 +1,6 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
+import { GenericDomainError, type DomainError } from "../errors/generic-domain-error.js";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, type Result } from "@tff/core";
 
 export class InMemoryArtifactStore implements ArtifactStore {
 	private files = new Map<string, string>();
@@ -13,14 +13,14 @@ export class InMemoryArtifactStore implements ArtifactStore {
 	async read(path: string): Promise<Result<string, DomainError>> {
 		const content = this.files.get(path);
 		if (content === undefined)
-			return Err(createDomainError("NOT_FOUND", `File not found: ${path}`, { path }));
+			return Err(new GenericDomainError("NOT_FOUND", `File not found: ${path}`, { path }));
 		return Ok(content);
 	}
 
 	async write(path: string, content: string): Promise<Result<void, DomainError>> {
 		if (this.failOnWritePaths.has(path)) {
 			return Err(
-				createDomainError("WRITE_FAILURE", `Simulated write failure for: ${path}`, { path }),
+				new GenericDomainError("WRITE_FAILURE", `Simulated write failure for: ${path}`, { path }),
 			);
 		}
 		this.files.set(path, content);

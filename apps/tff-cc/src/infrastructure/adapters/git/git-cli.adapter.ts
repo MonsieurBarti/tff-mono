@@ -1,14 +1,11 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { createDomainError, type DomainError } from "../../../domain/errors/domain-error.js";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type { GitOps } from "../../../domain/ports/git-ops.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
-import type { CommitRef } from "../../../domain/value-objects/commit-ref.js";
+import { Err, Ok, type Result } from "@tff/core";
+import type { CommitRef } from "../../../shared/value-objects/commit-ref.js";
 
 const exec = promisify(execFile);
-const gitError = (message: string, context?: Record<string, unknown>): DomainError =>
-	createDomainError("GIT_CONFLICT", message, context);
-
 /** Strip GIT_* env vars to prevent CI runner state from leaking into subprocesses. */
 const cleanGitEnv = (): Record<string, string> => {
 	const env: Record<string, string> = {};
@@ -26,7 +23,9 @@ const runGit = async (args: string[], cwd?: string): Promise<Result<string, Doma
 		// execFile errors include stdout/stderr on the error object
 		const e = err as { stdout?: string; stderr?: string; message?: string };
 		const detail = e.stderr?.trim() || e.stdout?.trim() || e.message || String(err);
-		return Err(gitError(`git ${args.join(" ")} failed: ${detail}`, { args }));
+		return Err(
+			new GenericDomainError("GIT_CONFLICT", `git ${args.join(" ")} failed: ${detail}`, { args }),
+		);
 	}
 };
 
@@ -128,9 +127,13 @@ export class GitCliAdapter implements GitOps {
 		if (!r.ok) return r;
 		if (r.data === "HEAD") {
 			return Err(
-				createDomainError("DETACHED_HEAD", "git is on detached HEAD — checkout a feature branch", {
-					cwd,
-				}),
+				new GenericDomainError(
+					"DETACHED_HEAD",
+					"git is on detached HEAD — checkout a feature branch",
+					{
+						cwd,
+					},
+				),
 			);
 		}
 		this.setCache(cacheKey, r.data);
@@ -206,7 +209,15 @@ export class GitCliAdapter implements GitOps {
 				},
 				(err, stdout) => {
 					if (err) {
-						resolve(Err(gitError(`git show ${ref}:${filePath} failed: ${err}`, { ref, filePath })));
+						resolve(
+							Err(
+								new GenericDomainError(
+									"GIT_CONFLICT",
+									`git show ${ref}:${filePath} failed: ${err}`,
+									{ ref, filePath },
+								),
+							),
+						);
 					} else {
 						resolve(Ok(stdout as unknown as Buffer));
 					}

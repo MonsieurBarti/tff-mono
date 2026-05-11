@@ -2,15 +2,15 @@ import { readFile } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
-import { createDomainError } from "../../../domain/errors/domain-error.js";
+import type { DomainError } from "../../errors/generic-domain-error.js";
+import { GenericDomainError } from "../../errors/generic-domain-error.js";
 import type {
 	RoutingConfig,
 	RoutingConfigReader,
 } from "../../../domain/ports/routing-config-reader.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
-import type { AgentCapability } from "../../../domain/value-objects/agent-capability.js";
-import type { WorkflowPool } from "../../../domain/value-objects/workflow-pool.js";
+import { Err, Ok, type Result } from "@tff/core";
+import type { AgentCapability } from "../../../shared/value-objects/agent-capability.js";
+import type { WorkflowPool } from "../../../shared/value-objects/workflow-pool.js";
 
 const AGENT_ID_REGEX = /^[a-z][a-z0-9-]*$/;
 const MAX_YAML_FILE_SIZE = 1024 * 1024; // 1 MB
@@ -83,7 +83,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		const schemaResult = RoutingConfigSchema.safeParse(rawRouting);
 		if (!schemaResult.success) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", "routing config schema validation failed", {
+				new GenericDomainError("ROUTING_CONFIG", "routing config schema validation failed", {
 					errors: schemaResult.error.issues,
 				}),
 			);
@@ -97,7 +97,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		const rel = relative(projectRoot, resolvedLogPath);
 		if (rel.startsWith("..") || rel.startsWith(`..${sep}`)) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", "routing.logging.path escapes project root", {
+				new GenericDomainError("ROUTING_CONFIG", "routing.logging.path escapes project root", {
 					path: routing.logging.path,
 					projectRoot,
 				}),
@@ -116,7 +116,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		const parts = workflow_id.split(":");
 		if (parts.length !== 2) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `invalid workflow_id format: ${workflow_id}`, {
+				new GenericDomainError("ROUTING_CONFIG", `invalid workflow_id format: ${workflow_id}`, {
 					workflow_id,
 				}),
 			);
@@ -136,9 +136,13 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 			if (!frontmatterResult.ok) return frontmatterResult;
 			if (frontmatterResult.data === undefined) {
 				return Err(
-					createDomainError("ROUTING_CONFIG", `no pool declared for workflow: ${workflow_id}`, {
-						workflow_id,
-					}),
+					new GenericDomainError(
+						"ROUTING_CONFIG",
+						`no pool declared for workflow: ${workflow_id}`,
+						{
+							workflow_id,
+						},
+					),
 				);
 			}
 			agentIds = frontmatterResult.data;
@@ -147,15 +151,19 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		// 3. Validate ids.
 		if (agentIds.length === 0) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `no pool agents defined for workflow: ${workflow_id}`, {
-					workflow_id,
-				}),
+				new GenericDomainError(
+					"ROUTING_CONFIG",
+					`no pool agents defined for workflow: ${workflow_id}`,
+					{
+						workflow_id,
+					},
+				),
 			);
 		}
 		for (const id of agentIds) {
 			if (!AGENT_ID_REGEX.test(id)) {
 				return Err(
-					createDomainError("ROUTING_CONFIG", `invalid agent id: ${id}`, { workflow_id, id }),
+					new GenericDomainError("ROUTING_CONFIG", `invalid agent id: ${id}`, { workflow_id, id }),
 				);
 			}
 		}
@@ -163,7 +171,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		for (const id of agentIds) {
 			if (seen.has(id)) {
 				return Err(
-					createDomainError("ROUTING_CONFIG", `duplicate agent id in pool: ${id}`, {
+					new GenericDomainError("ROUTING_CONFIG", `duplicate agent id in pool: ${id}`, {
 						workflow_id,
 						id,
 					}),
@@ -204,7 +212,9 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		try {
 			parsed = parseYaml(raw);
 		} catch {
-			return Err(createDomainError("ROUTING_CONFIG", "settings.yaml parse error", { workflow_id }));
+			return Err(
+				new GenericDomainError("ROUTING_CONFIG", "settings.yaml parse error", { workflow_id }),
+			);
 		}
 
 		const SettingsPoolsSchema = z
@@ -224,7 +234,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 				(parsed as { routing?: { pools?: unknown } } | null)?.routing?.pools !== undefined;
 			if (hasPools) {
 				return Err(
-					createDomainError("ROUTING_CONFIG", "settings.yaml routing.pools schema error", {
+					new GenericDomainError("ROUTING_CONFIG", "settings.yaml routing.pools schema error", {
 						workflow_id,
 					}),
 				);
@@ -244,7 +254,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		const [ns, name] = workflow_id.split(":");
 		if (!AGENT_ID_REGEX.test(ns) || !AGENT_ID_REGEX.test(name)) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `invalid workflow_id segments: ${workflow_id}`, {
+				new GenericDomainError("ROUTING_CONFIG", `invalid workflow_id segments: ${workflow_id}`, {
 					workflow_id,
 				}),
 			);
@@ -274,7 +284,9 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 			frontmatter = parseYaml(match[1]);
 		} catch {
 			return Err(
-				createDomainError("ROUTING_CONFIG", "command frontmatter parse error", { workflow_id }),
+				new GenericDomainError("ROUTING_CONFIG", "command frontmatter parse error", {
+					workflow_id,
+				}),
 			);
 		}
 
@@ -313,16 +325,16 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 			}
 		}
 		if (raw === undefined) {
-			return Err(createDomainError("ROUTING_CONFIG", `agent file not found: ${id}`, { id }));
+			return Err(new GenericDomainError("ROUTING_CONFIG", `agent file not found: ${id}`, { id }));
 		}
 		if (raw.length > MAX_YAML_FILE_SIZE) {
-			return Err(createDomainError("ROUTING_CONFIG", `agent file too large: ${id}`, { id }));
+			return Err(new GenericDomainError("ROUTING_CONFIG", `agent file too large: ${id}`, { id }));
 		}
 
 		const match = raw.match(/^---\n([\s\S]*?)\n---/);
 		if (!match) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `no frontmatter in agent file: ${id}`, { id }),
+				new GenericDomainError("ROUTING_CONFIG", `no frontmatter in agent file: ${id}`, { id }),
 			);
 		}
 
@@ -331,7 +343,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 			frontmatter = parseYaml(match[1]);
 		} catch {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `agent frontmatter parse error: ${id}`, { id }),
+				new GenericDomainError("ROUTING_CONFIG", `agent frontmatter parse error: ${id}`, { id }),
 			);
 		}
 
@@ -349,7 +361,7 @@ export class YamlRoutingConfigReader implements RoutingConfigReader {
 		const parsed = AgentFrontmatterSchema.safeParse(frontmatter);
 		if (!parsed.success) {
 			return Err(
-				createDomainError("ROUTING_CONFIG", `agent frontmatter schema error: ${id}`, { id }),
+				new GenericDomainError("ROUTING_CONFIG", `agent frontmatter schema error: ${id}`, { id }),
 			);
 		}
 

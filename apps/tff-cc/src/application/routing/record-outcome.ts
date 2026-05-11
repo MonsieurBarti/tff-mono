@@ -64,16 +64,6 @@ export const recordOutcomeUseCase = async (
 		);
 	}
 
-	await deps.writer.append({
-		outcome_id: outcome.outcomeId,
-		decision_id: outcome.decisionId,
-		dimension: outcome.dimension,
-		verdict: outcome.verdict,
-		source: outcome.source,
-		slice_id: outcome.sliceId,
-		workflow_id: outcome.workflowId,
-		reason: outcome.reason,
-		emitted_at: outcome.emittedAt,
-	});
+	await deps.writer.append(outcome);
 	return Ok({ outcome_id: outcome.outcomeId });
 };

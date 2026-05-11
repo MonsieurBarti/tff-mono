@@ -1,8 +1,8 @@
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { createDomainError, type DomainError } from "../../../domain/errors/domain-error.js";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type { ArtifactStore } from "../../../domain/ports/artifact-store.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
+import { Err, Ok, type Result } from "@tff/core";
 
 export class MarkdownArtifactAdapter implements ArtifactStore {
 	constructor(private readonly basePath: string) {}
@@ -19,7 +19,7 @@ export class MarkdownArtifactAdapter implements ArtifactStore {
 		try {
 			return Ok(await readFile(this.resolve(path), "utf-8"));
 		} catch {
-			return Err(createDomainError("NOT_FOUND", `File not found: ${path}`, { path }));
+			return Err(new GenericDomainError("NOT_FOUND", `File not found: ${path}`, { path }));
 		}
 	}
 
@@ -31,7 +31,7 @@ export class MarkdownArtifactAdapter implements ArtifactStore {
 			return Ok(undefined);
 		} catch (err) {
 			return Err(
-				createDomainError("VALIDATION_ERROR", `Failed to write: ${path}`, {
+				new GenericDomainError("VALIDATION_ERROR", `Failed to write: ${path}`, {
 					path,
 					error: String(err),
 				}),
@@ -63,7 +63,7 @@ export class MarkdownArtifactAdapter implements ArtifactStore {
 			return Ok(undefined);
 		} catch (err) {
 			return Err(
-				createDomainError("VALIDATION_ERROR", `Failed to mkdir: ${path}`, {
+				new GenericDomainError("VALIDATION_ERROR", `Failed to mkdir: ${path}`, {
 					path,
 					error: String(err),
 				}),

@@ -1,5 +1,6 @@
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
-import type { DomainError, Result } from "@tff/core";
+import type { Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface ListWorktreesDeps {
 	gitOps: GitOps;

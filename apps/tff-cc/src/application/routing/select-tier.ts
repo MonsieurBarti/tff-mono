@@ -8,7 +8,7 @@ import {
 	isOk,
 	resolveEffectiveTier,
 	signalsToPolicyTier,
-	type DomainError,
+	type BaseDomainError,
 	type Result,
 } from "@tff/core";
 
@@ -27,7 +27,7 @@ interface SelectTierDeps {
 export const selectTierUseCase = async (
 	input: SelectTierInput,
 	deps: SelectTierDeps,
-): Promise<Result<TierDecision, DomainError>> => {
+): Promise<Result<TierDecision, BaseDomainError<unknown>>> => {
 	const policyRes = await deps.tierConfigReader.readTierPolicy();
 	if (!isOk(policyRes)) return policyRes;
 

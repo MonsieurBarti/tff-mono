@@ -5,11 +5,11 @@ import {
 	isOk,
 	milestoneDir as milestoneDirPath,
 	milestoneLabel,
-	type DomainError,
 	type Milestone,
 	type MilestoneStore,
 	type Result,
 } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface CreateMilestoneInput {
 	name: string;
