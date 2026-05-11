@@ -1,6 +1,5 @@
-import type { DomainError } from "../errors/domain-error.js";
-import type { Result } from "../result.js";
-import type { ReviewRecord, ReviewType } from "../value-objects/review-record.js";
+import type { DomainError, Result } from "@tff/core";
+import type { ReviewRecord, ReviewType } from "../../shared/value-objects/review-record.js";
 
 export type { ReviewRecord, ReviewType };
 

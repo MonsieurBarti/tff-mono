@@ -1,6 +1,5 @@
-import type { DomainError } from "../errors/domain-error.js";
-import type { Result } from "../result.js";
-import type { WorkflowSession } from "../value-objects/workflow-session.js";
+import type { DomainError, Result } from "@tff/core";
+import type { WorkflowSession } from "../../shared/value-objects/workflow-session.js";
 
 export interface SessionStore {
 	getSession(): Result<WorkflowSession | null, DomainError>;

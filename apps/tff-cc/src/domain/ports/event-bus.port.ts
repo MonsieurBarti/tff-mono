@@ -1,4 +1,4 @@
-import type { DomainEvent, DomainEventType } from "../events/domain-event.js";
+import type { DomainEvent, DomainEventType } from "@tff/core";
 
 export interface EventBus {
 	publish(event: DomainEvent): void;

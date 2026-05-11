@@ -1,4 +1,7 @@
-import type { OutcomeSourceKind, RoutingOutcome } from "../value-objects/routing-outcome.js";
+import type {
+	OutcomeSourceKind,
+	RoutingOutcome,
+} from "../../shared/value-objects/routing-outcome.js";
 
 export interface OutcomeReadFilter {
 	since?: string;
