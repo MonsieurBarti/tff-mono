@@ -1,17 +1,15 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolveSliceId } from "../../cli/utils/resolve-id.js";
-import { transitionSlice as transitionSliceDomain } from "../../domain/entities/slice.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import type { Slice } from "../../domain/index.js";
-import { checkSliceStatus } from "../../domain/state-machine/preconditions.js";
 import {
+	type BaseDomainError,
+	PreconditionViolationError,
+	SliceInvalidTransitionError,
+	SliceNotFoundError,
+	SLICE_TRANSITIONS,
 	type SliceStatus,
-	validPredecessorsOf,
-	validTransitionsFrom,
-} from "../../domain/value-objects/slice-status.js";
+	validateTransition,
+} from "@tff/core";
+import { resolveSliceId } from "../../cli/utils/resolve-id.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import type { ClosableStateStores } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
@@ -29,12 +27,12 @@ export interface TransitionSliceRequest {
 export interface TransitionSliceSuccess {
 	ok: true;
 	data: { status: SliceStatus };
-	warnings: DomainError[];
+	warnings: BaseDomainError<unknown>[];
 }
 
 export interface TransitionSliceFailure {
 	ok: false;
-	error: DomainError;
+	error: BaseDomainError<unknown>;
 }
 
 export type TransitionSliceResponse = TransitionSliceSuccess | TransitionSliceFailure;
@@ -48,6 +46,14 @@ const sliceLabelFromSlice = (slice: { number: number }, milestoneNumber: number)
 	const sn = String(slice.number).padStart(2, "0");
 	return `M${ms}-S${sn}`;
 };
+
+const validTransitionsFrom = (status: SliceStatus): readonly SliceStatus[] =>
+	SLICE_TRANSITIONS[status] ?? [];
+
+const validPredecessorsOf = (target: SliceStatus): readonly SliceStatus[] =>
+	(Object.entries(SLICE_TRANSITIONS) as [SliceStatus, readonly SliceStatus[]][])
+		.filter(([, nexts]) => nexts.includes(target))
+		.map(([from]) => from);
 
 /**
  * Orchestrates a slice status transition end-to-end:
@@ -77,44 +83,41 @@ export const transitionSliceOrchestrator = async (
 	if (!currentResult.data) {
 		return {
 			ok: false,
-			error: createDomainError("NOT_FOUND", `Slice "${sliceId}" not found`),
+			error: new SliceNotFoundError(`Slice "${sliceId}" not found`, sliceId),
 		};
 	}
-	const currentSlice: Slice = currentResult.data;
+	const currentSlice = currentResult.data;
 
 	// Pre-validate transition (pure domain) so we surface INVALID_TRANSITION
 	// with a recovery hint without entering the tx.
-	const validation = transitionSliceDomain(currentSlice, targetStatus);
+	const validation = validateTransition(currentSlice.status, targetStatus, SLICE_TRANSITIONS);
 	if (!validation.ok) {
-		if (validation.error.code === "INVALID_TRANSITION") {
-			const validNext = validTransitionsFrom(currentSlice.status);
-			const predecessors = validPredecessorsOf(targetStatus);
-			const recoveryHint =
-				predecessors.length > 0
-					? `Valid predecessors of '${targetStatus}': [${predecessors.join(", ")}]. Transition through one of those first.`
-					: validNext.length > 0
-						? `Valid next from '${currentSlice.status}': [${validNext.join(", ")}]`
-						: "No valid transitions available from this status";
-			return {
-				ok: false,
-				error: {
-					code: validation.error.code,
-					message: validation.error.message,
-					recoveryHint,
-					validPredecessors: predecessors,
-					validNext,
-				} satisfies DomainError,
-			};
-		}
-		return { ok: false, error: validation.error };
+		const validNext = validTransitionsFrom(currentSlice.status);
+		const predecessors = validPredecessorsOf(targetStatus);
+		const recoveryHint =
+			predecessors.length > 0
+				? `Valid predecessors of '${targetStatus}': [${predecessors.join(", ")}]. Transition through one of those first.`
+				: validNext.length > 0
+					? `Valid next from '${currentSlice.status}': [${validNext.join(", ")}]`
+					: "No valid transitions available from this status";
+		return {
+			ok: false,
+			error: new SliceInvalidTransitionError(
+				`Invalid transition from ${currentSlice.status} to ${targetStatus}`,
+				currentSlice.status,
+				targetStatus,
+				validNext,
+				recoveryHint,
+			),
+		};
 	}
 
 	if (!currentSlice.milestoneId) {
 		return {
 			ok: false,
-			error: createDomainError(
-				"NOT_FOUND",
+			error: new SliceNotFoundError(
 				`Slice "${sliceId}" has no milestone (kind=${currentSlice.kind}); transition not yet supported for ad-hoc slices`,
+				sliceId,
 			),
 		};
 	}
@@ -124,7 +127,7 @@ export const transitionSliceOrchestrator = async (
 	if (!milestoneResult.data) {
 		return {
 			ok: false,
-			error: createDomainError("NOT_FOUND", `Milestone "${milestoneId}" not found`),
+			error: new SliceNotFoundError(`Milestone "${milestoneId}" not found`, milestoneId),
 		};
 	}
 	const milestoneNumber = milestoneResult.data.number;
@@ -133,7 +136,7 @@ export const transitionSliceOrchestrator = async (
 	// Render STATE.md content (reflecting the post-transition state).
 	// We patch the slice status in-memory to simulate post-commit state; the
 	// renderer is pure so this is safe.
-	const projectedSlice: Slice = { ...currentSlice, status: targetStatus };
+	const projectedSlice = { ...currentSlice, status: targetStatus };
 	const stateContent = renderStateMd(
 		{ milestoneId },
 		{
@@ -143,7 +146,9 @@ export const transitionSliceOrchestrator = async (
 				listSlices: (mid?: string) => {
 					const base = sliceStore.listSlices(mid);
 					if (!base.ok) return base;
-					const swapped = base.data.map((s) => (s.id === projectedSlice.id ? projectedSlice : s));
+					const swapped = base.data.map((s: { id: string }) =>
+						s.id === projectedSlice.id ? projectedSlice : s,
+					);
 					return { ok: true as const, data: swapped };
 				},
 			},
@@ -175,24 +180,42 @@ export const transitionSliceOrchestrator = async (
 	stagedTmps.push(ckptTmpAbs);
 
 	// Closure-capture pattern (see with-transaction.ts JSDoc): if the TOCTOU
-	// precondition re-check fails we capture the DomainError and throw a
+	// precondition re-check fails we capture the BaseDomainError and throw a
 	// generic Error to trigger rollback. The outer handler re-surfaces the
 	// captured error instead of the generic TRANSACTION_ROLLBACK wrapper so
 	// the public error code stays PRECONDITION_VIOLATION.
-	let preconditionRollbackError: DomainError | undefined;
+	let preconditionRollbackError: BaseDomainError<unknown> | undefined;
 
 	const txResult = await withTransaction(
 		db,
 		() => {
-			const recheck = checkSliceStatus(sliceStore, sliceId, currentSlice.status);
+			// TOCTOU re-check: verify slice still has the expected status.
+			const recheck = sliceStore.getSlice(sliceId);
 			if (!recheck.ok) {
-				preconditionRollbackError = preconditionViolationError(recheck.violations);
+				preconditionRollbackError = new PreconditionViolationError(
+					`TOCTOU re-check failed: store error`,
+					[`Store error during re-check: ${recheck.error.message}`],
+				);
+				throw new Error(preconditionRollbackError.message);
+			}
+			if (!recheck.data) {
+				preconditionRollbackError = new PreconditionViolationError(
+					`TOCTOU re-check failed: slice "${sliceId}" not found`,
+					[`Slice not found during re-check`],
+				);
+				throw new Error(preconditionRollbackError.message);
+			}
+			if (recheck.data.status !== currentSlice.status) {
+				preconditionRollbackError = new PreconditionViolationError(
+					`TOCTOU re-check failed: slice status changed from '${currentSlice.status}' to '${recheck.data.status}'`,
+					[`Expected status '${currentSlice.status}', found '${recheck.data.status}'`],
+				);
 				throw new Error(preconditionRollbackError.message);
 			}
 
 			const transitionResult = sliceStore.transitionSlice(sliceId, targetStatus);
 			if (!transitionResult.ok) {
-				throw new Error(`${transitionResult.error.code}: ${transitionResult.error.message}`);
+				throw new Error(`Store transition failed: ${transitionResult.error.message}`);
 			}
 			return {
 				data: { status: targetStatus },
@@ -214,13 +237,19 @@ export const transitionSliceOrchestrator = async (
 	}
 
 	// Best-effort WAL checkpoint (non-critical).
-	const warnings: DomainError[] = [...txResult.warnings];
+	const warnings: BaseDomainError<unknown>[] = [...txResult.warnings];
 	try {
 		deps.stores.checkpoint();
 	} catch (e) {
 		const msg = `checkpoint failed: ${String(e)}`;
 		tffWarn(msg);
-		warnings.push(createDomainError("PARTIAL_SUCCESS", msg, { pendingEffect: "wal_checkpoint" }));
+		warnings.push({
+			errorLabel: "PARTIAL_SUCCESS",
+			status: 200,
+			message: msg,
+			context: { pendingEffect: "wal_checkpoint" },
+			recoveryHint: undefined,
+		} as unknown as BaseDomainError<unknown>);
 	}
 
 	return { ok: true, data: { status: txResult.data.status }, warnings };
