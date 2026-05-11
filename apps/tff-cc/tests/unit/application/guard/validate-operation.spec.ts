@@ -6,7 +6,7 @@ import {
 	OperationBlockedError,
 	validateOperation,
 } from "../../../../src/application/guard/validate-operation.js";
-import type { SliceStatus } from "../../../../src/domain/value-objects/slice-status.js";
+import type { SliceStatus } from "@tff/core";
 
 describe("validate-operation", () => {
 	describe("validateOperation", () => {
@@ -30,11 +30,11 @@ describe("validate-operation", () => {
 				expect(result.requiredStatus).toBe("planning");
 			});
 
-			it("should allow complete when status is completing", () => {
-				const result = validateOperation("complete", "completing");
+			it("should allow complete when status is shipping", () => {
+				const result = validateOperation("complete", "shipping");
 
 				expect(result.allowed).toBe(true);
-				expect(result.requiredStatus).toBe("completing");
+				expect(result.requiredStatus).toBe("shipping");
 			});
 
 			it("should allow all operations at their respective required statuses", () => {
@@ -45,7 +45,7 @@ describe("validate-operation", () => {
 					{ op: "execute", status: "executing" },
 					{ op: "verify", status: "verifying" },
 					{ op: "ship", status: "reviewing" },
-					{ op: "complete", status: "completing" },
+					{ op: "complete", status: "shipping" },
 				];
 
 				for (const { op, status } of validCases) {
@@ -196,7 +196,7 @@ describe("validate-operation", () => {
 		it("should return true for allowed operations", () => {
 			expect(isOperationAllowed("execute", "executing")).toBe(true);
 			expect(isOperationAllowed("plan", "planning")).toBe(true);
-			expect(isOperationAllowed("complete", "completing")).toBe(true);
+			expect(isOperationAllowed("complete", "shipping")).toBe(true);
 		});
 
 		it("should return false for blocked operations", () => {
@@ -254,13 +254,14 @@ describe("validate-operation", () => {
 
 			// These should be valid SliceStatus values
 			const validStatuses: SliceStatus[] = [
+				"created",
 				"discussing",
 				"researching",
 				"planning",
 				"executing",
 				"verifying",
 				"reviewing",
-				"completing",
+				"shipping",
 				"closed",
 			];
 
@@ -272,13 +273,14 @@ describe("validate-operation", () => {
 	describe("edge cases and boundary conditions", () => {
 		it("should handle all valid status values", () => {
 			const allStatuses: SliceStatus[] = [
+				"created",
 				"discussing",
 				"researching",
 				"planning",
 				"executing",
 				"verifying",
 				"reviewing",
-				"completing",
+				"shipping",
 				"closed",
 			];
 

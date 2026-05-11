@@ -7,7 +7,7 @@ import {
 	isValidOperation,
 	type WorkflowOperation,
 } from "../../../../src/application/guard/operation-prerequisites.js";
-import type { SliceStatus } from "../../../../src/domain/value-objects/slice-status.js";
+import type { SliceStatus } from "@tff/core";
 
 describe("operation-prerequisites", () => {
 	describe("getPrerequisite", () => {
@@ -38,7 +38,7 @@ describe("operation-prerequisites", () => {
 			expect(getPrerequisite("execute").requiredStatus).toBe("executing");
 			expect(getPrerequisite("verify").requiredStatus).toBe("verifying");
 			expect(getPrerequisite("ship").requiredStatus).toBe("reviewing");
-			expect(getPrerequisite("complete").requiredStatus).toBe("completing");
+			expect(getPrerequisite("complete").requiredStatus).toBe("shipping");
 		});
 	});
 
@@ -101,7 +101,7 @@ describe("operation-prerequisites", () => {
 			expect(getRequiredStatus("execute")).toBe("executing");
 			expect(getRequiredStatus("verify")).toBe("verifying");
 			expect(getRequiredStatus("ship")).toBe("reviewing");
-			expect(getRequiredStatus("complete")).toBe("completing");
+			expect(getRequiredStatus("complete")).toBe("shipping");
 		});
 	});
 
@@ -145,16 +145,16 @@ describe("operation-prerequisites", () => {
 
 		describe("complex multi-step recovery paths", () => {
 			it("should suggest next available step when direct transition not possible", () => {
-				// From executing, trying to complete (requires completing status)
+				// From executing, trying to complete (requires shipping status)
 				// executing can only go to verifying
-				const hint = generateRecoveryHint("complete", "executing", "completing");
+				const hint = generateRecoveryHint("complete", "executing", "shipping");
 				expect(hint).toBe("Current status is executing. Next: /tff:verify");
 			});
 
 			it("should show multiple options when available", () => {
-				// From verifying, trying to complete (requires completing)
+				// From verifying, trying to complete (requires shipping)
 				// verifying can go to reviewing or executing
-				const hint = generateRecoveryHint("complete", "verifying", "completing");
+				const hint = generateRecoveryHint("complete", "verifying", "shipping");
 				expect(hint).toMatch(/Current status is verifying\. Next:/);
 				expect(hint).toContain("/tff:verify");
 				expect(hint).toContain("/tff:execute");
@@ -202,8 +202,8 @@ describe("operation-prerequisites", () => {
 				{
 					op: "complete",
 					current: "reviewing",
-					required: "completing",
-					expectedContains: "/tff:complete",
+					required: "shipping",
+					expectedContains: "/tff:ship",
 				},
 			];
 
