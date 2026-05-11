@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS slice (
   kind TEXT NOT NULL DEFAULT 'milestone' CHECK (kind IN ('milestone', 'quick', 'debug')),
   number INTEGER NOT NULL,
   title TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'discussing' CHECK (status IN ('discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'completing', 'closed')),
+  status TEXT NOT NULL DEFAULT 'discussing' CHECK (status IN ('discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'shipping', 'closed')),
   tier TEXT CHECK (tier IN ('S', 'SS', 'SSS')),
   base_branch TEXT,
   branch_name TEXT,

@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { prepareJudgeEvidenceUseCase } from "../../../../src/application/routing/prepare-judge-evidence.js";
-import type { DomainError } from "../../src/infrastructure/errors/generic-domain-error.js";
+import type { DomainError } from "../../../../src/infrastructure/errors/generic-domain-error.js";
 import type { DiffReader } from "../../../../src/domain/ports/diff-reader.port.js";
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { SliceMergeLookup } from "../../../../src/domain/ports/slice-merge-lookup.port.js";
 import type { SliceSpecReader } from "../../../../src/domain/ports/slice-spec-reader.port.js";
 import { Err, isErr, isOk, Ok } from "@tff/core";
-import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
+import { RoutingOutcome } from "@tff/core";
 
 const SLICE_ID = "00000000-0000-4000-8000-0000000000aa";
 const D1 = "00000000-0000-4000-8000-000000000001";
@@ -95,7 +95,7 @@ describe("prepareJudgeEvidenceUseCase", () => {
 		const res = await prepareJudgeEvidenceUseCase({ slice_id: SLICE_ID }, deps);
 		expect(isErr(res)).toBe(true);
 		if (!isErr(res)) throw new Error("not err");
-		expect(res.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
 	it("returns PRECONDITION_VIOLATION when slice is not closed", async () => {
@@ -103,7 +103,7 @@ describe("prepareJudgeEvidenceUseCase", () => {
 		const res = await prepareJudgeEvidenceUseCase({ slice_id: SLICE_ID }, deps);
 		expect(isErr(res)).toBe(true);
 		if (!isErr(res)) throw new Error("not err");
-		expect(res.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
 	it("returns evidence null when no decisions", async () => {
@@ -117,16 +117,16 @@ describe("prepareJudgeEvidenceUseCase", () => {
 	});
 
 	it("returns evidence null with skipped count when all decisions already judged", async () => {
-		const existing: RoutingOutcome = {
-			outcome_id: "00000000-0000-4000-8000-000000000aaa",
-			decision_id: D1,
+		const existing = RoutingOutcome.create({
+			outcomeId: "00000000-0000-4000-8000-000000000aaa",
+			decisionId: D1,
 			dimension: "tier",
 			verdict: "ok",
 			source: "model-judge",
-			slice_id: "M01-S02",
-			workflow_id: "tff:ship",
-			emitted_at: "2026-04-20T09:00:00.000Z",
-		};
+			sliceId: "M01-S02",
+			workflowId: "tff:ship",
+			emittedAt: "2026-04-20T09:00:00.000Z",
+		});
 		const { deps } = makeDeps({ existingOutcomes: [existing] });
 		const res = await prepareJudgeEvidenceUseCase({ slice_id: SLICE_ID }, deps);
 		expect(isOk(res)).toBe(true);

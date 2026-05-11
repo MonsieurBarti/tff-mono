@@ -4,7 +4,7 @@ import type {
 	OutcomeReadFilter,
 	OutcomeSource,
 } from "../../../src/domain/ports/outcome-source.port.js";
-import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
+import { RoutingOutcome, type RoutingOutcomeProps } from "@tff/core";
 
 const fakeSource = (outcomes: RoutingOutcome[]): OutcomeSource => ({
 	async *readOutcomes(filter: OutcomeReadFilter) {
@@ -15,18 +15,18 @@ const fakeSource = (outcomes: RoutingOutcome[]): OutcomeSource => ({
 	},
 });
 
-const out = (overrides: Partial<RoutingOutcome>): RoutingOutcome =>
-	({
-		outcome_id: "00000000-0000-4000-8000-000000000000",
-		decision_id: "00000000-0000-4000-8000-000000000001",
+const out = (overrides: Partial<RoutingOutcomeProps>): RoutingOutcome =>
+	RoutingOutcome.create({
+		outcomeId: "00000000-0000-4000-8000-000000000000",
+		decisionId: "00000000-0000-4000-8000-000000000001",
 		dimension: "agent",
 		verdict: "ok",
 		source: "model-judge",
-		slice_id: "M01-S01",
-		workflow_id: "tff:ship",
-		emitted_at: "2026-04-25T00:00:00.000Z",
+		sliceId: "M01-S01",
+		workflowId: "tff:ship",
+		emittedAt: "2026-04-25T00:00:00.000Z",
 		...overrides,
-	}) as RoutingOutcome;
+	});
 
 describe("buildMilestoneScorecard", () => {
 	it("returns vacuous scorecard when no outcomes", async () => {

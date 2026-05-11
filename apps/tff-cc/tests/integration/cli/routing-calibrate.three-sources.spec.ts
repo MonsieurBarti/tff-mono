@@ -40,14 +40,14 @@ const seed = (root: string) => {
 `,
 	);
 	const mkOutcome = (id: string, source: "manual" | "debug-join" | "model-judge") => ({
-		outcome_id: id,
-		decision_id: D1,
+		outcomeId: id,
+		decisionId: D1,
 		dimension: source === "debug-join" ? "unknown" : "tier",
 		verdict: source === "debug-join" ? "wrong" : "too-high",
 		source,
-		slice_id: SLICE,
-		workflow_id: "tff:ship",
-		emitted_at: "2026-04-20T10:00:00.000Z",
+		sliceId: SLICE,
+		workflowId: "tff:ship",
+		emittedAt: "2026-04-20T10:00:00.000Z",
 	});
 	writeFileSync(
 		join(root, ".tff", "logs", "routing-outcomes.jsonl"),

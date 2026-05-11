@@ -3,7 +3,7 @@ import { calibrateUseCase } from "../../../../src/application/routing/calibrate.
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../../../src/domain/ports/outcome-writer.port.js";
 import type { RoutingDecision } from "../../src/shared/value-objects/routing-decision.js";
-import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
+import { RoutingOutcome } from "@tff/core";
 
 const decision: RoutingDecision = {
 	agent: "tff-code-reviewer",
@@ -14,16 +14,16 @@ const decision: RoutingDecision = {
 	decision_id: "00000000-0000-4000-8000-000000000001",
 };
 
-const manualTierTooLow: RoutingOutcome = {
-	outcome_id: "00000000-0000-4000-8000-0000000000a1",
-	decision_id: decision.decision_id,
+const manualTierTooLow = RoutingOutcome.create({
+	outcomeId: "00000000-0000-4000-8000-0000000000a1",
+	decisionId: decision.decision_id,
 	dimension: "tier",
 	verdict: "too-low",
 	source: "manual",
-	slice_id: "M01-S01",
-	workflow_id: "tff:ship",
-	emitted_at: "2026-04-19T10:00:00.000Z",
-};
+	sliceId: "M01-S01",
+	workflowId: "tff:ship",
+	emittedAt: "2026-04-19T10:00:00.000Z",
+});
 
 const arraySource = (items: RoutingOutcome[]): OutcomeSource => ({
 	readOutcomes: async function* () {
@@ -62,11 +62,13 @@ describe("calibrateUseCase", () => {
 	});
 
 	it("emits a tier-too-low-dominant recommendation when N_min met", async () => {
-		const outcomes: RoutingOutcome[] = Array.from({ length: 6 }, (_, i) => ({
-			...manualTierTooLow,
-			outcome_id: `00000000-0000-4000-8000-${String(100 + i).padStart(12, "0")}`,
-			verdict: i < 5 ? "too-low" : "too-high",
-		}));
+		const outcomes: RoutingOutcome[] = Array.from({ length: 6 }, (_, i) =>
+			RoutingOutcome.create({
+				...manualTierTooLow,
+				outcomeId: `00000000-0000-4000-8000-${String(100 + i).padStart(12, "0")}`,
+				verdict: i < 5 ? "too-low" : "too-high",
+			}),
+		);
 		const report = await calibrateUseCase({
 			decisions: [decision],
 			implicitSource: arraySource([]),
@@ -79,16 +81,16 @@ describe("calibrateUseCase", () => {
 	});
 
 	it("scans implicit source first and writes new debug-join outcomes", async () => {
-		const debugJoin: RoutingOutcome = {
-			outcome_id: "00000000-0000-4000-8000-0000000000b1",
-			decision_id: decision.decision_id,
+		const debugJoin = RoutingOutcome.create({
+			outcomeId: "00000000-0000-4000-8000-0000000000b1",
+			decisionId: decision.decision_id,
 			dimension: "unknown",
 			verdict: "wrong",
 			source: "debug-join",
-			slice_id: "M01-S01",
-			workflow_id: "tff:ship",
-			emitted_at: "2026-04-19T11:00:00.000Z",
-		};
+			sliceId: "M01-S01",
+			workflowId: "tff:ship",
+			emittedAt: "2026-04-19T11:00:00.000Z",
+		});
 		const written: RoutingOutcome[] = [];
 		const writer: OutcomeWriter = { append: async (o) => void written.push(o) };
 

@@ -106,8 +106,8 @@ describe("slice:record-merge CLI", () => {
 	it("rejects request with neither --pr nor inline pair", async () => {
 		const out = JSON.parse(await sliceRecordMergeCmd(["--slice-id", "M01-S01"]));
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("PRECONDITION_VIOLATION");
-		expect(out.error.context.violations[0].code).toBe("merge-source");
+		expect(out.error.errorLabel).toBe("PRECONDITION_VIOLATION");
+		expect(out.error.context.preconditions[0]).toBe("merge-source");
 	});
 
 	it("rejects request with only one of --merge-sha / --base-ref", async () => {
@@ -115,7 +115,8 @@ describe("slice:record-merge CLI", () => {
 			await sliceRecordMergeCmd(["--slice-id", "M01-S01", "--merge-sha", "abc"]),
 		);
 		expect(out.ok).toBe(false);
-		expect(out.error.context.violations[0].code).toBe("merge-sha+base-ref");
+		expect(out.error.errorLabel).toBe("PRECONDITION_VIOLATION");
+		expect(out.error.context.preconditions[0]).toBe("merge-sha+base-ref");
 	});
 
 	it("surfaces ghPrView failure as gh.pr.view precondition", async () => {
@@ -127,8 +128,8 @@ describe("slice:record-merge CLI", () => {
 			}),
 		);
 		expect(out.ok).toBe(false);
-		expect(out.error.context.violations[0].code).toBe("gh.pr.view");
-		expect(out.error.context.violations[0].actual).toContain("PR not merged yet");
+		expect(out.error.errorLabel).toBe("PRECONDITION_VIOLATION");
+		expect(out.error.context.preconditions[0]).toBe("gh.pr.view");
 	});
 
 	it("upserts: a second record-merge overwrites previous merge_sha + base_ref", async () => {

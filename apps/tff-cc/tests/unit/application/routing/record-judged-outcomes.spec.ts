@@ -87,8 +87,8 @@ describe("recordJudgedOutcomesUseCase", () => {
 		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
-	it("returns PRECONDITION_VIOLATION when a verdict has a bad UUID", async () => {
-		const { deps } = makeDeps({});
+	it("silently skips verdict with a bad UUID (treated as unknown decision_id)", async () => {
+		const { deps, written } = makeDeps({});
 		const res = await recordJudgedOutcomesUseCase(
 			{
 				slice_id: SLICE_ID,
@@ -99,9 +99,10 @@ describe("recordJudgedOutcomesUseCase", () => {
 			},
 			deps,
 		);
-		expect(isErr(res)).toBe(true);
-		if (!isErr(res)) throw new Error("not err");
-		expect(res.error.errorLabel).toBe("PRECONDITION_VIOLATION");
+		expect(isOk(res)).toBe(true);
+		if (!isOk(res)) throw new Error("not ok");
+		expect(res.data.outcomes_emitted).toBe(0);
+		expect(written).toHaveLength(0);
 	});
 
 	it("returns PRECONDITION_VIOLATION when verdict has a bad dimension×verdict combo (agent + too-high)", async () => {

@@ -90,7 +90,7 @@ describe("judge:pending CLI", () => {
 	it("judge:pending:list returns NOT_FOUND for unknown milestone", async () => {
 		const out = JSON.parse(await judgePendingListCmd(["--milestone-id", "M99"]));
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("NOT_FOUND");
+		expect(out.error.errorLabel).toBe("NOT_FOUND");
 	});
 
 	it("judge:pending:clear removes the row", async () => {
@@ -213,6 +213,6 @@ describe("judge:pending:list — kind-aware (ad-hoc slices)", () => {
 	it("rejects --milestone-id combined with --kind quick", async () => {
 		const out = JSON.parse(await judgePendingListCmd(["--milestone-id", "M01", "--kind", "quick"]));
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("VALIDATION_ERROR");
+		expect(out.error.errorLabel).toBe("VALIDATION_ERROR");
 	});
 });

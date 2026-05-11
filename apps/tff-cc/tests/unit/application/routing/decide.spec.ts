@@ -11,6 +11,7 @@ import {
 	type TierConfigReader,
 } from "../../../../src/domain/ports/tier-config-reader.port.js";
 import { Err, isOk, Ok } from "@tff/core";
+import { GenericDomainError } from "../../../../src/infrastructure/errors/generic-domain-error.js";
 import type { Signals } from "../../src/shared/value-objects/signals.js";
 import type { WorkflowPool } from "../../src/shared/value-objects/workflow-pool.js";
 

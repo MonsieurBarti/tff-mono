@@ -16,10 +16,7 @@ describe("slice-close completeness invariant is wired", () => {
 			"shipping",
 		] as const;
 		for (const target of path) {
-			const r = stores.sliceStore.transitionSlice(id, target);
-			if (!r.ok) {
-				console.log("transition failed to", target, r.error?.errorLabel, r.error?.message);
-			}
+			stores.sliceStore.transitionSlice(id, target);
 		}
 	};
 
@@ -68,8 +65,6 @@ describe("slice-close completeness invariant is wired", () => {
 
 		// Drive the primary slice to `shipping` so close is a legal next transition.
 		driveToShipping(sliceId);
-		const check = stores.sliceStore.getSlice(sliceId);
-		console.log("after driveToShipping status:", check.data?.status);
 
 		// Seed both approved code + security reviews so close succeeds (so we observe the listReviews call).
 		const codeReviewResult = stores.reviewStore.recordReview({

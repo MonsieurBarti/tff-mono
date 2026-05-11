@@ -2,18 +2,19 @@ import { describe, expect, it } from "vitest";
 import { computeImplicitOutcomesUseCase } from "../../../../src/application/routing/compute-outcomes.js";
 import type { OutcomeSource } from "../../../../src/domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../../../src/domain/ports/outcome-writer.port.js";
-import type { RoutingOutcome } from "../../src/shared/value-objects/routing-outcome.js";
+import { RoutingOutcome } from "@tff/core";
 
-const outcome = (decision_id: string, outcome_id: string): RoutingOutcome => ({
-	outcome_id,
-	decision_id,
-	dimension: "unknown",
-	verdict: "wrong",
-	source: "debug-join",
-	slice_id: "M01-S01",
-	workflow_id: "tff:ship",
-	emitted_at: "2026-04-19T10:00:00.000Z",
-});
+const outcome = (decisionId: string, outcomeId: string): RoutingOutcome =>
+	RoutingOutcome.create({
+		outcomeId,
+		decisionId,
+		dimension: "unknown",
+		verdict: "wrong",
+		source: "debug-join",
+		sliceId: "M01-S01",
+		workflowId: "tff:ship",
+		emittedAt: "2026-04-19T10:00:00.000Z",
+	});
 
 const arraySource = (items: RoutingOutcome[]): OutcomeSource => ({
 	readOutcomes: async function* () {
@@ -54,7 +55,7 @@ describe("computeImplicitOutcomesUseCase", () => {
 		});
 		expect(res.written).toBe(1);
 		expect(written).toHaveLength(1);
-		expect(written[0].decision_id).toBe("00000000-0000-4000-8000-000000000002");
+		expect(written[0].decisionId).toBe("00000000-0000-4000-8000-000000000002");
 	});
 
 	it("is idempotent across two runs", async () => {

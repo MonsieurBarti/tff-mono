@@ -50,7 +50,7 @@ describe("resolveMilestoneId", () => {
 		const store = createMockMilestoneStore();
 		const result = resolveMilestoneId("FOOBAR", store as never);
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+		if (!result.ok) expect(result.error.errorLabel).toBe("VALIDATION_ERROR");
 	});
 
 	it("returns NOT_FOUND for unknown label", () => {
@@ -58,7 +58,7 @@ describe("resolveMilestoneId", () => {
 		vi.mocked(store.getMilestoneByNumber!).mockReturnValue(ok(null));
 		const result = resolveMilestoneId("M99", store as never);
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("NOT_FOUND");
+		if (!result.ok) expect(result.error.errorLabel).toBe("NOT_FOUND");
 	});
 });
 
@@ -84,7 +84,7 @@ describe("resolveSliceId", () => {
 		const sStore = createMockSliceStore();
 		const result = resolveSliceId("FOOBAR", sStore as never);
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("VALIDATION_ERROR");
+		if (!result.ok) expect(result.error.errorLabel).toBe("VALIDATION_ERROR");
 	});
 
 	it("returns NOT_FOUND for unknown slice label", () => {
@@ -92,6 +92,6 @@ describe("resolveSliceId", () => {
 		vi.mocked(sStore.getSliceByNumbers!).mockReturnValue(ok(null));
 		const result = resolveSliceId("M01-S99", sStore as never);
 		expect(result.ok).toBe(false);
-		if (!result.ok) expect(result.error.code).toBe("NOT_FOUND");
+		if (!result.ok) expect(result.error.errorLabel).toBe("NOT_FOUND");
 	});
 });
