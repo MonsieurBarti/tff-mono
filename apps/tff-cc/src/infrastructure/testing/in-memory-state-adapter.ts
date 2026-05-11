@@ -108,6 +108,7 @@ export class InMemoryStateAdapter
 	}
 
 	saveProject(props: ProjectProps): Result<Project, DomainError> {
+		// TODO(S04): Replace with Project.reconstruct() once in-memory adapter aligns with core entities
 		const project: Project = {
 			id: "singleton",
 			name: props.name,
@@ -124,6 +125,7 @@ export class InMemoryStateAdapter
 		const id = props.id ?? crypto.randomUUID();
 		// Use provided branch or compute from UUID
 		const branch = props.branch ?? milestoneBranchName(id);
+		// TODO(S04): Replace with Milestone.reconstruct() once in-memory adapter aligns with core entities
 		const milestone: Milestone = {
 			id,
 			projectId: "singleton",
@@ -251,6 +253,7 @@ export class InMemoryStateAdapter
 		}
 		// Use provided id or generate a new UUID
 		const id = props.id ?? crypto.randomUUID();
+		// TODO(S04): Replace with Slice.reconstruct() once in-memory adapter aligns with core entities
 		const slice: Slice = {
 			id,
 			milestoneId: props.milestoneId ?? null,
@@ -376,6 +379,7 @@ export class InMemoryStateAdapter
 	// TaskStore
 	createTask(props: TaskProps): Result<Task, DomainError> {
 		const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
+		// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
 		const task: Task = {
 			id,
 			sliceId: props.sliceId,
@@ -558,6 +562,7 @@ export class InMemoryStateAdapter
 				mut(existing).claimedBy = agent;
 				this.tasks.set(id, existing);
 			} else {
+				// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
 				const task: Task = {
 					id,
 					sliceId,

@@ -66,16 +66,6 @@ export const reviewRecordCmd = async (args: string[]): Promise<string> => {
 		"commit-sha": string;
 	};
 
-	if (type !== "code" && type !== "security" && type !== "spec") {
-		return JSON.stringify({
-			ok: false,
-			error: {
-				code: "INVALID_ARGS",
-				message: `Invalid type "${type}". Must be: code, security, spec`,
-			},
-		});
-	}
-
 	const { reviewStore, sliceStore } = createClosableStateStoresUnchecked();
 	const resolved = resolveSliceId(sliceId, sliceStore);
 	if (!resolved.ok) return JSON.stringify({ ok: false, error: resolved.error });

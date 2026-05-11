@@ -108,9 +108,8 @@ describe("task:claim — journal integration", () => {
 		const journalPath = path.join(homeDir, projectId, "journal", `${sliceId}.jsonl`);
 
 		// Claim the task
-		const result = JSON.parse(
-			await taskClaimCmd(["--task-id", `${sliceId}-T01`, "--claimed-by", "test-agent"]),
-		);
+		const raw = await taskClaimCmd(["--task-id", `${sliceId}-T01`, "--claimed-by", "test-agent"]);
+		const result = JSON.parse(raw);
 		expect(result.ok).toBe(true);
 
 		// Verify journal file exists and contains task-started entry

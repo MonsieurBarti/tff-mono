@@ -48,12 +48,15 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	const { db, taskStore, journalRepository } = closableStores;
 	// Read task to get wave index and sliceId for journal entry
 	const taskResult = taskStore.getTask(taskId);
-	if (!isOk(taskResult)) return JSON.stringify({ ok: false, error: taskResult.error });
-	if (!taskResult.data)
+	if (!isOk(taskResult)) {
+		return JSON.stringify({ ok: false, error: taskResult.error });
+	}
+	if (!taskResult.data) {
 		return JSON.stringify({
 			ok: false,
 			error: { code: "TASK_NOT_FOUND", message: `Task ${taskId} not found` },
 		});
+	}
 
 	const task = taskResult.data;
 	const waveIndex = task.wave ?? 0;
@@ -105,5 +108,6 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 		);
 	}
 
-	return JSON.stringify({ ok: true, data: null, warnings });
+	const output = JSON.stringify({ ok: true, data: null, warnings });
+	return output;
 };

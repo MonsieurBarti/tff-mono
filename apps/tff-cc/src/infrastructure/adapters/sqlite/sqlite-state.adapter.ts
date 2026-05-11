@@ -25,7 +25,6 @@ import type {
 	Result,
 	ReviewState,
 	SliceProps,
-	SliceState,
 	SliceStatus,
 	SliceStore,
 	SliceUpdateProps,
@@ -225,6 +224,7 @@ export class SQLiteStateAdapter
 				  }
 				| undefined;
 			if (!row) return Ok(null);
+			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 			return Ok({
 				id: row.id,
 				name: row.name,
@@ -247,6 +247,7 @@ export class SQLiteStateAdapter
            ON CONFLICT(id) DO UPDATE SET name = excluded.name, vision = excluded.vision, updated_at = excluded.updated_at`,
 				)
 				.run(props.name, props.vision ?? null, now, now);
+			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 			return Ok({
 				id: "singleton",
 				name: props.name,
@@ -271,12 +272,13 @@ export class SQLiteStateAdapter
            VALUES (?, 'singleton', ?, ?, 'open', ?, ?, ?)`,
 				)
 				.run(id, props.number, props.name, branch, now, now);
+			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 			return Ok({
 				id,
 				projectId: "singleton",
 				number: props.number,
 				name: props.name,
-				status: "open" as const,
+				status: "open" as Milestone["status"],
 				branch,
 				closeReason: null,
 				createdAt: new Date(now),
@@ -440,13 +442,14 @@ export class SQLiteStateAdapter
 					now,
 					now,
 				);
+			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 			return Ok({
 				id,
 				milestoneId: props.milestoneId ?? null,
 				kind,
 				number: props.number,
 				title: props.title,
-				status: "discussing" as const,
+				status: "discussing",
 				tier: props.tier ?? null,
 				baseBranch: props.baseBranch ?? "",
 				branchName: props.branchName ?? "",
@@ -611,7 +614,18 @@ export class SQLiteStateAdapter
 					createdAt: new Date(r.created_at),
 				}));
 				const slice = Slice.reconstruct({
-					...(getResult.data as unknown as SliceState),
+					id: getResult.data.id,
+					milestoneId: getResult.data.milestoneId,
+					kind: getResult.data.kind,
+					number: getResult.data.number,
+					title: getResult.data.title,
+					status: getResult.data.status,
+					tier: getResult.data.tier,
+					baseBranch: getResult.data.baseBranch,
+					branchName: getResult.data.branchName,
+					createdAt: getResult.data.createdAt,
+					updatedAt: getResult.data.updatedAt,
+					archivedAt: getResult.data.archivedAt,
 					reviews,
 				});
 				slice.transition(target);
@@ -669,13 +683,14 @@ export class SQLiteStateAdapter
 					now,
 					now,
 				);
+			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 			return Ok({
 				id,
 				sliceId: props.sliceId,
 				number: props.number,
 				title: props.title,
 				description: props.description ?? "",
-				status: "open" as const,
+				status: "open",
 				wave: props.wave ?? null,
 				difficulty: null,
 				claimedAt: null,
@@ -1189,6 +1204,7 @@ export class SQLiteStateAdapter
 
 	// Helpers
 	private rowToSlice(row: SliceRow): Slice {
+		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 		return {
 			id: row.id,
 			milestoneId: row.milestone_id ?? null,
@@ -1196,7 +1212,7 @@ export class SQLiteStateAdapter
 			number: row.number,
 			title: row.title,
 			status: row.status as Slice["status"],
-			tier: row.tier ?? null,
+			tier: row.tier as Slice["tier"] | null,
 			baseBranch: row.base_branch ?? "",
 			branchName: row.branch_name ?? "",
 			createdAt: new Date(row.created_at),
@@ -1206,6 +1222,7 @@ export class SQLiteStateAdapter
 	}
 
 	private rowToTask(row: TaskRow): Task {
+		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 		return {
 			id: row.id,
 			sliceId: row.slice_id,
@@ -1224,6 +1241,7 @@ export class SQLiteStateAdapter
 	}
 
 	private rowToMilestone(row: MilestoneRow): Milestone {
+		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
 		return {
 			id: row.id,
 			projectId: row.project_id,

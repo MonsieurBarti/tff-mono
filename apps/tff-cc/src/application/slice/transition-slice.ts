@@ -10,6 +10,7 @@ import {
 	type SliceStatus,
 	validateTransition,
 } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import { resolveSliceId } from "../../cli/utils/resolve-id.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import type { ClosableStateStores } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
@@ -257,13 +258,9 @@ export const transitionSliceOrchestrator = async (
 	} catch (e) {
 		const msg = `checkpoint failed: ${String(e)}`;
 		tffWarn(msg);
-		warnings.push({
-			errorLabel: "PARTIAL_SUCCESS",
-			status: 200,
-			message: msg,
-			context: { pendingEffect: "wal_checkpoint" },
-			recoveryHint: undefined,
-		} as unknown as BaseDomainError<unknown>);
+		warnings.push(
+			new GenericDomainError("PARTIAL_SUCCESS", msg, { pendingEffect: "wal_checkpoint" }),
+		);
 	}
 
 	return { ok: true, data: { status: txResult.data.status }, warnings };
