@@ -67,6 +67,17 @@ export {
 	TASK_TRANSITIONS,
 } from "./domain/task/index.js";
 export {
+	RoutingOutcome,
+	type RoutingOutcomeProps,
+	type OutcomeDimension,
+	type OutcomeVerdict,
+	type OutcomeSourceKind,
+	JudgeVerdict,
+	type JudgeVerdictProps,
+	type JudgeDimension,
+	type JudgeVerdictValue,
+} from "./domain/routing/index.js";
+export {
 	TFF_DIR,
 	tffPath,
 	milestoneDir,
