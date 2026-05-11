@@ -1,21 +1,37 @@
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
-import type { Milestone } from "../../../domain/entities/milestone.js";
-import type { Project } from "../../../domain/entities/project.js";
-import type { Slice } from "../../../domain/entities/slice.js";
-import { transitionSlice } from "../../../domain/entities/slice.js";
-import type { Task } from "../../../domain/entities/task.js";
-import { alreadyClaimedError } from "../../../domain/errors/already-claimed.error.js";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
-import { createDomainError } from "../../../domain/errors/domain-error.js";
-import { freshReviewerViolationError } from "../../../domain/errors/fresh-reviewer-violation.error.js";
-import { hasOpenChildrenError } from "../../../domain/errors/has-open-children.error.js";
-import { milestoneCompletenessViolationError } from "../../../domain/errors/milestone-completeness-violation.error.js";
-import { shipCompletenessViolationError } from "../../../domain/errors/ship-completeness-violation.error.js";
-import { versionMismatchError } from "../../../domain/errors/version-mismatch.error.js";
-import type { DomainEvent } from "../../../domain/events/domain-event.js";
-import { milestoneBranchName } from "../../../domain/helpers/branch-naming.js";
+import {
+	AlreadyClaimedError,
+	BaseDomainError,
+	Err,
+	Ok,
+	PreconditionViolationError,
+	Slice,
+	SliceNotFoundError,
+	milestoneBranchName,
+	runMigrations,
+} from "@tff/core";
+import type {
+	DomainEvent,
+	Milestone,
+	MilestoneProps,
+	MilestoneStore,
+	MilestoneUpdateProps,
+	Project,
+	ProjectProps,
+	ProjectStore,
+	Result,
+	SliceProps,
+	SliceState,
+	SliceStatus,
+	SliceStore,
+	SliceUpdateProps,
+	Task,
+	TaskProps,
+	TaskStore,
+	TaskUpdateProps,
+} from "@tff/core";
 import type { DatabaseInit } from "../../../domain/ports/database-init.port.js";
 import type { DependencyStore } from "../../../domain/ports/dependency-store.port.js";
 import type {
@@ -23,36 +39,22 @@ import type {
 	MilestoneAuditRecord,
 	MilestoneAuditStore,
 } from "../../../domain/ports/milestone-audit-store.port.js";
-import type { MilestoneStore } from "../../../domain/ports/milestone-store.port.js";
 import type {
 	PendingJudgmentRecord,
 	PendingJudgmentStore,
 } from "../../../domain/ports/pending-judgment-store.port.js";
-import type { ProjectStore } from "../../../domain/ports/project-store.port.js";
 import type { ReviewStore } from "../../../domain/ports/review-store.port.js";
 import type { SessionStore } from "../../../domain/ports/session-store.port.js";
 import type {
 	SliceDependency,
 	SliceDependencyStore,
 } from "../../../domain/ports/slice-dependency-store.port.js";
-import type { SliceStore } from "../../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../../domain/ports/task-store.port.js";
 import type { TransactionRunner } from "../../../domain/ports/transaction-runner.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
-import type { Dependency } from "../../../domain/value-objects/dependency.js";
-import type { MilestoneProps } from "../../../domain/value-objects/milestone-props.js";
-import type { MilestoneUpdateProps } from "../../../domain/value-objects/milestone-update-props.js";
-import type { ProjectProps } from "../../../domain/value-objects/project-props.js";
-import type { ReviewRecord, ReviewType } from "../../../domain/value-objects/review-record.js";
-import type { SliceProps } from "../../../domain/value-objects/slice-props.js";
-import type { SliceStatus } from "../../../domain/value-objects/slice-status.js";
-import type { SliceUpdateProps } from "../../../domain/value-objects/slice-update-props.js";
-import type { TaskProps } from "../../../domain/value-objects/task-props.js";
-import type { TaskUpdateProps } from "../../../domain/value-objects/task-update-props.js";
-import type { WorkflowSession } from "../../../domain/value-objects/workflow-session.js";
+import type { Dependency } from "../../../shared/value-objects/dependency.js";
+import type { ReviewRecord, ReviewType } from "../../../shared/value-objects/review-record.js";
+import type { WorkflowSession } from "../../../shared/value-objects/workflow-session.js";
 import { getProjectHome, getProjectId } from "../../home-directory.js";
 import { openDatabase } from "./open-database.js";
-import { runMigrations } from "@tff/core";
 
 interface SliceRow {
 	id: string;
@@ -65,6 +67,7 @@ interface SliceRow {
 	base_branch: string | null;
 	branch_name: string | null;
 	created_at: string;
+	updated_at: string;
 	archived_at: string | null;
 }
 
@@ -77,7 +80,24 @@ interface MilestoneRow {
 	branch: string;
 	close_reason: string | null;
 	created_at: string;
+	updated_at: string;
 	archived_at: string | null;
+}
+
+interface TaskRow {
+	id: string;
+	slice_id: string;
+	number: number;
+	title: string;
+	description: string | null;
+	status: string;
+	wave: number | null;
+	difficulty: number | null;
+	claimed_at: string | null;
+	claimed_by: string | null;
+	closed_reason: string | null;
+	created_at: string;
+	updated_at: string;
 }
 
 export class SQLiteStateAdapter
@@ -126,8 +146,12 @@ export class SQLiteStateAdapter
 		return new SQLiteStateAdapter(db, ":memory:", migrationsDir);
 	}
 
+	private writeFailure(message: string): PreconditionViolationError {
+		return new PreconditionViolationError(message, ["WRITE_FAILURE"]);
+	}
+
 	// DatabaseInit
-	init(): Result<void, DomainError> {
+	init(): Result<void, BaseDomainError<unknown>> {
 		try {
 			runMigrations(this.db, this.migrationsDir);
 			return Ok(undefined);
@@ -137,7 +161,12 @@ export class SQLiteStateAdapter
 				if (!this.dbPath || this.dbPath === ":memory:") {
 					const dbVer = Number(msg.match(/version (\d+)/)?.[1] ?? 0);
 					const codeVer = Number(msg.match(/code version (\d+)/)?.[1] ?? 0);
-					return Err(versionMismatchError(dbVer, codeVer));
+					return Err(
+						new PreconditionViolationError(
+							`Database schema version ${dbVer} is newer than code version ${codeVer}. Upgrade tff-tools.`,
+							["VERSION_MISMATCH"],
+						),
+					);
 				}
 				console.warn(
 					`[tff] Database schema version mismatch at ${this.dbPath}; backing up and recreating.`,
@@ -158,12 +187,10 @@ export class SQLiteStateAdapter
 				} catch (recoveryErr) {
 					const recoveryMsg =
 						recoveryErr instanceof Error ? recoveryErr.message : String(recoveryErr);
-					return Err(
-						createDomainError("WRITE_FAILURE", `Schema wipe/recreate failed: ${recoveryMsg}`),
-					);
+					return Err(this.writeFailure(`Schema wipe/recreate failed: ${recoveryMsg}`));
 				}
 			}
-			return Err(createDomainError("WRITE_FAILURE", `Migration failed: ${msg}`));
+			return Err(this.writeFailure(`Migration failed: ${msg}`));
 		}
 	}
 
@@ -180,26 +207,35 @@ export class SQLiteStateAdapter
 	}
 
 	// ProjectStore
-	getProject(): Result<Project | null, DomainError> {
+	getProject(): Result<Project | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db
-				.prepare("SELECT id, name, vision, created_at FROM project WHERE id = 'singleton'")
+				.prepare(
+					"SELECT id, name, vision, created_at, updated_at FROM project WHERE id = 'singleton'",
+				)
 				.get() as
-				| { id: string; name: string; vision: string | null; created_at: string }
+				| {
+						id: string;
+						name: string;
+						vision: string | null;
+						created_at: string;
+						updated_at: string;
+				  }
 				| undefined;
 			if (!row) return Ok(null);
 			return Ok({
 				id: row.id,
 				name: row.name,
-				vision: row.vision ?? undefined,
+				vision: row.vision ?? "",
 				createdAt: new Date(row.created_at),
-			});
+				updatedAt: new Date(row.updated_at),
+			} as unknown as Project);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get project: ${e}`));
+			return Err(this.writeFailure(`Failed to get project: ${e}`));
 		}
 	}
 
-	saveProject(props: ProjectProps): Result<Project, DomainError> {
+	saveProject(props: ProjectProps): Result<Project, BaseDomainError<unknown>> {
 		try {
 			const now = new Date().toISOString();
 			this.db
@@ -209,24 +245,22 @@ export class SQLiteStateAdapter
            ON CONFLICT(id) DO UPDATE SET name = excluded.name, vision = excluded.vision, updated_at = excluded.updated_at`,
 				)
 				.run(props.name, props.vision ?? null, now, now);
-			const project: Project = {
+			return Ok({
 				id: "singleton",
 				name: props.name,
-				vision: props.vision,
+				vision: props.vision ?? "",
 				createdAt: new Date(now),
-			};
-			return Ok(project);
+				updatedAt: new Date(now),
+			} as unknown as Project);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to save project: ${e}`));
+			return Err(this.writeFailure(`Failed to save project: ${e}`));
 		}
 	}
 
 	// MilestoneStore
-	createMilestone(props: MilestoneProps): Result<Milestone, DomainError> {
+	createMilestone(props: MilestoneProps): Result<Milestone, BaseDomainError<unknown>> {
 		try {
-			// Use provided id or generate a new UUID
 			const id = props.id ?? crypto.randomUUID();
-			// Use provided branch or compute from UUID
 			const branch = props.branch ?? milestoneBranchName(id);
 			const now = new Date().toISOString();
 			this.db
@@ -242,14 +276,17 @@ export class SQLiteStateAdapter
 				name: props.name,
 				status: "open" as const,
 				branch,
+				closeReason: null,
 				createdAt: new Date(now),
-			});
+				updatedAt: new Date(now),
+				archivedAt: null,
+			} as unknown as Milestone);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to create milestone: ${e}`));
+			return Err(this.writeFailure(`Failed to create milestone: ${e}`));
 		}
 	}
 
-	getMilestone(id: string): Result<Milestone | null, DomainError> {
+	getMilestone(id: string): Result<Milestone | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db.prepare("SELECT * FROM milestone WHERE id = ?").get(id) as
 				| MilestoneRow
@@ -257,15 +294,12 @@ export class SQLiteStateAdapter
 			if (!row) return Ok(null);
 			return Ok(this.rowToMilestone(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get milestone: ${e}`));
+			return Err(this.writeFailure(`Failed to get milestone: ${e}`));
 		}
 	}
 
-	getMilestoneByNumber(number: number): Result<Milestone | null, DomainError> {
+	getMilestoneByNumber(number: number): Result<Milestone | null, BaseDomainError<unknown>> {
 		try {
-			// Prefer the live (non-archived) milestone when label numbers collide
-			// with prior archived ones — milestone numbers are not unique across
-			// archived rows, so a bare lookup can return a stale match.
 			const row = this.db
 				.prepare(
 					"SELECT * FROM milestone WHERE number = ? AND archived_at IS NULL ORDER BY created_at DESC LIMIT 1",
@@ -274,11 +308,13 @@ export class SQLiteStateAdapter
 			if (!row) return Ok(null);
 			return Ok(this.rowToMilestone(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get milestone by number: ${e}`));
+			return Err(this.writeFailure(`Failed to get milestone by number: ${e}`));
 		}
 	}
 
-	listMilestones(options?: { includeArchived?: boolean }): Result<Milestone[], DomainError> {
+	listMilestones(options?: {
+		includeArchived?: boolean;
+	}): Result<Milestone[], BaseDomainError<unknown>> {
 		try {
 			const includeArchived = options?.includeArchived === true;
 			const sql = includeArchived
@@ -287,11 +323,14 @@ export class SQLiteStateAdapter
 			const rows = this.db.prepare(sql).all() as Array<MilestoneRow>;
 			return Ok(rows.map((r) => this.rowToMilestone(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list milestones: ${e}`));
+			return Err(this.writeFailure(`Failed to list milestones: ${e}`));
 		}
 	}
 
-	updateMilestone(id: string, updates: MilestoneUpdateProps): Result<void, DomainError> {
+	updateMilestone(
+		id: string,
+		updates: MilestoneUpdateProps,
+	): Result<void, BaseDomainError<unknown>> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -309,15 +348,15 @@ export class SQLiteStateAdapter
 			this.db.prepare(`UPDATE milestone SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to update milestone: ${e}`));
+			return Err(this.writeFailure(`Failed to update milestone: ${e}`));
 		}
 	}
 
-	archiveMilestoneCascade(id: string): Result<{ slicesArchived: number }, DomainError> {
-		return this.db.transaction((): Result<{ slicesArchived: number }, DomainError> => {
+	archiveMilestoneCascade(
+		id: string,
+	): Result<{ slicesArchived: number }, BaseDomainError<unknown>> {
+		return this.db.transaction((): Result<{ slicesArchived: number }, BaseDomainError<unknown>> => {
 			try {
-				// Idempotent slice archive: only update slices that are not yet archived,
-				// so the returned count reflects work actually done in this call.
 				const sliceInfo = this.db
 					.prepare(
 						"UPDATE slice SET archived_at = datetime('now'), updated_at = datetime('now') WHERE milestone_id = ? AND archived_at IS NULL",
@@ -330,16 +369,14 @@ export class SQLiteStateAdapter
 					.run(id);
 				return Ok({ slicesArchived: sliceInfo.changes });
 			} catch (e) {
-				return Err(createDomainError("WRITE_FAILURE", `Failed to archive milestone cascade: ${e}`));
+				return Err(this.writeFailure(`Failed to archive milestone cascade: ${e}`));
 			}
 		})();
 	}
 
-	closeMilestone(id: string, reason?: string): Result<void, DomainError> {
-		return this.db.transaction((): Result<void, DomainError> => {
+	closeMilestone(id: string, reason?: string): Result<void, BaseDomainError<unknown>> {
+		return this.db.transaction((): Result<void, BaseDomainError<unknown>> => {
 			try {
-				// Per-slice spec-approval invariant: every slice in the milestone must have
-				// at least one approved `type: "spec"` review. Fires regardless of slice state.
 				const slicesResult = this.listSlices(id);
 				if (!slicesResult.ok) return slicesResult;
 				const missing: string[] = [];
@@ -352,7 +389,12 @@ export class SQLiteStateAdapter
 					if (!hasApprovedSpec) missing.push(slice.id);
 				}
 				if (missing.length > 0) {
-					return Err(milestoneCompletenessViolationError(id, missing));
+					return Err(
+						new PreconditionViolationError(
+							`Milestone "${id}" cannot close — slices missing approved spec review: ${missing.join(", ")}`,
+							["MILESTONE_COMPLETENESS_VIOLATION"],
+						),
+					);
 				}
 				const openSlices = this.db
 					.prepare(
@@ -360,7 +402,12 @@ export class SQLiteStateAdapter
 					)
 					.get(id) as { count: number };
 				if (openSlices.count > 0) {
-					return Err(hasOpenChildrenError(id, openSlices.count));
+					return Err(
+						new PreconditionViolationError(
+							`Cannot close "${id}" — ${String(openSlices.count)} children are still open`,
+							["HAS_OPEN_CHILDREN"],
+						),
+					);
 				}
 				this.db
 					.prepare(
@@ -369,15 +416,14 @@ export class SQLiteStateAdapter
 					.run(reason ?? null, id);
 				return Ok(undefined);
 			} catch (e) {
-				return Err(createDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
+				return Err(this.writeFailure(`Failed to close milestone: ${e}`));
 			}
 		})();
 	}
 
 	// SliceStore
-	createSlice(props: SliceProps): Result<Slice, DomainError> {
+	createSlice(props: SliceProps): Result<Slice, BaseDomainError<unknown>> {
 		try {
-			// Use provided id or generate a new UUID
 			const id = props.id ?? crypto.randomUUID();
 			const kind = props.kind ?? "milestone";
 			const now = new Date().toISOString();
@@ -400,22 +446,24 @@ export class SQLiteStateAdapter
 				);
 			return Ok({
 				id,
-				milestoneId: props.milestoneId,
+				milestoneId: props.milestoneId ?? null,
 				kind,
 				number: props.number,
 				title: props.title,
 				status: "discussing" as const,
-				tier: props.tier,
-				baseBranch: props.baseBranch,
-				branchName: props.branchName,
+				tier: props.tier ?? null,
+				baseBranch: props.baseBranch ?? "",
+				branchName: props.branchName ?? "",
 				createdAt: new Date(now),
-			});
+				updatedAt: new Date(now),
+				archivedAt: null,
+			} as unknown as Slice);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to create slice: ${e}`));
+			return Err(this.writeFailure(`Failed to create slice: ${e}`));
 		}
 	}
 
-	getSlice(id: string): Result<Slice | null, DomainError> {
+	getSlice(id: string): Result<Slice | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db.prepare("SELECT * FROM slice WHERE id = ?").get(id) as
 				| SliceRow
@@ -423,21 +471,15 @@ export class SQLiteStateAdapter
 			if (!row) return Ok(null);
 			return Ok(this.rowToSlice(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get slice: ${e}`));
+			return Err(this.writeFailure(`Failed to get slice: ${e}`));
 		}
 	}
 
 	getSliceByNumbers(
 		milestoneNumber: number,
 		sliceNumber: number,
-	): Result<Slice | null, DomainError> {
+	): Result<Slice | null, BaseDomainError<unknown>> {
 		try {
-			// Restrict to non-archived rows on both sides so a label like M01-S01
-			// resolves to the live slice in the active milestone, not a stale one
-			// from a prior closed/archived milestone that happens to share the
-			// same number. Without this scope, label resolution silently picks
-			// the first matching row (often the prior archived one) and reviews
-			// get attached to the wrong slice — see issue #162.
 			const row = this.db
 				.prepare(
 					`SELECT s.* FROM slice s
@@ -450,13 +492,13 @@ export class SQLiteStateAdapter
 			if (!row) return Ok(null);
 			return Ok(this.rowToSlice(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get slice by numbers: ${e}`));
+			return Err(this.writeFailure(`Failed to get slice by numbers: ${e}`));
 		}
 	}
 
 	listSlices(
 		milestoneIdOrOptions?: string | { milestoneId?: string; includeArchived?: boolean },
-	): Result<Slice[], DomainError> {
+	): Result<Slice[], BaseDomainError<unknown>> {
 		try {
 			const opts =
 				typeof milestoneIdOrOptions === "string"
@@ -474,14 +516,14 @@ export class SQLiteStateAdapter
 						.all() as Array<SliceRow>);
 			return Ok(rows.map((r) => this.rowToSlice(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list slices: ${e}`));
+			return Err(this.writeFailure(`Failed to list slices: ${e}`));
 		}
 	}
 
 	listSlicesByKind(
 		kind: Slice["kind"],
 		options?: { includeArchived?: boolean },
-	): Result<Slice[], DomainError> {
+	): Result<Slice[], BaseDomainError<unknown>> {
 		try {
 			const includeArchived = options?.includeArchived === true;
 			const sql = includeArchived
@@ -490,11 +532,11 @@ export class SQLiteStateAdapter
 			const rows = this.db.prepare(sql).all(kind) as Array<SliceRow>;
 			return Ok(rows.map((r) => this.rowToSlice(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list slices by kind: ${e}`));
+			return Err(this.writeFailure(`Failed to list slices by kind: ${e}`));
 		}
 	}
 
-	updateSlice(id: string, updates: SliceUpdateProps): Result<void, DomainError> {
+	updateSlice(id: string, updates: SliceUpdateProps): Result<void, BaseDomainError<unknown>> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -512,16 +554,19 @@ export class SQLiteStateAdapter
 			this.db.prepare(`UPDATE slice SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to update slice: ${e}`));
+			return Err(this.writeFailure(`Failed to update slice: ${e}`));
 		}
 	}
 
-	transitionSlice(id: string, target: SliceStatus): Result<DomainEvent[], DomainError> {
-		return this.db.transaction((): Result<DomainEvent[], DomainError> => {
+	transitionSlice(
+		id: string,
+		target: SliceStatus,
+	): Result<DomainEvent<unknown>[], BaseDomainError<unknown>> {
+		return this.db.transaction((): Result<DomainEvent<unknown>[], BaseDomainError<unknown>> => {
 			if (target === "closed") {
 				const currentResult = this.getSlice(id);
 				if (!currentResult.ok) return currentResult;
-				if (currentResult.data?.status === "completing") {
+				if (currentResult.data?.status === "shipping") {
 					const reviewsResult = this.listReviews(id);
 					if (!reviewsResult.ok) return reviewsResult;
 					const approvedTypes = new Set(
@@ -531,7 +576,12 @@ export class SQLiteStateAdapter
 					if (!approvedTypes.has("code")) missing.push("code");
 					if (!approvedTypes.has("security")) missing.push("security");
 					if (missing.length > 0) {
-						return Err(shipCompletenessViolationError(id, missing));
+						return Err(
+							new PreconditionViolationError(
+								`Slice "${id}" cannot close — missing approved review(s) of type: ${missing.join(", ")}`,
+								["SHIP_COMPLETENESS_VIOLATION"],
+							),
+						);
 					}
 				}
 			}
@@ -539,15 +589,13 @@ export class SQLiteStateAdapter
 				const getResult = this.getSlice(id);
 				if (!getResult.ok) return getResult;
 				if (!getResult.data) {
-					return Err(createDomainError("NOT_FOUND", `Slice "${id}" not found`));
+					return Err(new SliceNotFoundError(`Slice "${id}" not found`, id));
 				}
-				const domainResult = transitionSlice(getResult.data, target);
-				if (!domainResult.ok) return domainResult;
+				const slice = Slice.reconstruct(getResult.data as unknown as SliceState);
+				slice.transition(target);
 				this.db
 					.prepare("UPDATE slice SET status = ?, updated_at = datetime('now') WHERE id = ?")
 					.run(target, id);
-				// Queue a routing judgment when a slice closes so post-merge grading
-				// can be drained before the milestone is allowed to close.
 				if (target === "closed") {
 					this.db
 						.prepare(
@@ -556,14 +604,17 @@ export class SQLiteStateAdapter
 						)
 						.run(id);
 				}
-				return Ok(domainResult.data.events);
+				return Ok(slice.pullEvents());
 			} catch (e) {
-				return Err(createDomainError("WRITE_FAILURE", `Failed to transition slice: ${e}`));
+				if (e instanceof BaseDomainError) {
+					return Err(e);
+				}
+				return Err(this.writeFailure(`Failed to transition slice: ${e}`));
 			}
 		})();
 	}
 
-	archiveSlice(id: string): Result<void, DomainError> {
+	archiveSlice(id: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare(
@@ -572,12 +623,12 @@ export class SQLiteStateAdapter
 				.run(id);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to archive slice: ${e}`));
+			return Err(this.writeFailure(`Failed to archive slice: ${e}`));
 		}
 	}
 
 	// TaskStore
-	createTask(props: TaskProps): Result<Task, DomainError> {
+	createTask(props: TaskProps): Result<Task, BaseDomainError<unknown>> {
 		try {
 			const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
 			const now = new Date().toISOString();
@@ -601,64 +652,43 @@ export class SQLiteStateAdapter
 				sliceId: props.sliceId,
 				number: props.number,
 				title: props.title,
-				description: props.description,
+				description: props.description ?? "",
 				status: "open" as const,
-				wave: props.wave,
+				wave: props.wave ?? null,
+				difficulty: null,
+				claimedAt: null,
+				claimedBy: null,
+				closedReason: null,
 				createdAt: new Date(now),
-			});
+				updatedAt: new Date(now),
+			} as unknown as Task);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to create task: ${e}`));
+			return Err(this.writeFailure(`Failed to create task: ${e}`));
 		}
 	}
 
-	getTask(id: string): Result<Task | null, DomainError> {
+	getTask(id: string): Result<Task | null, BaseDomainError<unknown>> {
 		try {
-			const row = this.db.prepare("SELECT * FROM task WHERE id = ?").get(id) as
-				| {
-						id: string;
-						slice_id: string;
-						number: number;
-						title: string;
-						description: string | null;
-						status: string;
-						wave: number | null;
-						claimed_at: string | null;
-						claimed_by: string | null;
-						closed_reason: string | null;
-						created_at: string;
-				  }
-				| undefined;
+			const row = this.db.prepare("SELECT * FROM task WHERE id = ?").get(id) as TaskRow | undefined;
 			if (!row) return Ok(null);
 			return Ok(this.rowToTask(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get task: ${e}`));
+			return Err(this.writeFailure(`Failed to get task: ${e}`));
 		}
 	}
 
-	listTasks(sliceId: string): Result<Task[], DomainError> {
+	listTasks(sliceId: string): Result<Task[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare("SELECT * FROM task WHERE slice_id = ? ORDER BY number")
-				.all(sliceId) as Array<{
-				id: string;
-				slice_id: string;
-				number: number;
-				title: string;
-				description: string | null;
-				status: string;
-				wave: number | null;
-				claimed_at: string | null;
-				claimed_by: string | null;
-				closed_reason: string | null;
-				created_at: string;
-			}>;
+				.all(sliceId) as Array<TaskRow>;
 			return Ok(rows.map((r) => this.rowToTask(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list tasks: ${e}`));
+			return Err(this.writeFailure(`Failed to list tasks: ${e}`));
 		}
 	}
 
-	updateTask(id: string, updates: TaskUpdateProps): Result<void, DomainError> {
+	updateTask(id: string, updates: TaskUpdateProps): Result<void, BaseDomainError<unknown>> {
 		try {
 			const sets: string[] = [];
 			const values: unknown[] = [];
@@ -680,11 +710,11 @@ export class SQLiteStateAdapter
 			this.db.prepare(`UPDATE task SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to update task: ${e}`));
+			return Err(this.writeFailure(`Failed to update task: ${e}`));
 		}
 	}
 
-	claimTask(id: string, claimedBy?: string): Result<void, DomainError> {
+	claimTask(id: string, claimedBy?: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			const info =
 				claimedBy !== undefined
@@ -699,15 +729,17 @@ export class SQLiteStateAdapter
 							)
 							.run(id);
 			if (info.changes === 0) {
-				return Err(alreadyClaimedError(id));
+				return Err(
+					new AlreadyClaimedError(`Task "${id}" is already claimed`, id, claimedBy ?? "unknown"),
+				);
 			}
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to claim task: ${e}`));
+			return Err(this.writeFailure(`Failed to claim task: ${e}`));
 		}
 	}
 
-	closeTask(id: string, reason?: string): Result<void, DomainError> {
+	closeTask(id: string, reason?: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare(
@@ -716,11 +748,11 @@ export class SQLiteStateAdapter
 				.run(reason ?? null, id);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to close task: ${e}`));
+			return Err(this.writeFailure(`Failed to close task: ${e}`));
 		}
 	}
 
-	listReadyTasks(sliceId: string): Result<Task[], DomainError> {
+	listReadyTasks(sliceId: string): Result<Task[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -733,26 +765,14 @@ export class SQLiteStateAdapter
            )
            ORDER BY number`,
 				)
-				.all(sliceId) as Array<{
-				id: string;
-				slice_id: string;
-				number: number;
-				title: string;
-				description: string | null;
-				status: string;
-				wave: number | null;
-				claimed_at: string | null;
-				claimed_by: string | null;
-				closed_reason: string | null;
-				created_at: string;
-			}>;
+				.all(sliceId) as Array<TaskRow>;
 			return Ok(rows.map((r) => this.rowToTask(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list ready tasks: ${e}`));
+			return Err(this.writeFailure(`Failed to list ready tasks: ${e}`));
 		}
 	}
 
-	listStaleClaims(ttlMinutes: number): Result<Task[], DomainError> {
+	listStaleClaims(ttlMinutes: number): Result<Task[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -761,26 +781,14 @@ export class SQLiteStateAdapter
            AND claimed_at < datetime('now', (-1 * ?) || ' minutes')
            ORDER BY claimed_at`,
 				)
-				.all(ttlMinutes) as Array<{
-				id: string;
-				slice_id: string;
-				number: number;
-				title: string;
-				description: string | null;
-				status: string;
-				wave: number | null;
-				claimed_at: string | null;
-				claimed_by: string | null;
-				closed_reason: string | null;
-				created_at: string;
-			}>;
+				.all(ttlMinutes) as Array<TaskRow>;
 			return Ok(rows.map((r) => this.rowToTask(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list stale claims: ${e}`));
+			return Err(this.writeFailure(`Failed to list stale claims: ${e}`));
 		}
 	}
 
-	getExecutorsForSlice(sliceId: string): Result<string[], DomainError> {
+	getExecutorsForSlice(sliceId: string): Result<string[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -789,78 +797,82 @@ export class SQLiteStateAdapter
 				.all(sliceId) as Array<{ claimed_by: string }>;
 			return Ok(rows.map((r) => r.claimed_by));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get executors for slice: ${e}`));
+			return Err(this.writeFailure(`Failed to get executors for slice: ${e}`));
 		}
 	}
 
 	// DependencyStore
-	addDependency(fromId: string, toId: string, type: "blocks"): Result<void, DomainError> {
+	addDependency(
+		fromId: string,
+		toId: string,
+		type: "blocks",
+	): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare("INSERT OR REPLACE INTO dependency (from_id, to_id, type) VALUES (?, ?, ?)")
 				.run(fromId, toId, type);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to add dependency: ${e}`));
+			return Err(this.writeFailure(`Failed to add dependency: ${e}`));
 		}
 	}
 
-	removeDependency(fromId: string, toId: string): Result<void, DomainError> {
+	removeDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db.prepare("DELETE FROM dependency WHERE from_id = ? AND to_id = ?").run(fromId, toId);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to remove dependency: ${e}`));
+			return Err(this.writeFailure(`Failed to remove dependency: ${e}`));
 		}
 	}
 
-	getDependencies(taskId: string): Result<Dependency[], DomainError> {
+	getDependencies(taskId: string): Result<Dependency[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare("SELECT from_id, to_id, type FROM dependency WHERE from_id = ? OR to_id = ?")
 				.all(taskId, taskId) as Array<{ from_id: string; to_id: string; type: string }>;
 			return Ok(rows.map((r) => ({ fromId: r.from_id, toId: r.to_id, type: r.type as "blocks" })));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get dependencies: ${e}`));
+			return Err(this.writeFailure(`Failed to get dependencies: ${e}`));
 		}
 	}
 
 	// SliceDependencyStore
-	addSliceDependency(fromId: string, toId: string): Result<void, DomainError> {
+	addSliceDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare("INSERT OR REPLACE INTO slice_dependency (from_id, to_id) VALUES (?, ?)")
 				.run(fromId, toId);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to add slice dependency: ${e}`));
+			return Err(this.writeFailure(`Failed to add slice dependency: ${e}`));
 		}
 	}
 
-	removeSliceDependency(fromId: string, toId: string): Result<void, DomainError> {
+	removeSliceDependency(fromId: string, toId: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare("DELETE FROM slice_dependency WHERE from_id = ? AND to_id = ?")
 				.run(fromId, toId);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to remove slice dependency: ${e}`));
+			return Err(this.writeFailure(`Failed to remove slice dependency: ${e}`));
 		}
 	}
 
-	getSliceDependencies(sliceId: string): Result<SliceDependency[], DomainError> {
+	getSliceDependencies(sliceId: string): Result<SliceDependency[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare("SELECT from_id, to_id FROM slice_dependency WHERE from_id = ? OR to_id = ?")
 				.all(sliceId, sliceId) as Array<{ from_id: string; to_id: string }>;
 			return Ok(rows.map((r) => ({ fromId: r.from_id, toId: r.to_id })));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get slice dependencies: ${e}`));
+			return Err(this.writeFailure(`Failed to get slice dependencies: ${e}`));
 		}
 	}
 
 	// SessionStore
-	getSession(): Result<WorkflowSession | null, DomainError> {
+	getSession(): Result<WorkflowSession | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db.prepare("SELECT * FROM workflow_session WHERE id = 1").get() as
 				| {
@@ -880,14 +892,12 @@ export class SQLiteStateAdapter
 				contextJson: row.context_json ?? undefined,
 			});
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get session: ${e}`));
+			return Err(this.writeFailure(`Failed to get session: ${e}`));
 		}
 	}
 
-	saveSession(session: WorkflowSession): Result<void, DomainError> {
+	saveSession(session: WorkflowSession): Result<void, BaseDomainError<unknown>> {
 		try {
-			// Disable FK checks for session save: active_slice_id and active_milestone_id may
-			// reference IDs that don't exist yet (e.g. during planning before slices are created).
 			this.db.pragma("foreign_keys = OFF");
 			try {
 				this.db
@@ -910,17 +920,22 @@ export class SQLiteStateAdapter
 			}
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to save session: ${e}`));
+			return Err(this.writeFailure(`Failed to save session: ${e}`));
 		}
 	}
 
 	// ReviewStore
-	recordReview(review: ReviewRecord): Result<void, DomainError> {
-		return this.db.transaction((): Result<void, DomainError> => {
+	recordReview(review: ReviewRecord): Result<void, BaseDomainError<unknown>> {
+		return this.db.transaction((): Result<void, BaseDomainError<unknown>> => {
 			const executorsResult = this.getExecutorsForSlice(review.sliceId);
 			if (!executorsResult.ok) return executorsResult;
 			if (executorsResult.data.includes(review.reviewer)) {
-				return Err(freshReviewerViolationError(review.sliceId, review.reviewer));
+				return Err(
+					new PreconditionViolationError(
+						`Agent "${review.reviewer}" cannot review slice "${review.sliceId}" — was the executor`,
+						["FRESH_REVIEWER_VIOLATION"],
+					),
+				);
 			}
 			try {
 				this.db
@@ -939,12 +954,15 @@ export class SQLiteStateAdapter
 					);
 				return Ok(undefined);
 			} catch (e) {
-				return Err(createDomainError("WRITE_FAILURE", `Failed to record review: ${e}`));
+				return Err(this.writeFailure(`Failed to record review: ${e}`));
 			}
 		})();
 	}
 
-	getLatestReview(sliceId: string, type: ReviewType): Result<ReviewRecord | null, DomainError> {
+	getLatestReview(
+		sliceId: string,
+		type: ReviewType,
+	): Result<ReviewRecord | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db
 				.prepare(
@@ -964,11 +982,11 @@ export class SQLiteStateAdapter
 			if (!row) return Ok(null);
 			return Ok(this.rowToReview(row));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get latest review: ${e}`));
+			return Err(this.writeFailure(`Failed to get latest review: ${e}`));
 		}
 	}
 
-	listReviews(sliceId: string): Result<ReviewRecord[], DomainError> {
+	listReviews(sliceId: string): Result<ReviewRecord[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare("SELECT * FROM review WHERE slice_id = ? ORDER BY created_at")
@@ -983,12 +1001,12 @@ export class SQLiteStateAdapter
 			}>;
 			return Ok(rows.map((r) => this.rowToReview(r)));
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list reviews: ${e}`));
+			return Err(this.writeFailure(`Failed to list reviews: ${e}`));
 		}
 	}
 
 	// MilestoneAuditStore
-	upsertAudit(r: MilestoneAuditRecord): Result<void, DomainError> {
+	upsertAudit(r: MilestoneAuditRecord): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare(
@@ -1002,12 +1020,12 @@ export class SQLiteStateAdapter
 				.run(r.milestoneId, r.verdict, r.auditedAt, r.notes ?? null);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to upsert audit: ${e}`));
+			return Err(this.writeFailure(`Failed to upsert audit: ${e}`));
 		}
 	}
 
 	// PendingJudgmentStore
-	insertPending(sliceId: string): Result<void, DomainError> {
+	insertPending(sliceId: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare(
@@ -1017,20 +1035,20 @@ export class SQLiteStateAdapter
 				.run(sliceId);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to insert pending judgment: ${e}`));
+			return Err(this.writeFailure(`Failed to insert pending judgment: ${e}`));
 		}
 	}
 
-	clearPending(sliceId: string): Result<void, DomainError> {
+	clearPending(sliceId: string): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db.prepare("DELETE FROM pending_judgments WHERE slice_id = ?").run(sliceId);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to clear pending judgment: ${e}`));
+			return Err(this.writeFailure(`Failed to clear pending judgment: ${e}`));
 		}
 	}
 
-	listPending(): Result<PendingJudgmentRecord[], DomainError> {
+	listPending(): Result<PendingJudgmentRecord[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -1053,11 +1071,13 @@ export class SQLiteStateAdapter
 				})),
 			);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to list pending judgments: ${e}`));
+			return Err(this.writeFailure(`Failed to list pending judgments: ${e}`));
 		}
 	}
 
-	listPendingForMilestone(milestoneId: string): Result<PendingJudgmentRecord[], DomainError> {
+	listPendingForMilestone(
+		milestoneId: string,
+	): Result<PendingJudgmentRecord[], BaseDomainError<unknown>> {
 		try {
 			const rows = this.db
 				.prepare(
@@ -1083,13 +1103,11 @@ export class SQLiteStateAdapter
 				})),
 			);
 		} catch (e) {
-			return Err(
-				createDomainError("WRITE_FAILURE", `Failed to list pending judgments for milestone: ${e}`),
-			);
+			return Err(this.writeFailure(`Failed to list pending judgments for milestone: ${e}`));
 		}
 	}
 
-	getPending(sliceId: string): Result<PendingJudgmentRecord | null, DomainError> {
+	getPending(sliceId: string): Result<PendingJudgmentRecord | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db
 				.prepare(
@@ -1113,11 +1131,15 @@ export class SQLiteStateAdapter
 				...(row.baseRef != null ? { baseRef: row.baseRef } : {}),
 			});
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to get pending judgment: ${e}`));
+			return Err(this.writeFailure(`Failed to get pending judgment: ${e}`));
 		}
 	}
 
-	recordMerge(sliceId: string, mergeSha: string, baseRef: string): Result<void, DomainError> {
+	recordMerge(
+		sliceId: string,
+		mergeSha: string,
+		baseRef: string,
+	): Result<void, BaseDomainError<unknown>> {
 		try {
 			this.db
 				.prepare(
@@ -1129,11 +1151,11 @@ export class SQLiteStateAdapter
 				.run(sliceId, mergeSha, baseRef);
 			return Ok(undefined);
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to record merge context: ${e}`));
+			return Err(this.writeFailure(`Failed to record merge context: ${e}`));
 		}
 	}
 
-	getAudit(milestoneId: string): Result<MilestoneAuditRecord | null, DomainError> {
+	getAudit(milestoneId: string): Result<MilestoneAuditRecord | null, BaseDomainError<unknown>> {
 		try {
 			const row = this.db
 				.prepare(
@@ -1151,7 +1173,7 @@ export class SQLiteStateAdapter
 				notes: row.notes ?? undefined,
 			});
 		} catch (e) {
-			return Err(createDomainError("WRITE_FAILURE", `Failed to load audit: ${e}`));
+			return Err(this.writeFailure(`Failed to load audit: ${e}`));
 		}
 	}
 
@@ -1159,45 +1181,36 @@ export class SQLiteStateAdapter
 	private rowToSlice(row: SliceRow): Slice {
 		return {
 			id: row.id,
-			milestoneId: row.milestone_id ?? undefined,
+			milestoneId: row.milestone_id ?? null,
 			kind: row.kind as Slice["kind"],
 			number: row.number,
 			title: row.title,
 			status: row.status as Slice["status"],
-			tier: (row.tier ?? undefined) as Slice["tier"],
-			baseBranch: row.base_branch ?? undefined,
-			branchName: row.branch_name ?? undefined,
+			tier: row.tier ?? null,
+			baseBranch: row.base_branch ?? "",
+			branchName: row.branch_name ?? "",
 			createdAt: new Date(row.created_at),
-			archivedAt: row.archived_at ? new Date(row.archived_at) : undefined,
-		};
+			updatedAt: new Date(row.updated_at),
+			archivedAt: row.archived_at ? new Date(row.archived_at) : null,
+		} as unknown as Slice;
 	}
 
-	private rowToTask(row: {
-		id: string;
-		slice_id: string;
-		number: number;
-		title: string;
-		description: string | null;
-		status: string;
-		wave: number | null;
-		claimed_at: string | null;
-		claimed_by: string | null;
-		closed_reason: string | null;
-		created_at: string;
-	}): Task {
+	private rowToTask(row: TaskRow): Task {
 		return {
 			id: row.id,
 			sliceId: row.slice_id,
 			number: row.number,
 			title: row.title,
-			description: row.description ?? undefined,
+			description: row.description ?? "",
 			status: row.status as Task["status"],
-			wave: row.wave ?? undefined,
-			claimedAt: row.claimed_at ? new Date(row.claimed_at) : undefined,
-			claimedBy: row.claimed_by ?? undefined,
-			closedReason: row.closed_reason ?? undefined,
+			wave: row.wave ?? null,
+			difficulty: row.difficulty ?? null,
+			claimedAt: row.claimed_at ? new Date(row.claimed_at) : null,
+			claimedBy: row.claimed_by ?? null,
+			closedReason: row.closed_reason ?? null,
 			createdAt: new Date(row.created_at),
-		};
+			updatedAt: new Date(row.updated_at),
+		} as unknown as Task;
 	}
 
 	private rowToMilestone(row: MilestoneRow): Milestone {
@@ -1208,10 +1221,11 @@ export class SQLiteStateAdapter
 			name: row.name,
 			status: row.status as Milestone["status"],
 			branch: row.branch,
-			closeReason: row.close_reason ?? undefined,
+			closeReason: row.close_reason ?? null,
 			createdAt: new Date(row.created_at),
-			archivedAt: row.archived_at ? new Date(row.archived_at) : undefined,
-		};
+			updatedAt: new Date(row.updated_at),
+			archivedAt: row.archived_at ? new Date(row.archived_at) : null,
+		} as unknown as Milestone;
 	}
 
 	private rowToReview(row: {
