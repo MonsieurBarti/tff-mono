@@ -18,7 +18,6 @@ import {
 	HumanGateRequiredError,
 	ReviewNotFoundError,
 } from "../../src/domain/slice/slice.error.js";
-import { SliceRepository } from "../../src/domain/slice/slice.repository.js";
 import { SLICE_TRANSITIONS, type SliceStatus } from "../../src/domain/slice/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
 
@@ -940,13 +939,6 @@ describe("Slice errors", () => {
 		expect(error.status).toBe(403);
 		expect(error.context).toEqual({ status: "shipping", message: "Approval required" });
 		expect(error.message).toBe("Approval required");
-	});
-});
-
-describe("SliceRepository", () => {
-	it("is an abstract class extending RepositoryPort", () => {
-		expect(typeof SliceRepository).toBe("function");
-		expect(Object.getPrototypeOf(SliceRepository).name).toBe("RepositoryPort");
 	});
 });
 

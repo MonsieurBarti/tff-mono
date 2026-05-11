@@ -8,7 +8,6 @@ import {
 	MilestoneAlreadyArchivedError,
 	InvalidTransitionError,
 } from "../../src/domain/milestone/milestone.error.js";
-import { MilestoneRepository } from "../../src/domain/milestone/milestone.repository.js";
 import { MILESTONE_TRANSITIONS } from "../../src/domain/milestone/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
 
@@ -399,13 +398,6 @@ describe("InvalidTransitionError", () => {
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ from: "created", to: "closed", expected: ["in_progress"] });
 		expect(error.message).toBe("Invalid transition from created to closed");
-	});
-});
-
-describe("MilestoneRepository", () => {
-	it("is an abstract class extending RepositoryPort", () => {
-		expect(typeof MilestoneRepository).toBe("function");
-		expect(Object.getPrototypeOf(MilestoneRepository).name).toBe("RepositoryPort");
 	});
 });
 

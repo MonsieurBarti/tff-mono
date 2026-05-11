@@ -12,7 +12,6 @@ import {
 	InvalidTransitionError,
 	TaskNotFoundError,
 } from "../../src/domain/task/task.error.js";
-import { TaskRepository } from "../../src/domain/task/task.repository.js";
 import { TASK_TRANSITIONS, type TaskStatus } from "../../src/domain/task/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
 
@@ -431,19 +430,6 @@ describe("Task aggregate root", () => {
 			expect(TASK_TRANSITIONS.open).toEqual(["in_progress"]);
 			expect(TASK_TRANSITIONS.in_progress).toEqual(["closed"]);
 			expect(TASK_TRANSITIONS.closed).toEqual([]);
-		});
-	});
-
-	describe("TaskRepository", () => {
-		it("extends RepositoryPort", () => {
-			class TestRepo extends TaskRepository {
-				save = async (): Promise<void> => {};
-				findById = async (): Promise<Task | null> => null;
-				findAll = async (): Promise<Task[]> => [];
-				delete = async (): Promise<void> => {};
-			}
-			const repo = new TestRepo();
-			expect(repo).toBeDefined();
 		});
 	});
 

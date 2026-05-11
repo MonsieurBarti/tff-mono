@@ -12,6 +12,5 @@ export {
 	isErr,
 	match,
 } from "./result.js";
-export { type RepositoryPort } from "./repository-port.js";
 export { IDateProvider, RealDateProvider, FakeDateProvider } from "./date-provider.js";
 export { EventBus } from "./event-bus.js";

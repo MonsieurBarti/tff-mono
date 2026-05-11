@@ -7,5 +7,5 @@ export {
 	MilestoneAlreadyArchivedError,
 	InvalidTransitionError,
 } from "./milestone.error.js";
-export { MilestoneRepository } from "./milestone.repository.js";
+export { type MilestoneProps, type MilestoneUpdateProps } from "./milestone-props.js";
 export { type MilestoneStatus, MILESTONE_TRANSITIONS } from "./transitions.js";

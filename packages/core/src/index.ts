@@ -3,6 +3,7 @@ export { runMigrations, getCurrentVersion } from "./db/run-migrations.js";
 export * from "./shared/index.js";
 export * from "./domain/shared/index.js";
 export * from "./domain/project/index.js";
+export * from "./domain/ports/index.js";
 export {
 	Milestone,
 	type MilestoneState,
@@ -11,7 +12,8 @@ export {
 	MilestoneArchivedEvent,
 	MilestoneNotFoundError,
 	MilestoneAlreadyArchivedError,
-	MilestoneRepository,
+	type MilestoneProps,
+	type MilestoneUpdateProps,
 	type MilestoneStatus,
 	MILESTONE_TRANSITIONS,
 	InvalidTransitionError as MilestoneInvalidTransitionError,
@@ -37,7 +39,8 @@ export {
 	SliceNotFoundError,
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
-	SliceRepository,
+	type SliceProps,
+	type SliceUpdateProps,
 	InvalidTransitionError as SliceInvalidTransitionError,
 	type SliceStatus,
 	type ComplexityTier,
@@ -63,7 +66,9 @@ export {
 	TaskUnclaimedEvent,
 	AlreadyClaimedError,
 	TaskNotFoundError,
-	TaskRepository,
+	type TaskProps,
+	type TaskUpdateProps,
+	type Difficulty,
 	type TaskStatus,
 	TASK_TRANSITIONS,
 } from "./domain/task/index.js";
