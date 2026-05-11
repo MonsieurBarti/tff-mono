@@ -1,7 +1,4 @@
-import type { z } from "zod";
-import type { ObservationSchema } from "../../domain/value-objects/observation.js";
-
-type Observation = z.infer<typeof ObservationSchema>;
+import type { Observation } from "@tff/core";
 
 interface ClusterOpts {
 	minSessions?: number;
