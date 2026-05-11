@@ -1,11 +1,17 @@
-import { createProject, type Project } from "../../domain/entities/project.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { projectExistsError } from "../../domain/errors/project-exists.error.js";
+import {
+	Project,
+	ProjectExistsError,
+	type BaseDomainError,
+	type ProjectStore,
+	type Result,
+	Ok,
+	Err,
+	isOk,
+	MILESTONES_DIR,
+	PROJECT_FILE,
+	TFF_DIR,
+} from "@tff/core";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import type { ProjectStore } from "../../domain/ports/project-store.port.js";
-
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { MILESTONES_DIR, PROJECT_FILE, TFF_DIR } from "@tff/core";
 
 interface InitProjectInput {
 	name: string;
@@ -22,14 +28,16 @@ interface InitProjectOutput {
 export const initProject = async (
 	input: InitProjectInput,
 	deps: InitProjectDeps,
-): Promise<Result<InitProjectOutput, DomainError>> => {
-	if (await deps.artifactStore.exists(PROJECT_FILE)) return Err(projectExistsError(input.name));
+): Promise<Result<InitProjectOutput, BaseDomainError>> => {
+	if (await deps.artifactStore.exists(PROJECT_FILE))
+		return Err(new ProjectExistsError("Project already exists", input.name));
 
 	const existing = deps.projectStore.getProject();
 	if (!isOk(existing)) return existing;
-	if (existing.data !== null) return Err(projectExistsError(input.name));
+	if (existing.data !== null)
+		return Err(new ProjectExistsError("Project already exists", input.name));
 
-	const project = createProject(input);
+	const project = Project.createNew(input);
 
 	const saveResult = deps.projectStore.saveProject({ name: project.name, vision: project.vision });
 	if (!isOk(saveResult)) return saveResult;
