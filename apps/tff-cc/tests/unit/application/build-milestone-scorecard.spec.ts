@@ -87,8 +87,8 @@ describe("buildMilestoneScorecard", () => {
 			milestoneLabel: "M01",
 			sliceLabels: ["M01-S01"],
 			outcomeSource: fakeSource([
-				out({ slice_id: "M01-S01", dimension: "agent", verdict: "ok" }),
-				out({ slice_id: "M02-S01", dimension: "agent", verdict: "wrong" }),
+				out({ sliceId: "M01-S01", dimension: "agent", verdict: "ok" }),
+				out({ sliceId: "M02-S01", dimension: "agent", verdict: "wrong" }),
 			]),
 			now: () => "n",
 		});

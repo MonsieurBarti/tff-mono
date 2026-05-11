@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { renderStateMd } from "../../application/sync/generate-state.js";
 import { isOk } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
@@ -86,7 +87,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 		if (!sliceResult.data) {
 			return JSON.stringify({
 				ok: false,
-				error: { code: "NOT_FOUND", message: `Slice "${sliceLabel}" not found` },
+				error: new GenericDomainError("NOT_FOUND", `Slice "${sliceLabel}" not found`),
 			});
 		}
 		const slice = sliceResult.data;

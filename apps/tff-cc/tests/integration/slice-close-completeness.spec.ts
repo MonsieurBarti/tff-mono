@@ -15,7 +15,7 @@ describe("slice-close completeness invariant", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const;
 		for (const target of path) {
 			const r = stores.sliceStore.transitionSlice(id, target);
@@ -66,7 +66,7 @@ describe("slice-close completeness invariant", () => {
 			}).ok,
 		).toBe(true);
 
-		// Drive the primary slice to `completing` so tests can attempt `closed`.
+		// Drive the primary slice to `shipping` so tests can attempt `closed`.
 		driveToCompleting(sliceId);
 	});
 
@@ -87,7 +87,7 @@ describe("slice-close completeness invariant", () => {
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
 			expect(r.error.errorLabel).toBe("SHIP_COMPLETENESS_VIOLATION");
-			expect(r.error.context).toMatchObject(["SHIP_COMPLETENESS_VIOLATION"]);
+			expect(r.error.context.missing).toEqual(["code", "security"]);
 		}
 	});
 
@@ -97,7 +97,7 @@ describe("slice-close completeness invariant", () => {
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
 			expect(r.error.errorLabel).toBe("SHIP_COMPLETENESS_VIOLATION");
-			expect(r.error.context).toMatchObject(["SHIP_COMPLETENESS_VIOLATION"]);
+			expect(r.error.context.missing).toEqual(["security"]);
 		}
 	});
 

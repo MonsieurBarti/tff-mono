@@ -74,9 +74,9 @@ describe("slice:create — kind-aware (quick/debug)", () => {
 		expect(result.ok).toBe(true);
 		const slice = result.data?.slice;
 		expect(slice.kind).toBe("quick");
-		expect(slice.milestoneId).toBeUndefined();
+		expect(slice.milestoneId).toBeNull();
 		expect(slice.baseBranch).toBe("main");
-		expect(slice.branchName).toBeUndefined();
+		expect(slice.branchName).toBe("");
 		expect(slice.number).toBe(1);
 
 		// PLAN.md exists at .tff/quick/Q-01/PLAN.md

@@ -44,7 +44,7 @@ describe("slice transition to closed queues a pending judgment", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			const r = stores.sliceStore.transitionSlice(sliceId, target);
 			if (!r.ok) throw new Error(`transition to ${target} failed`);
@@ -111,7 +111,7 @@ describe("slice transition to closed queues a pending judgment", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			const r = stores.sliceStore.transitionSlice(sId, target);
 			if (!r.ok) throw new Error(`transition to ${target} failed`);

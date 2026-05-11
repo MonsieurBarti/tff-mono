@@ -164,9 +164,9 @@ export class SQLiteStateAdapter
 					const dbVer = Number(msg.match(/version (\d+)/)?.[1] ?? 0);
 					const codeVer = Number(msg.match(/code version (\d+)/)?.[1] ?? 0);
 					return Err(
-						new PreconditionViolationError(
+						new GenericDomainError(
+							"VERSION_MISMATCH",
 							`Database schema version ${dbVer} is newer than code version ${codeVer}. Upgrade tff-tools.`,
-							["VERSION_MISMATCH"],
 						),
 					);
 				}

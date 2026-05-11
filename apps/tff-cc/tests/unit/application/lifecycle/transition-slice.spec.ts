@@ -39,7 +39,7 @@ describe("transitionSliceUseCase", () => {
 });
 
 describe("transitionSlice with EventBus", () => {
-	it("publishes SLICE_STATUS_CHANGED event via EventBus (AC13)", async () => {
+	it("publishes slice.transitioned event via EventBus (AC13)", async () => {
 		const adapter = new InMemoryStateAdapter();
 		adapter.saveProject({ name: "Test", vision: "v" });
 		const msResult = adapter.createMilestone({ number: 1, name: "M01" });
@@ -56,6 +56,6 @@ describe("transitionSlice with EventBus", () => {
 		);
 		expect(isOk(result)).toBe(true);
 		expect(publishFn).toHaveBeenCalledOnce();
-		expect(publishFn.mock.calls[0][0].type).toBe("SLICE_STATUS_CHANGED");
+		expect(publishFn.mock.calls[0][0].eventName).toBe("slice.transitioned");
 	});
 });

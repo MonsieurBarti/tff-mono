@@ -1,5 +1,6 @@
 import { sliceLabelFor } from "@tff/core";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveMilestoneId } from "../utils/resolve-id.js";
 
@@ -51,10 +52,10 @@ export const judgePendingListCmd = async (args: string[]): Promise<string> => {
 	if (rawMilestoneId && (kindFilter === "quick" || kindFilter === "debug")) {
 		return JSON.stringify({
 			ok: false,
-			error: {
-				code: "VALIDATION_ERROR",
-				message: `--milestone-id is incompatible with --kind ${kindFilter}; ad-hoc slices have no milestone.`,
-			},
+			error: new GenericDomainError(
+				"VALIDATION_ERROR",
+				`--milestone-id is incompatible with --kind ${kindFilter}; ad-hoc slices have no milestone.`,
+			),
 		});
 	}
 

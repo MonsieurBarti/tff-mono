@@ -223,9 +223,9 @@ describe("generateReminder", () => {
 		expect(result).toContain("Next: /tff:verify");
 	});
 
-	it("suggests correct command for completing phase", () => {
+	it("suggests correct command for shipping phase", () => {
 		const session: WorkflowSession = {
-			phase: "completing",
+			phase: "shipping",
 			activeSliceId: "S01",
 			activeMilestoneId: "M001",
 		};

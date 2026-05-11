@@ -5,8 +5,8 @@ import {
 	type Result,
 	type SliceStore,
 	type BaseDomainError,
-	PreconditionViolationError,
 } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MILESTONE_LABEL_RE = /^M(\d+)$/;
@@ -22,9 +22,7 @@ export function resolveMilestoneId(
 	const m = MILESTONE_LABEL_RE.exec(label);
 	if (!m) {
 		return Err(
-			new PreconditionViolationError(`Cannot resolve milestone label: '${label}'`, [
-				"VALIDATION_ERROR",
-			]),
+			new GenericDomainError("VALIDATION_ERROR", `Cannot resolve milestone label: '${label}'`),
 		);
 	}
 
@@ -32,7 +30,7 @@ export function resolveMilestoneId(
 	const result = milestoneStore.getMilestoneByNumber(number);
 	if (!result.ok) return result;
 	if (!result.data) {
-		return Err(new PreconditionViolationError(`Milestone not found: '${label}'`, ["NOT_FOUND"]));
+		return Err(new GenericDomainError("NOT_FOUND", `Milestone not found: '${label}'`));
 	}
 	return Ok(result.data.id);
 }
@@ -51,7 +49,7 @@ export function resolveSliceId(
 		if (!list.ok) return list;
 		const found = list.data.find((s) => s.number === number);
 		if (!found) {
-			return Err(new PreconditionViolationError(`Slice not found: '${label}'`, ["NOT_FOUND"]));
+			return Err(new GenericDomainError("NOT_FOUND", `Slice not found: '${label}'`));
 		}
 		return Ok(found.id);
 	}
@@ -59,9 +57,7 @@ export function resolveSliceId(
 	const m = SLICE_LABEL_RE.exec(label);
 	if (!m) {
 		return Err(
-			new PreconditionViolationError(`Cannot resolve slice label: '${label}'`, [
-				"VALIDATION_ERROR",
-			]),
+			new GenericDomainError("VALIDATION_ERROR", `Cannot resolve slice label: '${label}'`),
 		);
 	}
 
@@ -70,7 +66,7 @@ export function resolveSliceId(
 	const result = sliceStore.getSliceByNumbers(milestoneNumber, sliceNumber);
 	if (!result.ok) return result;
 	if (!result.data) {
-		return Err(new PreconditionViolationError(`Slice not found: '${label}'`, ["NOT_FOUND"]));
+		return Err(new GenericDomainError("NOT_FOUND", `Slice not found: '${label}'`));
 	}
 	return Ok(result.data.id);
 }

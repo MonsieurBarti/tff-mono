@@ -22,8 +22,8 @@ describe("chain-workflow", () => {
 	it("verifying → ship-slice", () => {
 		expect(nextWorkflow("verifying")).toBe("ship-slice");
 	});
-	it("completing → null (gate)", () => {
-		expect(nextWorkflow("completing")).toBeNull();
+	it("shipping → null (gate)", () => {
+		expect(nextWorkflow("shipping")).toBeNull();
 	});
 	it("auto-transition in plan-to-pr", () => {
 		expect(shouldAutoTransition("executing", "plan-to-pr")).toBe(true);
@@ -33,7 +33,7 @@ describe("chain-workflow", () => {
 	});
 	it("never auto at gates", () => {
 		expect(shouldAutoTransition("planning", "plan-to-pr")).toBe(false);
-		expect(shouldAutoTransition("completing", "plan-to-pr")).toBe(false);
+		expect(shouldAutoTransition("shipping", "plan-to-pr")).toBe(false);
 	});
 });
 
@@ -45,7 +45,7 @@ describe("suggestedCommand", () => {
 		["executing", "/tff:execute"],
 		["verifying", "/tff:verify"],
 		["reviewing", "/tff:ship"],
-		["completing", "/tff:complete-milestone"],
+		["shipping", "/tff:complete-milestone"],
 		// closed → next slice starts in `discussing`
 		["closed", "/tff:discuss"],
 	])("%s → %s", (status, expected) => {

@@ -1,5 +1,4 @@
 import type {
-	DomainEvent,
 	Milestone,
 	MilestoneProps,
 	MilestoneStore,
@@ -18,7 +17,7 @@ import type {
 	TaskStore,
 	TaskUpdateProps,
 } from "@tff/core";
-import { Err, Ok, milestoneBranchName } from "@tff/core";
+import { DomainEvent, Err, Ok, milestoneBranchName, SLICE_TRANSITIONS } from "@tff/core";
 import type { DomainError } from "../errors/generic-domain-error.js";
 import { GenericDomainError } from "../errors/generic-domain-error.js";
 import type { DatabaseInit } from "../../domain/ports/database-init.port.js";
@@ -348,8 +347,21 @@ export class InMemoryStateAdapter
 				);
 			}
 		}
+		const allowed = SLICE_TRANSITIONS[slice.status];
+		if (!allowed.includes(target)) {
+			return Err(
+				new GenericDomainError(
+					"INVALID_TRANSITION",
+					`Cannot transition slice "${id}" from "${slice.status}" to "${target}"`,
+					{ sliceId: id, from: slice.status, to: target, expected: allowed },
+				),
+			);
+		}
+		const from = slice.status;
 		mut(slice).status = target;
-		return Ok([]);
+		this.slices.set(id, slice);
+		const event = DomainEvent.create("slice.transitioned", { sliceId: id, from, to: target });
+		return Ok([event]);
 	}
 
 	archiveSlice(id: string): Result<void, DomainError> {

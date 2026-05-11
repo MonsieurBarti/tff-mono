@@ -18,7 +18,6 @@ export * from "./review-record.js";
 export * from "./routing-decision.js";
 export * from "./signals.js";
 export * from "./slice-props.js";
-export * from "./slice-status.js";
 export * from "./slice-update-props.js";
 export * from "./task-props.js";
 export * from "./task-update-props.js";

@@ -2,6 +2,7 @@ import { isOk, resolveBaseBranch, resolveBranchName, type Milestone } from "@tff
 import { createWorktreeUseCase } from "../../application/worktree/create-worktree.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import {
 	createTffSymlink,
 	getProjectId,
@@ -68,7 +69,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 			if (!isOk(milestoneResult) || !milestoneResult.data) {
 				return JSON.stringify({
 					ok: false,
-					error: { code: "NOT_FOUND", message: `Milestone ${slice.milestoneId} not found` },
+					error: new GenericDomainError("NOT_FOUND", `Milestone ${slice.milestoneId} not found`),
 				});
 			}
 			milestone = milestoneResult.data;
@@ -82,7 +83,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 		} catch (e) {
 			return JSON.stringify({
 				ok: false,
-				error: { code: "PRECONDITION_VIOLATION", message: (e as Error).message },
+				error: new GenericDomainError("PRECONDITION_VIOLATION", (e as Error).message),
 			});
 		}
 

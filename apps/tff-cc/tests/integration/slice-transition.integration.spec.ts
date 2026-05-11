@@ -150,7 +150,7 @@ describe("slice-transition integration", () => {
 
 		expect(result.ok).toBe(false);
 		expect(result.error.errorLabel).toBe("INVALID_TRANSITION");
-		expect(result.error.validPredecessors).toEqual(["verifying"]);
+		expect(result.error.context.expected).toEqual(["verifying"]);
 		expect(result.error.recoveryHint).toContain("verifying");
 	});
 });

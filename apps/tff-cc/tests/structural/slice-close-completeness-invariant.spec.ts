@@ -23,7 +23,7 @@ describe("slice-close completeness invariant is wired", () => {
 	beforeEach(() => {
 		stores = createClosableStateStoresUnchecked(":memory:");
 
-		// Seed: project → milestone → slice → task claimed by "exec-A" → drive to completing → seed approved code + security reviews.
+		// Seed: project → milestone → slice → task claimed by "exec-A" → drive to shipping → seed approved code + security reviews.
 		stores.projectStore.saveProject({ name: "Test Project" });
 		stores.milestoneStore.createMilestone({ number: 1, name: "Milestone One" });
 
@@ -120,7 +120,7 @@ describe("slice-close completeness invariant is wired", () => {
 	});
 
 	it("transitionSlice(..., 'closed') rejects when required reviews are missing", () => {
-		// Create a second slice with a claimed task, drive to completing, but do NOT seed reviews.
+		// Create a second slice with a claimed task, drive to shipping, but do NOT seed reviews.
 		const msResult = stores.milestoneStore.listMilestones();
 		if (!msResult.ok || msResult.data.length === 0) throw new Error("No milestones found");
 		const milestoneId = msResult.data[0].id;

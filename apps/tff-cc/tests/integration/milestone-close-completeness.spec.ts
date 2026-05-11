@@ -71,7 +71,7 @@ describe("milestone-close completeness invariant", () => {
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
 			expect(r.error.errorLabel).toBe("MILESTONE_COMPLETENESS_VIOLATION");
-			expect(r.error.context).toMatchObject(["MILESTONE_COMPLETENESS_VIOLATION"]);
+			expect(r.error.context.missing).toHaveLength(2);
 		}
 	});
 
@@ -80,7 +80,7 @@ describe("milestone-close completeness invariant", () => {
 		const r = stores.milestoneStore.closeMilestone(milestoneId);
 		expect(r.ok).toBe(false);
 		if (!r.ok) {
-			expect(r.error.context).toMatchObject(["MILESTONE_COMPLETENESS_VIOLATION"]);
+			expect(r.error.context.missing).toHaveLength(1);
 		}
 	});
 
@@ -96,7 +96,7 @@ describe("milestone-close completeness invariant", () => {
 				"executing",
 				"verifying",
 				"reviewing",
-				"completing",
+				"shipping",
 			] as const) {
 				expect(stores.sliceStore.transitionSlice(sliceId, state).ok).toBe(true);
 			}

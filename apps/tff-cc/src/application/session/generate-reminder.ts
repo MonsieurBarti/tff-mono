@@ -38,7 +38,7 @@ function determineCurrentWave(
  * the slice's ACTUAL status rather than a hardcoded default.
  *
  * Lifecycle: discussing → researching → planning → executing → verifying →
- *            reviewing → completing → closed
+ *            reviewing → shipping → closed
  */
 function getNextCommands(phase: string): string {
 	switch (phase) {
@@ -54,7 +54,7 @@ function getNextCommands(phase: string): string {
 			return "/tff:verify";
 		case "reviewing":
 			return "/tff:ship";
-		case "completing":
+		case "shipping":
 			return "/tff:complete-milestone";
 		case "closed":
 			// Current slice done — move to next slice, which starts in `discussing`.

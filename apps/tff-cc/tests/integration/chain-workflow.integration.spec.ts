@@ -3,7 +3,7 @@ import {
 	nextWorkflow,
 	shouldAutoTransition,
 } from "../../src/application/lifecycle/chain-workflow.js";
-import { canTransition, type SliceStatus } from "../../src/shared/value-objects/slice-status.js";
+import { SLICE_TRANSITIONS, type SliceStatus } from "@tff/core";
 
 describe("autonomous flow - integration", () => {
 	it("should produce valid transitions from discussing to first gate", () => {
@@ -23,7 +23,7 @@ describe("autonomous flow - integration", () => {
 			const nextStatus = statusMap[next];
 			if (!nextStatus) break;
 			// Verify the domain state machine allows this transition
-			expect(canTransition(current, nextStatus)).toBe(true);
+			expect(SLICE_TRANSITIONS[current].includes(nextStatus)).toBe(true);
 			current = nextStatus;
 			visited.push(current);
 			if (visited.length > 10) break; // safety
@@ -40,7 +40,7 @@ describe("autonomous flow - integration", () => {
 	});
 
 	it("should block at all gates in plan-to-pr", () => {
-		const gates = ["planning", "completing"];
+		const gates = ["planning", "shipping"];
 		for (const status of gates) {
 			expect(shouldAutoTransition(status, "plan-to-pr")).toBe(false);
 		}
@@ -54,7 +54,7 @@ describe("autonomous flow - integration", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		];
 		for (const status of allStatuses) {
 			expect(shouldAutoTransition(status, "guided")).toBe(false);

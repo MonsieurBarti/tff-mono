@@ -76,7 +76,7 @@ const driveSliceToClosed = (adapter: SQLiteStateAdapter, sliceId: string): void 
 		"executing",
 		"verifying",
 		"reviewing",
-		"completing",
+		"shipping",
 	] as const) {
 		const r = adapter.transitionSlice(sliceId, state);
 		if (!r.ok) console.error(`transition to ${state} failed:`, JSON.stringify(r.error));
@@ -172,7 +172,7 @@ describe("auto-archive on milestone close", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}
@@ -194,7 +194,7 @@ describe("auto-archive on milestone close", () => {
 		// DB: archived_at still null on the slice.
 		const re = adapter.getSlice(slice.data.id);
 		expect(re.ok).toBe(true);
-		if (re.ok && re.data) expect(re.data.archivedAt).toBeUndefined();
+		if (re.ok && re.data) expect(re.data.archivedAt).toBeNull();
 	});
 });
 
@@ -221,7 +221,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}
@@ -265,7 +265,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			expect(adapter.transitionSlice(slice.data.id, state).ok).toBe(true);
 		}

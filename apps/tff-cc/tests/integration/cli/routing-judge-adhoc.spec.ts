@@ -40,7 +40,7 @@ const driveSliceToClosed = (sliceId: string): void => {
 		"executing",
 		"verifying",
 		"reviewing",
-		"completing",
+		"shipping",
 	] as const) {
 		stores.sliceStore.transitionSlice(sliceId, target);
 	}
@@ -313,6 +313,6 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 		expect(lines).toHaveLength(1);
 		const outcome = JSON.parse(lines[0]);
 		expect(outcome.source).toBe("model-judge");
-		expect(outcome.decision_id).toBe(decisionId);
+		expect(outcome.decisionId).toBe(decisionId);
 	});
 });

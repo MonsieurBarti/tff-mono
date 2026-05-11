@@ -64,7 +64,7 @@ describe("calibrateUseCase", () => {
 	it("emits a tier-too-low-dominant recommendation when N_min met", async () => {
 		const outcomes: RoutingOutcome[] = Array.from({ length: 6 }, (_, i) =>
 			RoutingOutcome.create({
-				...manualTierTooLow,
+				...manualTierTooLow.toJSON(),
 				outcomeId: `00000000-0000-4000-8000-${String(100 + i).padStart(12, "0")}`,
 				verdict: i < 5 ? "too-low" : "too-high",
 			}),

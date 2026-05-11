@@ -5,10 +5,10 @@ const WORKFLOW_CHAIN: Record<string, string | null> = {
 	executing: "verify-slice",
 	verifying: "ship-slice",
 	reviewing: "ship-slice",
-	completing: null,
+	shipping: null,
 	closed: null,
 };
-const HUMAN_GATES = new Set(["planning", "completing"]);
+const HUMAN_GATES = new Set(["planning", "shipping"]);
 
 /**
  * User-facing command suggestion per slice status.
@@ -27,7 +27,7 @@ const SUGGESTED_COMMAND: Record<string, string> = {
 	executing: "/tff:execute",
 	verifying: "/tff:verify",
 	reviewing: "/tff:ship",
-	completing: "/tff:complete-milestone",
+	shipping: "/tff:complete-milestone",
 	closed: "/tff:discuss",
 };
 
