@@ -2,7 +2,11 @@ import type { TaskStartedEntry } from "../../shared/value-objects/journal-entry.
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
-import { isOk, partialSuccessWarning, type DomainError } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
+import { isOk } from "@tff/core";
 
 export const taskClaimSchema: CommandSchema = {
 	name: "task:claim",
@@ -69,7 +73,7 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	// no rows were changed and no journal entry should be written — we
 	// capture the error outcome via a sentinel rather than throwing (nothing
 	// to rollback) so the public error code is preserved.
-	let businessError: DomainError | null = null;
+	let businessError: unknown = null;
 	const txResult = await withTransaction(db, () => {
 		const r = taskStore.claimTask(taskId, claimedBy);
 		if (!r.ok) {
@@ -92,7 +96,12 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	const journalResult = journalRepository.append(task.sliceId, journalEntry);
 	if (!isOk(journalResult)) {
 		warnings.push(
-			partialSuccessWarning(`journal append failed: ${journalResult.error.message}`, "journal"),
+			new GenericDomainError(
+				"PARTIAL_SUCCESS",
+				`journal append failed: ${journalResult.error.message}`,
+				undefined,
+				"journal",
+			),
 		);
 	}
 

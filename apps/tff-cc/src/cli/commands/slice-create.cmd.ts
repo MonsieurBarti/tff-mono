@@ -313,7 +313,7 @@ export const sliceCreateCmd = async (args: string[]): Promise<string> => {
 					branchName: branchName ?? undefined,
 				});
 				if (!sliceResult.ok) {
-					throw new Error(`${sliceResult.error.code}: ${sliceResult.error.message}`);
+					throw new Error(`${sliceResult.error.errorLabel}: ${sliceResult.error.message}`);
 				}
 				const tmpRenames: Array<[string, string]> = [[planTmpAbs, planFinalAbs]];
 
@@ -323,7 +323,7 @@ export const sliceCreateCmd = async (args: string[]): Promise<string> => {
 						{ milestoneStore, sliceStore, taskStore: closableStores.taskStore },
 					);
 					if (!stateContent.ok) {
-						throw new Error(`${stateContent.error.code}: ${stateContent.error.message}`);
+						throw new Error(`${stateContent.error.errorLabel}: ${stateContent.error.message}`);
 					}
 					writeFileSync(stateTmpAbs, stateContent.data, "utf8");
 					tmpRenames.push([stateTmpAbs, stateFinalAbs]);

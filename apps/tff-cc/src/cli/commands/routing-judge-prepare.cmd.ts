@@ -18,9 +18,9 @@ import { resolveRoutingPaths } from "../utils/routing-paths.js";
 import {
 	detectDefaultBranch,
 	isOk,
-	preconditionViolationError,
 	resolveBaseBranch,
 	sliceLabelFor,
+	PreconditionViolationError,
 } from "@tff/core";
 
 const execFileP = promisify(execFile);
@@ -83,12 +83,8 @@ export const routingJudgePrepareCmd = async (
 	if (!modelJudgeEnabled) {
 		return JSON.stringify({
 			ok: false,
-			error: preconditionViolationError([
-				{
-					code: "settings.routing.calibration.model_judge.enabled",
-					expected: "true",
-					actual: "false",
-				},
+			error: new PreconditionViolationError("Precondition violated", [
+				"settings.routing.calibration.model_judge.enabled",
 			]),
 		});
 	}
@@ -123,9 +119,7 @@ export const routingJudgePrepareCmd = async (
 		if (!sliceEntity.ok || !sliceEntity.data) {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError([
-					{ code: "slice.exists", expected: "known slice", actual: "not found" },
-				]),
+				error: new PreconditionViolationError("Precondition violated", ["slice.exists"]),
 			});
 		}
 		let milestone: { id: string; number: number; branch?: string } | undefined;
@@ -134,9 +128,7 @@ export const routingJudgePrepareCmd = async (
 			if (!milestoneRes.ok || !milestoneRes.data) {
 				return JSON.stringify({
 					ok: false,
-					error: preconditionViolationError([
-						{ code: "milestone.exists", expected: "parent milestone", actual: "not found" },
-					]),
+					error: new PreconditionViolationError("Precondition violated", ["milestone.exists"]),
 				});
 			}
 			milestone = milestoneRes.data;

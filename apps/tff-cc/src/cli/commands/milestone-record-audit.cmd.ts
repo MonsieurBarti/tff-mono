@@ -2,7 +2,8 @@ import { recordAuditUseCase } from "../../application/milestone/record-audit.js"
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveMilestoneId } from "../utils/resolve-id.js";
-import { createDomainError, isOk } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
+import { isOk } from "@tff/core";
 
 const NOTES_MAX_LENGTH = 1000;
 // Zero-width and BOM characters that are invisible/dangerous.
@@ -48,7 +49,7 @@ export const milestoneRecordAuditCmd = async (args: string[]): Promise<string> =
 		if (notes.length > NOTES_MAX_LENGTH) {
 			return JSON.stringify({
 				ok: false,
-				error: createDomainError(
+				error: new GenericDomainError(
 					"VALIDATION_ERROR",
 					`--notes exceeds maximum length of ${NOTES_MAX_LENGTH} characters (got ${notes.length})`,
 				),
@@ -57,7 +58,7 @@ export const milestoneRecordAuditCmd = async (args: string[]): Promise<string> =
 		if (hasForbiddenChars(notes)) {
 			return JSON.stringify({
 				ok: false,
-				error: createDomainError(
+				error: new GenericDomainError(
 					"VALIDATION_ERROR",
 					"--notes contains disallowed control or zero-width characters",
 				),

@@ -1,14 +1,12 @@
-import { type BaseDomainError, isOk } from "@tff/core";
+import { isOk } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 import type { TaskCompletedEntry } from "../../shared/value-objects/journal-entry.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
-
-const partialSuccessWarning = (message: string, effect: string) => ({
-	code: "PARTIAL_SUCCESS",
-	message,
-	recoveryHint: `Retry effect: ${effect}`,
-});
 
 export const taskCloseSchema: CommandSchema = {
 	name: "task:close",
@@ -75,7 +73,7 @@ export const taskCloseCmd = async (args: string[]): Promise<string> => {
 
 	// Run the DB UPDATE inside a transaction. Business errors surface via a
 	// sentinel rather than a throw so public error codes are preserved.
-	let businessError: BaseDomainError<unknown> | null = null;
+	let businessError: DomainError | null = null;
 	const txResult = await withTransaction(db, () => {
 		const r = taskStore.closeTask(taskId, reason);
 		if (!r.ok) {
@@ -98,7 +96,12 @@ export const taskCloseCmd = async (args: string[]): Promise<string> => {
 	const journalResult = journalRepository.append(task.sliceId, journalEntry);
 	if (!isOk(journalResult)) {
 		warnings.push(
-			partialSuccessWarning(`journal append failed: ${journalResult.error.message}`, "journal"),
+			new GenericDomainError(
+				"PARTIAL_SUCCESS",
+				`journal append failed: ${journalResult.error.message}`,
+				undefined,
+				"journal",
+			),
 		);
 	}
 

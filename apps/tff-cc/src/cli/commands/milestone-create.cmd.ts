@@ -2,6 +2,7 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderStateMd } from "../../application/sync/generate-state.js";
 import { isOk, milestoneDir as milestoneDirPath, milestoneLabel } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
@@ -9,12 +10,6 @@ import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md
 import { mkdirTracked } from "../../infrastructure/persistence/track-mkdir.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
-
-const partialSuccessWarning = (message: string, effect: string) => ({
-	code: "PARTIAL_SUCCESS",
-	message,
-	recoveryHint: `Retry effect: ${effect}`,
-});
 
 export const milestoneCreateSchema: CommandSchema = {
 	name: "milestone:create",
@@ -83,7 +78,7 @@ export const milestoneCreateCmd = async (args: string[]): Promise<string> => {
 			() => {
 				const milestoneResult = milestoneStore.createMilestone({ number, name });
 				if (!milestoneResult.ok) {
-					throw new Error(`${milestoneResult.error.code}: ${milestoneResult.error.message}`);
+					throw new Error(`${milestoneResult.error.errorLabel}: ${milestoneResult.error.message}`);
 				}
 				// Render STATE.md from within the tx: the just-inserted milestone
 				// is visible to listMilestones / getMilestone here.
@@ -92,7 +87,7 @@ export const milestoneCreateCmd = async (args: string[]): Promise<string> => {
 					{ milestoneStore, sliceStore, taskStore },
 				);
 				if (!stateContent.ok) {
-					throw new Error(`${stateContent.error.code}: ${stateContent.error.message}`);
+					throw new Error(`${stateContent.error.errorLabel}: ${stateContent.error.message}`);
 				}
 				writeFileSync(stateTmpAbs, stateContent.data, "utf8");
 				return {
@@ -128,7 +123,9 @@ export const milestoneCreateCmd = async (args: string[]): Promise<string> => {
 		} catch (e) {
 			const msg = `git branch creation failed: ${String(e)}`;
 			tffWarn(msg);
-			warnings.push(partialSuccessWarning(msg, `git-branch:${branchName}`));
+			warnings.push(
+				new GenericDomainError("PARTIAL_SUCCESS", msg, undefined, `git-branch:${branchName}`),
+			);
 		}
 
 		// Best-effort WAL checkpoint.

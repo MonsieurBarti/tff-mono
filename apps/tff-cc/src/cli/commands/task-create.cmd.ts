@@ -114,7 +114,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 					wave,
 				});
 				if (!created.ok) {
-					throw new Error(`${created.error.code}: ${created.error.message}`);
+					throw new Error(`${created.error.errorLabel}: ${created.error.message}`);
 				}
 
 				const tmpRenames: Array<[string, string]> = [];
@@ -124,7 +124,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 						{ milestoneStore, sliceStore, taskStore },
 					);
 					if (!stateContent.ok) {
-						throw new Error(`${stateContent.error.code}: ${stateContent.error.message}`);
+						throw new Error(`${stateContent.error.errorLabel}: ${stateContent.error.message}`);
 					}
 					writeFileSync(stateTmpAbs, stateContent.data, "utf8");
 					tmpRenames.push([stateTmpAbs, stateFinalAbs]);

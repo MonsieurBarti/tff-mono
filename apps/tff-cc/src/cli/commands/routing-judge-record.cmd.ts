@@ -10,7 +10,7 @@ import { resolvePluginRoot } from "../../infrastructure/plugin-root.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
 import { resolveRoutingPaths } from "../utils/routing-paths.js";
-import { isOk, preconditionViolationError, sliceLabelFor } from "@tff/core";
+import { isOk, sliceLabelFor, PreconditionViolationError } from "@tff/core";
 
 export const routingJudgeRecordSchema: CommandSchema = {
 	name: "routing:judge-record",
@@ -71,12 +71,8 @@ export const routingJudgeRecordCmd = async (
 	if (!modelJudgeEnabled) {
 		return JSON.stringify({
 			ok: false,
-			error: preconditionViolationError([
-				{
-					code: "settings.routing.calibration.model_judge.enabled",
-					expected: "true",
-					actual: "false",
-				},
+			error: new PreconditionViolationError("Precondition violated", [
+				"settings.routing.calibration.model_judge.enabled",
 			]),
 		});
 	}
@@ -87,16 +83,10 @@ export const routingJudgeRecordCmd = async (
 		let raw: string;
 		try {
 			raw = readFileSync(flags["verdicts-path"], "utf8");
-		} catch (err) {
+		} catch {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError([
-					{
-						code: "verdicts-path.readable",
-						expected: "readable file",
-						actual: String(err),
-					},
-				]),
+				error: new PreconditionViolationError("Precondition violated", ["verdicts-path.readable"]),
 			});
 		}
 		try {
@@ -104,13 +94,7 @@ export const routingJudgeRecordCmd = async (
 		} catch {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError([
-					{
-						code: "verdicts-path.json",
-						expected: "valid JSON",
-						actual: "parse error",
-					},
-				]),
+				error: new PreconditionViolationError("Precondition violated", ["verdicts-path.json"]),
 			});
 		}
 	} else if (flags["verdicts-json"]) {
@@ -119,25 +103,13 @@ export const routingJudgeRecordCmd = async (
 		} catch {
 			return JSON.stringify({
 				ok: false,
-				error: preconditionViolationError([
-					{
-						code: "verdicts-json.json",
-						expected: "valid JSON",
-						actual: "parse error",
-					},
-				]),
+				error: new PreconditionViolationError("Precondition violated", ["verdicts-json.json"]),
 			});
 		}
 	} else {
 		return JSON.stringify({
 			ok: false,
-			error: preconditionViolationError([
-				{
-					code: "verdicts.source",
-					expected: "--verdicts-path or --verdicts-json",
-					actual: "neither provided",
-				},
-			]),
+			error: new PreconditionViolationError("Precondition violated", ["verdicts.source"]),
 		});
 	}
 
@@ -166,9 +138,7 @@ export const routingJudgeRecordCmd = async (
 			if (!sliceEntity.ok || !sliceEntity.data) {
 				return JSON.stringify({
 					ok: false,
-					error: preconditionViolationError([
-						{ code: "slice.exists", expected: "known slice", actual: "not found" },
-					]),
+					error: new PreconditionViolationError("Precondition violated", ["slice.exists"]),
 				});
 			}
 			let milestone: { number: number } | undefined;
@@ -177,9 +147,7 @@ export const routingJudgeRecordCmd = async (
 				if (!milestoneRes.ok || !milestoneRes.data) {
 					return JSON.stringify({
 						ok: false,
-						error: preconditionViolationError([
-							{ code: "milestone.exists", expected: "parent milestone", actual: "not found" },
-						]),
+						error: new PreconditionViolationError("Precondition violated", ["milestone.exists"]),
 					});
 				}
 				milestone = milestoneRes.data;

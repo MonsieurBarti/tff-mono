@@ -1,4 +1,5 @@
 import { transitionSliceOrchestrator } from "../../application/slice/transition-slice.js";
+import { type SliceStatus as CoreSliceStatus } from "@tff/core";
 import { SliceStatusSchema } from "../../shared/value-objects/slice-status.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
@@ -55,7 +56,7 @@ export const sliceTransitionCmd = async (args: string[]): Promise<string> => {
 	const stores = createClosableStateStoresUnchecked();
 	try {
 		const response = await transitionSliceOrchestrator(
-			{ sliceLabel, targetStatus: parsedStatus.data, cwd: process.cwd() },
+			{ sliceLabel, targetStatus: parsedStatus.data as CoreSliceStatus, cwd: process.cwd() },
 			{ stores },
 		);
 		return JSON.stringify(response);

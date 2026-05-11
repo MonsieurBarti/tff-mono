@@ -1,7 +1,6 @@
-import { ObservationSchema } from "../../shared/value-objects/observation.js";
+import { Observation, OBSERVATIONS_DIR, isOk } from "@tff/core";
 import { JsonlStoreAdapter } from "../../infrastructure/adapters/jsonl/jsonl-store.adapter.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
-import { OBSERVATIONS_DIR, isOk } from "@tff/core";
 
 export const observeRecordSchema: CommandSchema = {
 	name: "observe:record",
@@ -47,12 +46,15 @@ export const observeRecordCmd = async (args: string[]): Promise<string> => {
 	}
 
 	try {
-		const obs = ObservationSchema.parse({
-			ts: parsed.data.ts,
-			session: parsed.data.session,
-			tool: parsed.data.tool,
-			args: parsed.data.args,
-			project: parsed.data.project,
+		const rawArgs = parsed.data.args;
+		const args =
+			rawArgs === null ? null : typeof rawArgs === "string" ? rawArgs : JSON.stringify(rawArgs);
+		const obs = Observation.create({
+			ts: parsed.data.ts as string,
+			session: parsed.data.session as string,
+			tool: parsed.data.tool as string,
+			args,
+			project: parsed.data.project as string,
 		});
 		const store = new JsonlStoreAdapter(OBSERVATIONS_DIR);
 		const result = await store.appendObservation(obs);
