@@ -368,29 +368,37 @@ describe("MilestoneArchivedEvent", () => {
 });
 
 describe("MilestoneNotFoundError", () => {
-	it("has the correct label and status", () => {
-		const error = new MilestoneNotFoundError("ms-1");
+	it("has the correct label, status, and message", () => {
+		const error = new MilestoneNotFoundError("Milestone ms-1 not found", "ms-1");
 		expect(error.errorLabel).toBe("MILESTONE_NOT_FOUND");
 		expect(error.status).toBe(404);
 		expect(error.context).toEqual({ milestoneId: "ms-1" });
+		expect(error.message).toBe("Milestone ms-1 not found");
 	});
 });
 
 describe("MilestoneAlreadyArchivedError", () => {
-	it("has the correct label and status", () => {
-		const error = new MilestoneAlreadyArchivedError("ms-1");
+	it("has the correct label, status, and message", () => {
+		const error = new MilestoneAlreadyArchivedError("Milestone is already archived", "ms-1");
 		expect(error.errorLabel).toBe("MILESTONE_ALREADY_ARCHIVED");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ milestoneId: "ms-1" });
+		expect(error.message).toBe("Milestone is already archived");
 	});
 });
 
 describe("InvalidTransitionError", () => {
-	it("has the correct label and status", () => {
-		const error = new InvalidTransitionError("created", "closed", ["in_progress"]);
+	it("has the correct label, status, and message", () => {
+		const error = new InvalidTransitionError(
+			"Invalid transition from created to closed",
+			"created",
+			"closed",
+			["in_progress"],
+		);
 		expect(error.errorLabel).toBe("INVALID_TRANSITION");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ from: "created", to: "closed", expected: ["in_progress"] });
+		expect(error.message).toBe("Invalid transition from created to closed");
 	});
 });
 

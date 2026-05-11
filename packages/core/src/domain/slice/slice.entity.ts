@@ -213,7 +213,7 @@ export class Slice extends AggregateRoot {
 
 	rename(title: string): void {
 		if (this.isArchived) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Cannot rename archived slice`, this._id);
 		}
 		const validated = renameSchema.parse(title);
 		this._title = validated;
@@ -222,19 +222,24 @@ export class Slice extends AggregateRoot {
 
 	transition(to: SliceStatus, context?: TransitionContext): void {
 		if (this.isArchived) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Cannot transition archived slice`, this._id);
 		}
 		const allowed = SLICE_TRANSITIONS[this._status];
 		const isAllowed = allowed.includes(to);
 		const isTierSkip = tierSkipGuard(this._status, to, this._tier).ok;
 		if (!isAllowed && !isTierSkip) {
-			throw new InvalidTransitionError(this._status, to, allowed);
+			throw new InvalidTransitionError(
+				`Invalid transition from ${this._status} to ${to}`,
+				this._status,
+				to,
+				allowed,
+			);
 		}
 
 		if (this._status === "verifying" && to === "reviewing") {
 			const guardResult = reviewExistsGuard(this._reviews);
 			if (!guardResult.ok) {
-				throw new PreconditionViolationError([
+				throw new PreconditionViolationError(`Precondition failed for transition to reviewing`, [
 					guardResult.reason ?? "Review existence check failed",
 				]);
 			}
@@ -256,11 +261,11 @@ export class Slice extends AggregateRoot {
 
 	classifyTier(tier: ComplexityTier): void {
 		if (this.isArchived) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Cannot classify tier on archived slice`, this._id);
 		}
 		const validated = tierSchema.safeParse(tier);
 		if (!validated.success) {
-			throw new TierClassificationError(tier, "Invalid tier value");
+			throw new TierClassificationError(`Invalid tier value: ${tier}`, tier, "Invalid tier value");
 		}
 		this._tier = validated.data;
 		this._updatedAt = new Date();
@@ -274,7 +279,7 @@ export class Slice extends AggregateRoot {
 
 	archive(dateProvider: IDateProvider): void {
 		if (this._archivedAt !== null) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Slice is already archived`, this._id);
 		}
 		this._archivedAt = dateProvider.now();
 		this._updatedAt = dateProvider.now();
@@ -293,7 +298,7 @@ export class Slice extends AggregateRoot {
 		notes?: string;
 	}): void {
 		if (this.isArchived) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Cannot record review on archived slice`, this._id);
 		}
 		const reviewProps: {
 			sliceId: string;
@@ -325,11 +330,15 @@ export class Slice extends AggregateRoot {
 		verdict: "approved" | "changes_requested" | "commented",
 	): void {
 		if (this.isArchived) {
-			throw new SliceAlreadyArchivedError(this._id);
+			throw new SliceAlreadyArchivedError(`Cannot set review verdict on archived slice`, this._id);
 		}
 		const review = this._reviews.find((r) => r.id === reviewId);
 		if (!review) {
-			throw new ReviewNotFoundError(reviewId, this._id);
+			throw new ReviewNotFoundError(
+				`Review ${reviewId} not found on slice ${this._id}`,
+				reviewId,
+				this._id,
+			);
 		}
 		review.setVerdict(verdict);
 		const reviewEvents = review.pullEvents();

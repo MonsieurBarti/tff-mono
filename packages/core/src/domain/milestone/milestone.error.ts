@@ -4,9 +4,11 @@ export class MilestoneNotFoundError extends BaseDomainError<{ milestoneId: strin
 	readonly errorLabel = "MILESTONE_NOT_FOUND";
 	readonly status = 404;
 	readonly context: { milestoneId: string };
+	readonly message: string;
 
-	constructor(milestoneId: string) {
-		super();
+	constructor(message: string, milestoneId: string, recoveryHint?: string) {
+		super(recoveryHint);
+		this.message = message;
 		this.context = { milestoneId };
 	}
 }
@@ -15,9 +17,11 @@ export class MilestoneAlreadyArchivedError extends BaseDomainError<{ milestoneId
 	readonly errorLabel = "MILESTONE_ALREADY_ARCHIVED";
 	readonly status = 409;
 	readonly context: { milestoneId: string };
+	readonly message: string;
 
-	constructor(milestoneId: string) {
-		super();
+	constructor(message: string, milestoneId: string, recoveryHint?: string) {
+		super(recoveryHint);
+		this.message = message;
 		this.context = { milestoneId };
 	}
 }
@@ -30,9 +34,17 @@ export class InvalidTransitionError extends BaseDomainError<{
 	readonly errorLabel = "INVALID_TRANSITION";
 	readonly status = 409;
 	readonly context: { from: string; to: string; expected: readonly string[] };
+	readonly message: string;
 
-	constructor(from: string, to: string, expected: readonly string[]) {
-		super();
+	constructor(
+		message: string,
+		from: string,
+		to: string,
+		expected: readonly string[],
+		recoveryHint?: string,
+	) {
+		super(recoveryHint);
+		this.message = message;
 		this.context = { from, to, expected };
 	}
 }

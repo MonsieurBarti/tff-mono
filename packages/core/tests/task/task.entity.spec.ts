@@ -448,11 +448,12 @@ describe("Task aggregate root", () => {
 	});
 
 	describe("TaskNotFoundError", () => {
-		it("has correct label and status", () => {
-			const error = new TaskNotFoundError("task-123");
+		it("has correct label, status, and message", () => {
+			const error = new TaskNotFoundError("Task task-123 not found", "task-123");
 			expect(error.errorLabel).toBe("TASK_NOT_FOUND");
 			expect(error.status).toBe(404);
 			expect(error.context).toEqual({ taskId: "task-123" });
+			expect(error.message).toBe("Task task-123 not found");
 		});
 	});
 });

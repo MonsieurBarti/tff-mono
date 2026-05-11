@@ -191,11 +191,12 @@ describe("ProjectNameUpdatedEvent", () => {
 });
 
 describe("ProjectExistsError", () => {
-	it("has the correct label and status", () => {
-		const error = new ProjectExistsError("singleton");
+	it("has the correct label, status, and message", () => {
+		const error = new ProjectExistsError("Project singleton already exists", "singleton");
 		expect(error.errorLabel).toBe("PROJECT_EXISTS");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ projectId: "singleton" });
+		expect(error.message).toBe("Project singleton already exists");
 	});
 });
 
