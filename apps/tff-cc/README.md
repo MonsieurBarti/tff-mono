@@ -328,21 +328,24 @@ the-forge-flow/
   references/             # 8 reference documents (.md)
   hooks/                  # PostToolUse observation hook (.sh)
   src/
-    domain/               # Hexagonal domain layer (Zod, Result<T,E>)
-    application/          # Use cases (orchestrate domain via ports)
+    application/          # Use cases (orchestrate via local ports)
     infrastructure/       # Adapters (SQLite, git CLI, filesystem)
     cli/                  # CLI entry point
   dist/                   # Compiled CLI and native bindings
   tests/                  # Unit and integration tests
+packages/core/
+  src/
+    domain/               # Shared domain layer (state machine, schema, contracts)
+    shared/               # Content, migrations, and shared assets
 ```
 
-### Hexagonal Rules
+### Core / App Split
 
-- **Domain** imports only Zod + `node:crypto`. No infrastructure.
-- **Zod as single source of truth** -- `z.infer<typeof Schema>` everywhere, no TS `enum`.
-- **Result\<T, E\>** for all fallible operations. Never throw.
-- **Ports** define interfaces in domain. Adapters implement in infrastructure.
-- **Tests** colocated as `.spec.ts`. Unit tests use in-memory adapters.
+- `packages/core` owns domain models, state machine, schema, migrations, and shared content.
+- `apps/tff-cc` owns the CLI entry point, Claude-Code-specific adapters, and local port wiring.
+- `@tff/core` is bundled into the CLI at build time via esbuild (`external: []`); no runtime `node_modules` resolution is needed.
+- Local port definitions remain in `apps/tff-cc/src/domain/ports/` for app-specific contracts not provided by `@tff/core`.
+- **Tests** are organized as `.spec.ts`. Unit tests use in-memory adapters.
 
 ## Agents
 

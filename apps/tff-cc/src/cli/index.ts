@@ -551,3 +551,5 @@ if (isEntryPoint()) {
 		process.exit(1);
 	});
 }
+
+export { runMigrations, Milestone } from "@tff/core";
