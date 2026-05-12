@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { execSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
-import { createRequire } from "node:module";
 
 const distCli = resolve(process.cwd(), "dist", "cli", "index.js");
 const distMigrations = resolve(process.cwd(), "dist", "cli", "migrations");
@@ -10,7 +9,7 @@ const distMigrations = resolve(process.cwd(), "dist", "cli", "migrations");
 describe("Runtime @tff/core resolution", () => {
 	it("bundle --help exits cleanly", () => {
 		const out = execSync(`node "${distCli}" --help`, { encoding: "utf8" });
-		expect(out).toContain("tff");
+		expect(out).toContain("tff-tools");
 	});
 
 	it("dist/cli/migrations/ contains SQL files from @tff/core", () => {
@@ -20,9 +19,8 @@ describe("Runtime @tff/core resolution", () => {
 		expect(sqlFiles.length).toBeGreaterThan(0);
 	});
 
-	it("bundle exposes @tff/core exports via require()", () => {
-		const require = createRequire(import.meta.url);
-		const m = require(distCli);
+	it("bundle exposes @tff/core exports at runtime", async () => {
+		const m = await import(distCli);
 		expect(typeof m.runMigrations).toBe("function");
 		expect(typeof m.Milestone).toBe("function");
 	});

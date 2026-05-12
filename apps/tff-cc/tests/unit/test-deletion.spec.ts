@@ -48,7 +48,7 @@ const DIRS_TO_DELETE = [
 	"tests/unit/application/state-branch",
 ];
 
-const S03_FILES_TO_DELETE = [
+const S03_PATHS_TO_DELETE = [
 	"src/domain/entities/",
 	"src/domain/errors/",
 	"src/domain/events/",
@@ -63,7 +63,7 @@ const S02_FILES_TO_DELETE = Array.from(
 	(_, i) => `src/infrastructure/adapters/sqlite/migrations/v${i + 1}.ts`,
 );
 
-const RETAINED_LOCAL_PORTS = ["src/domain/ports/", "src/domain/index.ts"];
+const RETAINED_PATHS = ["src/domain/ports/", "src/domain/index.ts"];
 
 describe("T06: State-branch test file deletion", () => {
 	const projectRoot = process.cwd();
@@ -86,7 +86,7 @@ describe("T06: State-branch test file deletion", () => {
 describe("S02 + S03: Deleted domain and migration files", () => {
 	const projectRoot = process.cwd();
 
-	for (const file of S03_FILES_TO_DELETE) {
+	for (const file of S03_PATHS_TO_DELETE) {
 		it(`should NOT have ${file} after S03 deletion`, () => {
 			const fullPath = join(projectRoot, file);
 			expect(existsSync(fullPath)).toBe(false);
@@ -104,7 +104,7 @@ describe("S02 + S03: Deleted domain and migration files", () => {
 describe("Retained local port contracts", () => {
 	const projectRoot = process.cwd();
 
-	for (const file of RETAINED_LOCAL_PORTS) {
+	for (const file of RETAINED_PATHS) {
 		it(`should still have ${file}`, () => {
 			const fullPath = join(projectRoot, file);
 			expect(existsSync(fullPath)).toBe(true);
