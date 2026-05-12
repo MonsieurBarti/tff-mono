@@ -48,6 +48,23 @@ const DIRS_TO_DELETE = [
 	"tests/unit/application/state-branch",
 ];
 
+const S03_FILES_TO_DELETE = [
+	"src/domain/entities/",
+	"src/domain/errors/",
+	"src/domain/events/",
+	"src/domain/helpers/",
+	"src/domain/state-machine/",
+	"src/domain/value-objects/",
+	"src/domain/result.ts",
+];
+
+const S02_FILES_TO_DELETE = Array.from(
+	{ length: 9 },
+	(_, i) => `src/infrastructure/adapters/sqlite/migrations/v${i + 1}.ts`,
+);
+
+const RETAINED_LOCAL_PORTS = ["src/domain/ports/", "src/domain/index.ts"];
+
 describe("T06: State-branch test file deletion", () => {
 	const projectRoot = process.cwd();
 
@@ -62,6 +79,35 @@ describe("T06: State-branch test file deletion", () => {
 		it(`should NOT have ${dir}/ directory after deletion`, () => {
 			const fullPath = join(projectRoot, dir);
 			expect(existsSync(fullPath)).toBe(false);
+		});
+	}
+});
+
+describe("S02 + S03: Deleted domain and migration files", () => {
+	const projectRoot = process.cwd();
+
+	for (const file of S03_FILES_TO_DELETE) {
+		it(`should NOT have ${file} after S03 deletion`, () => {
+			const fullPath = join(projectRoot, file);
+			expect(existsSync(fullPath)).toBe(false);
+		});
+	}
+
+	for (const file of S02_FILES_TO_DELETE) {
+		it(`should NOT have ${file} after S02 deletion`, () => {
+			const fullPath = join(projectRoot, file);
+			expect(existsSync(fullPath)).toBe(false);
+		});
+	}
+});
+
+describe("Retained local port contracts", () => {
+	const projectRoot = process.cwd();
+
+	for (const file of RETAINED_LOCAL_PORTS) {
+		it(`should still have ${file}`, () => {
+			const fullPath = join(projectRoot, file);
+			expect(existsSync(fullPath)).toBe(true);
 		});
 	}
 });
