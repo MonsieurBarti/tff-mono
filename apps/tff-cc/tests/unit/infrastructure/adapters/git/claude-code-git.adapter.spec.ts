@@ -8,6 +8,7 @@ import { ClaudeCodeGitAdapter } from "../../../../../src/infrastructure/adapters
 
 let repoRoot: string;
 let git: ClaudeCodeGitAdapter;
+let defaultBranch: string;
 
 beforeEach(() => {
 	repoRoot = mkdtempSync(join(tmpdir(), "tff-git-"));
@@ -17,6 +18,9 @@ beforeEach(() => {
 	writeFileSync(join(repoRoot, "a.txt"), "hello", "utf8");
 	execFileSync("git", ["add", "."], { cwd: repoRoot });
 	execFileSync("git", ["commit", "-m", "init"], { cwd: repoRoot });
+	defaultBranch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: repoRoot })
+		.toString()
+		.trim();
 	git = new ClaudeCodeGitAdapter(repoRoot);
 });
 
@@ -33,7 +37,7 @@ describe("ClaudeCodeGitAdapter — happy path", () => {
 	it("detects current branch", async () => {
 		const res = await git.getCurrentBranch();
 		expect(isOk(res)).toBe(true);
-		if (isOk(res)) expect(res.data).toBe("main");
+		if (isOk(res)) expect(res.data).toBe(defaultBranch);
 	});
 
 	it("detects that a branch exists", async () => {
@@ -46,7 +50,7 @@ describe("ClaudeCodeGitAdapter — happy path", () => {
 	it("detects default branch as main", async () => {
 		const res = await git.detectDefaultBranch();
 		expect(isOk(res)).toBe(true);
-		if (isOk(res)) expect(res.data).toBe("main");
+		if (isOk(res)) expect(res.data).toBe(defaultBranch);
 	});
 
 	it("commits and returns sha", async () => {
@@ -61,13 +65,13 @@ describe("ClaudeCodeGitAdapter — happy path", () => {
 	});
 
 	it("lists tree entries", async () => {
-		const res = await git.lsTree("main");
+		const res = await git.lsTree(defaultBranch);
 		expect(isOk(res)).toBe(true);
 		if (isOk(res)) expect(res.data.length).toBeGreaterThanOrEqual(1);
 	});
 
 	it("extracts file content", async () => {
-		const res = await git.extractFile("main", "a.txt");
+		const res = await git.extractFile(defaultBranch, "a.txt");
 		expect(isOk(res)).toBe(true);
 		if (isOk(res)) expect(res.data).toBe("hello");
 	});
