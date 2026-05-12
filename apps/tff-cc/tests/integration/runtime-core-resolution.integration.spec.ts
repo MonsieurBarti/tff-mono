@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { execSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { createRequire } from "node:module";
 
 const distCli = resolve(process.cwd(), "dist", "cli", "index.js");
 const distMigrations = resolve(process.cwd(), "dist", "cli", "migrations");
@@ -17,5 +18,12 @@ describe("Runtime @tff/core resolution", () => {
 		const files = readdirSync(distMigrations);
 		const sqlFiles = files.filter((f) => f.endsWith(".sql"));
 		expect(sqlFiles.length).toBeGreaterThan(0);
+	});
+
+	it("bundle exposes @tff/core exports via require()", () => {
+		const require = createRequire(import.meta.url);
+		const m = require(distCli);
+		expect(typeof m.runMigrations).toBe("function");
+		expect(typeof m.Milestone).toBe("function");
 	});
 });
