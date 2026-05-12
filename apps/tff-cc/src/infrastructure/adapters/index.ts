@@ -4,14 +4,22 @@ import { ClaudeCodeAgentAdapter } from "./agent/claude-code-agent.adapter.js";
 import { ClaudeCodePromptAdapter } from "./prompt/claude-code-prompt.adapter.js";
 import { ClaudeCodeConfigAdapter } from "./config/claude-code-config.adapter.js";
 import { ClaudeCodeLifecycleAdapter } from "./lifecycle/claude-code-lifecycle.adapter.js";
+import type {
+	FileSystem,
+	GitOperations,
+	AgentDispatcher,
+	PromptLoader,
+	ConfigReader,
+	LifecycleManager,
+} from "@tff/core";
 
 export interface Adapters {
-	fileSystem: ClaudeCodeFileSystemAdapter;
-	gitOperations: ClaudeCodeGitAdapter;
-	agentDispatcher: ClaudeCodeAgentAdapter;
-	promptLoader: ClaudeCodePromptAdapter;
-	configReader: ClaudeCodeConfigAdapter;
-	lifecycleManager: ClaudeCodeLifecycleAdapter;
+	fileSystem: FileSystem;
+	gitOperations: GitOperations;
+	agentDispatcher: AgentDispatcher;
+	promptLoader: PromptLoader;
+	configReader: ConfigReader;
+	lifecycleManager: LifecycleManager;
 }
 
 export const createAdapters = (repoRoot: string): Adapters => ({

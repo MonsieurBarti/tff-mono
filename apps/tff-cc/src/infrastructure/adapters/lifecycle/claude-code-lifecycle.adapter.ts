@@ -27,10 +27,6 @@ export class ClaudeCodeLifecycleAdapter implements LifecycleManager {
 		process.on("SIGTERM", () => {
 			runShutdownHandlers().finally(() => process.exit(0));
 		});
-
-		process.on("exit", () => {
-			// Sync cleanup only — async handlers already run on SIGINT/SIGTERM
-		});
 	}
 
 	async onSessionStart(handler: () => Promise<void> | void) {
