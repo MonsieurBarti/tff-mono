@@ -1,6 +1,6 @@
-import type { DomainError } from "../errors/domain-error.js";
-import type { Result } from "../result.js";
-import type { WorkflowPool } from "../value-objects/workflow-pool.js";
+import type { Result } from "@tff/core";
+import type { DomainError } from "../../infrastructure/errors/generic-domain-error.js";
+import type { WorkflowPool } from "../../shared/value-objects/workflow-pool.js";
 
 export interface ModelJudgeConfig {
 	enabled: boolean;

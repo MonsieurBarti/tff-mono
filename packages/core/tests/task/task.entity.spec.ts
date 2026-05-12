@@ -12,7 +12,6 @@ import {
 	InvalidTransitionError,
 	TaskNotFoundError,
 } from "../../src/domain/task/task.error.js";
-import { TaskRepository } from "../../src/domain/task/task.repository.js";
 import { TASK_TRANSITIONS, type TaskStatus } from "../../src/domain/task/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
 
@@ -434,25 +433,13 @@ describe("Task aggregate root", () => {
 		});
 	});
 
-	describe("TaskRepository", () => {
-		it("extends RepositoryPort", () => {
-			class TestRepo extends TaskRepository {
-				save = async (): Promise<void> => {};
-				findById = async (): Promise<Task | null> => null;
-				findAll = async (): Promise<Task[]> => [];
-				delete = async (): Promise<void> => {};
-			}
-			const repo = new TestRepo();
-			expect(repo).toBeDefined();
-		});
-	});
-
 	describe("TaskNotFoundError", () => {
-		it("has correct label and status", () => {
-			const error = new TaskNotFoundError("task-123");
+		it("has correct label, status, and message", () => {
+			const error = new TaskNotFoundError("Task task-123 not found", "task-123");
 			expect(error.errorLabel).toBe("TASK_NOT_FOUND");
 			expect(error.status).toBe(404);
 			expect(error.context).toEqual({ taskId: "task-123" });
+			expect(error.message).toBe("Task task-123 not found");
 		});
 	});
 });

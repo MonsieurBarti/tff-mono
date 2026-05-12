@@ -1,5 +1,9 @@
-import { groupOutcomes } from "../../domain/helpers/calibration-group.js";
-import { runAllRules } from "../../domain/helpers/calibration-rules.js";
+import {
+	groupOutcomes,
+	runAllRules,
+	type GroupOutcomesInput,
+	type RoutingDecision,
+} from "@tff/core";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
 import type {
@@ -7,9 +11,7 @@ import type {
 	CalibrationRecommendation,
 	CalibrationReport,
 	SkippedCell,
-} from "../../domain/value-objects/calibration-report.js";
-import type { RoutingDecision } from "../../domain/value-objects/routing-decision.js";
-import type { RoutingOutcome } from "../../domain/value-objects/routing-outcome.js";
+} from "../../shared/value-objects/calibration-report.js";
 import { computeImplicitOutcomesUseCase } from "./compute-outcomes.js";
 
 export interface CalibrateConfig {
@@ -48,8 +50,14 @@ export const calibrateUseCase = async (deps: CalibrateDeps): Promise<Calibration
 		writer: deps.writer,
 	});
 
-	const outcomes: RoutingOutcome[] = [];
-	for await (const o of deps.outcomesSource.readOutcomes({})) outcomes.push(o);
+	const outcomes: GroupOutcomesInput["outcomes"] = [];
+	for await (const o of deps.outcomesSource.readOutcomes({})) {
+		outcomes.push({
+			decision_id: o.decisionId,
+			verdict: o.verdict,
+			source: o.source,
+		});
+	}
 
 	const weights = resolveWeights(deps.config);
 

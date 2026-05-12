@@ -1,5 +1,5 @@
-import type { ComplexityTier } from "../../domain/value-objects/complexity-tier.js";
-import type { Difficulty } from "../../domain/value-objects/difficulty.js";
+import type { ComplexityTier } from "../../shared/value-objects/complexity-tier.js";
+import type { Difficulty } from "../../shared/value-objects/difficulty.js";
 import {
 	classifyDifficulty,
 	type DifficultySignals,

@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { generateReminder } from "../../application/session/generate-reminder.js";
-import { loadProjectSettings } from "../../domain/value-objects/project-settings.js";
+import { loadProjectSettings } from "../../shared/value-objects/project-settings.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { resolveRepoRoot } from "../../infrastructure/home-directory.js";
-import { SETTINGS_FILE, TFF_CC_DIR } from "../../shared/paths.js";
+import { SETTINGS_FILE, TFF_DIR } from "@tff/core";
 import type { CommandSchema } from "../utils/flag-parser.js";
 
 /**
@@ -27,10 +27,10 @@ function areRemindersDisabled(repoRoot: string): boolean {
 }
 
 /**
- * Check if the project is initialized (has .tff-cc directory).
+ * Check if the project is initialized (has .tff directory).
  */
 function isProjectInitialized(repoRoot: string): boolean {
-	const tffDir = path.join(repoRoot, TFF_CC_DIR);
+	const tffDir = path.join(repoRoot, TFF_DIR);
 	return existsSync(tffDir);
 }
 

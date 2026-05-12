@@ -1,7 +1,7 @@
-import type { DomainError } from "../../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../../domain/errors/precondition-violation.error.js";
+import type { DomainError } from "../../errors/generic-domain-error.js";
+import { GenericDomainError } from "../../errors/generic-domain-error.js";
 import type { SliceMergeLookup } from "../../../domain/ports/slice-merge-lookup.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
+import { Err, Ok, type Result } from "@tff/core";
 import type { GitRunner } from "./git-runner.js";
 
 const SLICE_LABEL_RE = /^M\d+-S\d+$/;
@@ -28,16 +28,20 @@ export class GitSliceMergeLookup implements SliceMergeLookup {
 	): Promise<Result<string, DomainError>> {
 		if (!SLICE_LABEL_RE.test(sliceLabel)) {
 			return Err(
-				preconditionViolationError([
+				new GenericDomainError(
+					"PRECONDITION_VIOLATION",
+					`Invalid slice label format: "${sliceLabel}"`,
 					{ code: "slice_label.format", expected: "M<d+>-S<d+>", actual: sliceLabel },
-				]),
+				),
 			);
 		}
 		if (branches.length === 0) {
 			return Err(
-				preconditionViolationError([
-					{ code: "branches", expected: "at least one branch", actual: "empty" },
-				]),
+				new GenericDomainError("PRECONDITION_VIOLATION", "At least one branch is required", {
+					code: "branches",
+					expected: "at least one branch",
+					actual: "empty",
+				}),
 			);
 		}
 
@@ -67,13 +71,15 @@ export class GitSliceMergeLookup implements SliceMergeLookup {
 		}
 
 		return Err(
-			preconditionViolationError([
+			new GenericDomainError(
+				"PRECONDITION_VIOLATION",
+				`No merge commit found for slice "${sliceLabel}" on branches [${branches.join(", ")}]`,
 				{
 					code: "slice.merge_commit",
-					expected: `commit whose subject contains ${sliceLabel} as a standalone token on one of [${branches.join(", ")}]`,
+					expected: `commit whose subject contains ${sliceLabel} as a standalone token`,
 					actual: "no match",
 				},
-			]),
+			),
 		);
 	}
 }

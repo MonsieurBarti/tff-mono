@@ -12,10 +12,10 @@ beforeEach(() => {
 afterEach(() => rmSync(home, { recursive: true, force: true }));
 
 describe("recoverOrphans against a cyclic symlink tree", () => {
-	it("terminates and sweeps stale .tmp files when worktrees/<slice>/.tff-cc cycles back to home", async () => {
+	it("terminates and sweeps stale .tmp files when worktrees/<slice>/.tff cycles back to home", async () => {
 		const worktree = join(home, "worktrees", "M01-S01");
 		mkdirSync(worktree, { recursive: true });
-		symlinkSync(home, join(worktree, ".tff-cc"));
+		symlinkSync(home, join(worktree, ".tff"));
 
 		const staleTmp = join(home, "milestones", "M01", "STATE.md.tmp");
 		mkdirSync(join(home, "milestones", "M01"), { recursive: true });
@@ -44,7 +44,7 @@ describe("recoverOrphans against a cyclic symlink tree", () => {
 
 		const worktree = join(home, "worktrees", "M01-S01");
 		mkdirSync(worktree, { recursive: true });
-		symlinkSync(home, join(worktree, ".tff-cc"));
+		symlinkSync(home, join(worktree, ".tff"));
 
 		const result = await recoverOrphans({
 			stagingDirs: [home],

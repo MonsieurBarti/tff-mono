@@ -159,7 +159,7 @@ describe("withTransaction", () => {
 		if (result.ok) {
 			expect(result.warnings).toHaveLength(1);
 			expect(result.warnings[0].code).toBe("PARTIAL_SUCCESS");
-			expect(result.warnings[0].context?.pendingEffect).toContain("out.txt");
+			expect(result.warnings[0].context?.target).toContain("out.txt");
 		}
 		const p = adapter.getProject();
 		if (p.ok && p.data) expect(p.data.name).toBe("committed");

@@ -49,7 +49,7 @@ describe("branch-guard chokepoint via CLI dispatcher", () => {
 		const result = await dispatcher(["--name", "guard-test"]);
 		const parsed = JSON.parse(result);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("REFUSED_ON_DEFAULT_BRANCH");
+		expect(parsed.error.errorLabel).toBe("REFUSED_ON_DEFAULT_BRANCH");
 	});
 
 	it("allows a mutating command on a feature branch (guard does not fire)", async () => {
@@ -60,7 +60,7 @@ describe("branch-guard chokepoint via CLI dispatcher", () => {
 		// The command might succeed or fail for unrelated reasons (e.g. SQLite state).
 		// The only requirement: the branch-guard refusal must NOT be the cause.
 		if (!parsed.ok) {
-			expect(parsed.error.code).not.toBe("REFUSED_ON_DEFAULT_BRANCH");
+			expect(parsed.error.errorLabel).not.toBe("REFUSED_ON_DEFAULT_BRANCH");
 		}
 	});
 });

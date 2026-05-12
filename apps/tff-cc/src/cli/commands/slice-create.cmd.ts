@@ -3,16 +3,13 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { resolveMilestoneId } from "../../application/milestone/resolve-milestone-id.js";
 import { renderStateMd } from "../../application/sync/generate-state.js";
-import type { SliceKind } from "../../domain/entities/slice.js";
-import { milestoneLabel, sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { isOk } from "../../domain/result.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
 import { mkdirTracked } from "../../infrastructure/persistence/track-mkdir.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
-import { sliceDirFor } from "../../shared/paths.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import { isOk, milestoneLabel, sliceDirFor, sliceLabelFor, type SliceKind } from "@tff/core";
 
 export const sliceCreateSchema: CommandSchema = {
 	name: "slice:create",
@@ -316,7 +313,7 @@ export const sliceCreateCmd = async (args: string[]): Promise<string> => {
 					branchName: branchName ?? undefined,
 				});
 				if (!sliceResult.ok) {
-					throw new Error(`${sliceResult.error.code}: ${sliceResult.error.message}`);
+					throw new Error(`${sliceResult.error.errorLabel}: ${sliceResult.error.message}`);
 				}
 				const tmpRenames: Array<[string, string]> = [[planTmpAbs, planFinalAbs]];
 
@@ -326,7 +323,7 @@ export const sliceCreateCmd = async (args: string[]): Promise<string> => {
 						{ milestoneStore, sliceStore, taskStore: closableStores.taskStore },
 					);
 					if (!stateContent.ok) {
-						throw new Error(`${stateContent.error.code}: ${stateContent.error.message}`);
+						throw new Error(`${stateContent.error.errorLabel}: ${stateContent.error.message}`);
 					}
 					writeFileSync(stateTmpAbs, stateContent.data, "utf8");
 					tmpRenames.push([stateTmpAbs, stateFinalAbs]);

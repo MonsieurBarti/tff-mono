@@ -26,17 +26,17 @@ describe("observe:health integration", () => {
 	});
 
 	it("warns first-observation when enabled + sentinel + no sessions", async () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/settings.yaml"), "enabled: true\n");
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/.mutating-cli-ran"), "");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/settings.yaml"), "enabled: true\n");
+		fs.writeFileSync(path.join(tmp, ".tff/observations/.mutating-cli-ran"), "");
 		const out = await observeHealthCmd([]);
 		const parsed = JSON.parse(out);
 		expect(parsed.data.firstObservationSentinel.shouldWarn).toBe(true);
 	});
 
 	it("reports dead-letter entryCount when non-empty", async () => {
-		fs.mkdirSync(path.join(tmp, ".tff-cc/observations"), { recursive: true });
-		fs.writeFileSync(path.join(tmp, ".tff-cc/observations/dead-letter.jsonl"), "line1\nline2\n");
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/observations/dead-letter.jsonl"), "line1\nline2\n");
 		const out = await observeHealthCmd([]);
 		const parsed = JSON.parse(out);
 		expect(parsed.data.deadLetter.entryCount).toBe(2);

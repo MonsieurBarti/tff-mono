@@ -6,8 +6,8 @@ import type {
 } from "../../../../src/domain/ports/routing-config-reader.port.js";
 import type { RoutingDecisionLogger } from "../../../../src/domain/ports/routing-decision-logger.port.js";
 import type { SignalExtractor } from "../../../../src/domain/ports/signal-extractor.port.js";
-import { isOk, Ok } from "../../../../src/domain/result.js";
-import type { Signals } from "../../../../src/domain/value-objects/signals.js";
+import { isOk, Ok } from "@tff/core";
+import type { Signals } from "../../src/shared/value-objects/signals.js";
 
 const DETERMINISTIC_SIGNALS: Signals = {
 	complexity: "low",
@@ -17,7 +17,7 @@ const DETERMINISTIC_SIGNALS: Signals = {
 const CONFIG: RoutingConfig = {
 	enabled: true,
 	confidence_threshold: 0.5,
-	logging: { path: ".tff-cc/logs/routing.jsonl" },
+	logging: { path: ".tff/logs/routing.jsonl" },
 };
 
 const mkDeps = () => {

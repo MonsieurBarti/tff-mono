@@ -1,6 +1,6 @@
 import { recordReviewUseCase } from "../../application/review/record-review.js";
-import { isOk } from "../../domain/result.js";
-import { ReviewTypeSchema } from "../../domain/value-objects/review-record.js";
+import { isOk } from "@tff/core";
+import type { ReviewType } from "../../shared/value-objects/review-record.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveSliceId } from "../utils/resolve-id.js";
@@ -66,17 +66,6 @@ export const reviewRecordCmd = async (args: string[]): Promise<string> => {
 		"commit-sha": string;
 	};
 
-	const parsedType = ReviewTypeSchema.safeParse(type);
-	if (!parsedType.success) {
-		return JSON.stringify({
-			ok: false,
-			error: {
-				code: "INVALID_ARGS",
-				message: `Invalid type "${type}". Must be: code, security, spec`,
-			},
-		});
-	}
-
 	const { reviewStore, sliceStore } = createClosableStateStoresUnchecked();
 	const resolved = resolveSliceId(sliceId, sliceStore);
 	if (!resolved.ok) return JSON.stringify({ ok: false, error: resolved.error });
@@ -86,7 +75,7 @@ export const reviewRecordCmd = async (args: string[]): Promise<string> => {
 			sliceId: resolved.data,
 			reviewer: agent,
 			verdict: verdict as "approved" | "changes_requested",
-			type: parsedType.data,
+			type: type as ReviewType,
 			commitSha,
 		},
 		{ reviewStore },

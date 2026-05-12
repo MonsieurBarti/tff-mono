@@ -94,7 +94,7 @@ describe("slice-create atomicity", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("TRANSACTION_ROLLBACK");
+		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
 		spy.mockRestore();
 
@@ -112,7 +112,7 @@ describe("slice-create atomicity", () => {
 		installStores(adapter);
 
 		// Ensure the slice dir does NOT pre-exist — the writer must create it.
-		const sliceDirAbs = join(repo, ".tff-cc", "milestones", "M01", "slices", "M01-S01");
+		const sliceDirAbs = join(repo, ".tff", "milestones", "M01", "slices", "M01-S01");
 		expect(existsSync(sliceDirAbs)).toBe(false);
 
 		const spy = vi.spyOn(adapter, "createSlice").mockImplementation(() => {
@@ -129,6 +129,6 @@ describe("slice-create atomicity", () => {
 		// The slice dir and its parent-chain we created must be gone.
 		expect(existsSync(sliceDirAbs)).toBe(false);
 		// The milestone-level slices dir we also created must be gone.
-		expect(existsSync(join(repo, ".tff-cc", "milestones", "M01", "slices"))).toBe(false);
+		expect(existsSync(join(repo, ".tff", "milestones", "M01", "slices"))).toBe(false);
 	});
 });

@@ -1,7 +1,9 @@
 export { runMigrations, getCurrentVersion } from "./db/run-migrations.js";
 
+export * from "./shared/index.js";
 export * from "./domain/shared/index.js";
 export * from "./domain/project/index.js";
+export * from "./domain/ports/index.js";
 export {
 	Milestone,
 	type MilestoneState,
@@ -10,7 +12,8 @@ export {
 	MilestoneArchivedEvent,
 	MilestoneNotFoundError,
 	MilestoneAlreadyArchivedError,
-	MilestoneRepository,
+	type MilestoneProps,
+	type MilestoneUpdateProps,
 	type MilestoneStatus,
 	MILESTONE_TRANSITIONS,
 	InvalidTransitionError as MilestoneInvalidTransitionError,
@@ -36,7 +39,8 @@ export {
 	SliceNotFoundError,
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
-	SliceRepository,
+	type SliceProps,
+	type SliceUpdateProps,
 	InvalidTransitionError as SliceInvalidTransitionError,
 	type SliceStatus,
 	type ComplexityTier,
@@ -62,7 +66,41 @@ export {
 	TaskUnclaimedEvent,
 	AlreadyClaimedError,
 	TaskNotFoundError,
-	TaskRepository,
+	type TaskProps,
+	type TaskUpdateProps,
+	type Difficulty,
 	type TaskStatus,
 	TASK_TRANSITIONS,
 } from "./domain/task/index.js";
+export {
+	RoutingOutcome,
+	type RoutingOutcomeProps,
+	type OutcomeDimension,
+	type OutcomeVerdict,
+	type OutcomeSourceKind,
+	JudgeVerdict,
+	type JudgeVerdictProps,
+	type JudgeDimension,
+	type JudgeVerdictValue,
+} from "./domain/routing/index.js";
+export { Observation, type ObservationProps } from "./domain/observation/index.js";
+export {
+	TFF_DIR,
+	tffPath,
+	milestoneDir,
+	sliceDir,
+	worktreeDir,
+	OBSERVATIONS_DIR,
+	SETTINGS_FILE,
+	PROJECT_FILE,
+	STATE_FILE,
+	MILESTONES_DIR,
+	STATE_DB_FILE,
+	QUICK_DIR,
+	DEBUG_DIR,
+	quickSliceDir,
+	debugSliceDir,
+	sliceDirFor,
+} from "./shared/paths.js";
+
+export * from "./contract/index.js";

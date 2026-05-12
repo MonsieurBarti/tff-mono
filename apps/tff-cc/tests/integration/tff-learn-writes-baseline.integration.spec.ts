@@ -97,7 +97,7 @@ describe("/tff:learn command sequence", () => {
 
 		// Step 6: audit log has one entry for this refinement
 		const log = fs
-			.readFileSync(path.join(tmp, ".tff-cc/observations/skill-approvals.jsonl"), "utf8")
+			.readFileSync(path.join(tmp, ".tff/observations/skill-approvals.jsonl"), "utf8")
 			.trim();
 		const entry = JSON.parse(log);
 		expect(entry).toMatchObject({

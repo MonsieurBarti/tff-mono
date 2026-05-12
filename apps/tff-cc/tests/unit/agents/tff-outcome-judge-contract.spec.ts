@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { JudgeVerdictSchema } from "../../../src/domain/value-objects/judge-verdict.js";
+import { JudgeVerdict } from "@tff/core";
 
 const agentDoc = readFileSync(join(process.cwd(), "agents", "tff-outcome-judge.md"), "utf8");
 const shipDoc = readFileSync(join(process.cwd(), "workflows", "ship-slice.md"), "utf8");
@@ -20,10 +20,22 @@ describe("tff-outcome-judge agent contract", () => {
 			verdict: "ok" as const,
 			reason: "patch is small and matches reviewer scope",
 		};
-		expect(JudgeVerdictSchema.safeParse(sample).success).toBe(true);
-		expect(
-			JudgeVerdictSchema.safeParse({ ...sample, dimension: "tier", verdict: "too-high" }).success,
-		).toBe(true);
+		expect(() =>
+			JudgeVerdict.create({
+				decisionId: sample.decision_id,
+				dimension: sample.dimension,
+				verdict: sample.verdict,
+				reason: sample.reason,
+			}),
+		).not.toThrow();
+		expect(() =>
+			JudgeVerdict.create({
+				decisionId: sample.decision_id,
+				dimension: "tier",
+				verdict: "too-high",
+				reason: sample.reason,
+			}),
+		).not.toThrow();
 	});
 
 	it("declares its schema authoritative (override conflicting orchestrator prompts)", () => {

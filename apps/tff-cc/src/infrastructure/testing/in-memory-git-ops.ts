@@ -1,7 +1,7 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
+import { GenericDomainError, type DomainError } from "../errors/generic-domain-error.js";
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { CommitRef } from "../../domain/value-objects/commit-ref.js";
+import { Err, Ok, type Result } from "@tff/core";
+import type { CommitRef } from "../../shared/value-objects/commit-ref.js";
 
 export class InMemoryGitOps implements GitOps {
 	private branches = new Set<string>(["main"]);
@@ -29,7 +29,7 @@ export class InMemoryGitOps implements GitOps {
 
 	async deleteWorktree(path: string): Promise<Result<void, DomainError>> {
 		if (!this.worktrees.has(path))
-			return Err(createDomainError("NOT_FOUND", `Worktree not found: ${path}`, { path }));
+			return Err(new GenericDomainError("NOT_FOUND", `Worktree not found: ${path}`, { path }));
 		this.worktrees.delete(path);
 		return Ok(undefined);
 	}
@@ -77,7 +77,9 @@ export class InMemoryGitOps implements GitOps {
 	async checkoutWorktree(path: string, existingBranch: string): Promise<Result<void, DomainError>> {
 		if (!this.branches.has(existingBranch))
 			return Err(
-				createDomainError("NOT_FOUND", `Branch not found: ${existingBranch}`, { existingBranch }),
+				new GenericDomainError("NOT_FOUND", `Branch not found: ${existingBranch}`, {
+					existingBranch,
+				}),
 			);
 		this.worktrees.set(path, existingBranch);
 		return Ok(undefined);
@@ -104,7 +106,7 @@ export class InMemoryGitOps implements GitOps {
 		const key = `${ref}:${filePath}`;
 		const buf = this.fileContents.get(key);
 		if (!buf)
-			return Err(createDomainError("NOT_FOUND", `File not found: ${key}`, { ref, filePath }));
+			return Err(new GenericDomainError("NOT_FOUND", `File not found: ${key}`, { ref, filePath }));
 		return Ok(buf);
 	}
 

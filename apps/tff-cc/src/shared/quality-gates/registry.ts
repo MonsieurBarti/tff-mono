@@ -60,7 +60,7 @@ export const QUALITY_GATES: readonly QualityGate[] = [
 		name: "Every value-object exports a Zod schema or parse fn",
 		class: "III",
 		mechanism: "value-object",
-		enforcementSite: "src/domain/value-objects",
+		enforcementSite: "src/shared/value-objects",
 		metaTestPath: "tests/structural/value-object-invariants.spec.ts",
 		status: "enforced",
 	},

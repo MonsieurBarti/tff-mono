@@ -60,7 +60,7 @@ function installStores(adapter: SQLiteStateAdapter): void {
 beforeEach(() => {
 	prevCwd = process.cwd();
 	repo = mkdtempSync(join(tmpdir(), "tff-reconcile-on-read-"));
-	mkdirSync(join(repo, ".tff-cc"), { recursive: true });
+	mkdirSync(join(repo, ".tff"), { recursive: true });
 	process.chdir(repo);
 });
 
@@ -75,7 +75,7 @@ describe("reconcile-on-read integration", () => {
 		const { adapter } = setupAdapter();
 		installStores(adapter);
 
-		const stateMdPath = join(repo, ".tff-cc", "STATE.md");
+		const stateMdPath = join(repo, ".tff", "STATE.md");
 		writeFileSync(stateMdPath, "OLD CONTENT");
 
 		const { sliceListCmd } = await import("../../src/cli/commands/slice-list.cmd.js");
@@ -92,7 +92,7 @@ describe("reconcile-on-read integration", () => {
 		const { adapter } = setupAdapter();
 		installStores(adapter);
 
-		const stateMdPath = join(repo, ".tff-cc", "STATE.md");
+		const stateMdPath = join(repo, ".tff", "STATE.md");
 		writeFileSync(stateMdPath, "OLD CONTENT");
 
 		const { milestoneListCmd } = await import("../../src/cli/commands/milestone-list.cmd.js");
@@ -108,7 +108,7 @@ describe("reconcile-on-read integration", () => {
 		const { adapter } = setupAdapter();
 		installStores(adapter);
 
-		const stateMdPath = join(repo, ".tff-cc", "STATE.md");
+		const stateMdPath = join(repo, ".tff", "STATE.md");
 		writeFileSync(stateMdPath, "OLD CONTENT");
 
 		const { projectGetCmd } = await import("../../src/cli/commands/project-get.cmd.js");
@@ -130,7 +130,7 @@ describe("reconcile-on-read integration", () => {
 		if (!closed.ok) throw new Error("close failed");
 		installStores(adapter);
 
-		const stateMdPath = join(repo, ".tff-cc", "STATE.md");
+		const stateMdPath = join(repo, ".tff", "STATE.md");
 		writeFileSync(stateMdPath, "OLD CONTENT");
 
 		const { sliceListCmd } = await import("../../src/cli/commands/slice-list.cmd.js");

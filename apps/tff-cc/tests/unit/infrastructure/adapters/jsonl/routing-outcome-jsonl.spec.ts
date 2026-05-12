@@ -2,21 +2,22 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { RoutingOutcome } from "../../../../../src/domain/value-objects/routing-outcome.js";
+import type { RoutingOutcome } from "@tff/core";
 import { JsonlRoutingOutcomeReader } from "../../../../../src/infrastructure/adapters/jsonl/routing-outcome-jsonl-reader.js";
 import { JsonlRoutingOutcomeWriter } from "../../../../../src/infrastructure/adapters/jsonl/routing-outcome-jsonl-writer.js";
 
-const make = (over: Partial<RoutingOutcome>): RoutingOutcome => ({
-	outcome_id: "00000000-0000-4000-8000-000000000001",
-	decision_id: "00000000-0000-4000-8000-000000000002",
-	dimension: "tier",
-	verdict: "too-low",
-	source: "manual",
-	slice_id: "M01-S01",
-	workflow_id: "tff:ship",
-	emitted_at: "2026-04-19T10:00:00.000Z",
-	...over,
-});
+const make = (over: Partial<RoutingOutcome>): RoutingOutcome =>
+	({
+		outcomeId: "00000000-0000-4000-8000-000000000001",
+		decisionId: "00000000-0000-4000-8000-000000000002",
+		dimension: "tier",
+		verdict: "too-low",
+		source: "manual",
+		sliceId: "M01-S01",
+		workflowId: "tff:ship",
+		emittedAt: "2026-04-19T10:00:00.000Z",
+		...over,
+	}) as unknown as RoutingOutcome;
 
 describe("JsonlRoutingOutcomeWriter + Reader", () => {
 	let dir: string;
@@ -42,12 +43,12 @@ describe("JsonlRoutingOutcomeWriter + Reader", () => {
 
 	it("reader yields all appended outcomes in order", async () => {
 		const writer = new JsonlRoutingOutcomeWriter(path);
-		await writer.append(make({ outcome_id: "00000000-0000-4000-8000-00000000000a" }));
-		await writer.append(make({ outcome_id: "00000000-0000-4000-8000-00000000000b" }));
+		await writer.append(make({ outcomeId: "00000000-0000-4000-8000-00000000000a" }));
+		await writer.append(make({ outcomeId: "00000000-0000-4000-8000-00000000000b" }));
 		const reader = new JsonlRoutingOutcomeReader(path);
 		const collected: RoutingOutcome[] = [];
 		for await (const o of reader.readOutcomes({})) collected.push(o);
-		expect(collected.map((o) => o.outcome_id)).toEqual([
+		expect(collected.map((o) => o.outcomeId)).toEqual([
 			"00000000-0000-4000-8000-00000000000a",
 			"00000000-0000-4000-8000-00000000000b",
 		]);
@@ -64,7 +65,7 @@ describe("JsonlRoutingOutcomeWriter + Reader", () => {
 		const writer = new JsonlRoutingOutcomeWriter(path);
 		await writer.append(make({}));
 		await (await import("node:fs/promises")).appendFile(path, "not-json\n", "utf8");
-		await writer.append(make({ outcome_id: "00000000-0000-4000-8000-00000000000c" }));
+		await writer.append(make({ outcomeId: "00000000-0000-4000-8000-00000000000c" }));
 		const reader = new JsonlRoutingOutcomeReader(path);
 		const collected: RoutingOutcome[] = [];
 		for await (const o of reader.readOutcomes({})) collected.push(o);
@@ -76,7 +77,7 @@ describe("JsonlRoutingOutcomeWriter + Reader", () => {
 		await writer.append(make({ source: "manual" }));
 		await writer.append(
 			make({
-				outcome_id: "00000000-0000-4000-8000-00000000000d",
+				outcomeId: "00000000-0000-4000-8000-00000000000d",
 				source: "debug-join",
 				dimension: "unknown",
 				verdict: "wrong",

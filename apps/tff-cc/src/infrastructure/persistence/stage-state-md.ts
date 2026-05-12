@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { STATE_FILE } from "../../shared/paths.js";
+import { STATE_FILE } from "@tff/core";
 import { mkdirTracked } from "./track-mkdir.js";
 
 export interface StagedStateMd {
@@ -9,7 +9,7 @@ export interface StagedStateMd {
 
 /**
  * Stage the STATE.md tmp path for a writer-in-transaction. Creates the
- * `.tff-cc/` directory if needed, tracks newly-created dirs in
+ * `.tff/` directory if needed, tracks newly-created dirs in
  * `stagedDirs` (leaf-first) so withTransaction can clean them up on rollback,
  * and registers `stateTmpAbs` in `stagedTmps` so it is unlinked if the body
  * throws. Callers are responsible for writing the tmp file content inside the
@@ -26,7 +26,7 @@ export function stageStateMdTmp(
 ): StagedStateMd {
 	const stateFinalAbs = resolve(cwd, STATE_FILE);
 	const stateTmpAbs = `${stateFinalAbs}.tmp`;
-	stagedDirs.push(...mkdirTracked(resolve(cwd, ".tff-cc")));
+	stagedDirs.push(...mkdirTracked(resolve(cwd, ".tff")));
 	stagedTmps.push(stateTmpAbs);
 	return { stateFinalAbs, stateTmpAbs };
 }

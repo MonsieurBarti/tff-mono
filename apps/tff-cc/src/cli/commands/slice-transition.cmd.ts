@@ -1,7 +1,9 @@
 import { transitionSliceOrchestrator } from "../../application/slice/transition-slice.js";
-import { SliceStatusSchema } from "../../domain/value-objects/slice-status.js";
+import { type SliceStatus as CoreSliceStatus, SLICE_TRANSITIONS } from "@tff/core";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+
+const VALID_STATUSES = Object.keys(SLICE_TRANSITIONS) as CoreSliceStatus[];
 
 export const sliceTransitionSchema: CommandSchema = {
 	name: "slice:transition",
@@ -19,7 +21,7 @@ export const sliceTransitionSchema: CommandSchema = {
 			name: "status",
 			type: "string",
 			description: "Target status",
-			enum: [...SliceStatusSchema.options],
+			enum: [...VALID_STATUSES],
 		},
 	],
 	optionalFlags: [],
@@ -44,8 +46,7 @@ export const sliceTransitionCmd = async (args: string[]): Promise<string> => {
 
 	// Validate status shape (flag-parser already enforces enum, but preserve the
 	// historical INVALID_ARGS contract as a belt-and-braces check).
-	const parsedStatus = SliceStatusSchema.safeParse(rawStatus);
-	if (!parsedStatus.success) {
+	if (!VALID_STATUSES.includes(rawStatus as CoreSliceStatus)) {
 		return JSON.stringify({
 			ok: false,
 			error: { code: "INVALID_ARGS", message: `Invalid status: ${rawStatus}` },
@@ -55,7 +56,7 @@ export const sliceTransitionCmd = async (args: string[]): Promise<string> => {
 	const stores = createClosableStateStoresUnchecked();
 	try {
 		const response = await transitionSliceOrchestrator(
-			{ sliceLabel, targetStatus: parsedStatus.data, cwd: process.cwd() },
+			{ sliceLabel, targetStatus: rawStatus as CoreSliceStatus, cwd: process.cwd() },
 			{ stores },
 		);
 		return JSON.stringify(response);

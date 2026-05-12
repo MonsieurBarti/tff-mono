@@ -14,10 +14,10 @@ describe("Phase D end-to-end", () => {
 		origCwd = process.cwd();
 		dir = await mkdtemp(join(tmpdir(), "phase-d-e2e-"));
 		process.chdir(dir);
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
 	});
@@ -28,7 +28,7 @@ describe("Phase D end-to-end", () => {
 	});
 
 	it("ship decision -> debug event -> calibrate produces a report with implicit outcome", async () => {
-		const routingPath = join(dir, ".tff-cc/logs/routing.jsonl");
+		const routingPath = join(dir, ".tff/logs/routing.jsonl");
 		await mkdir(dirname(routingPath), { recursive: true });
 		await appendFile(
 			routingPath,
@@ -67,7 +67,7 @@ describe("Phase D end-to-end", () => {
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(true);
 
-		const outcomesRaw = await readFile(join(dir, ".tff-cc/logs/routing-outcomes.jsonl"), "utf8");
+		const outcomesRaw = await readFile(join(dir, ".tff/logs/routing-outcomes.jsonl"), "utf8");
 		const sources = outcomesRaw
 			.trim()
 			.split("\n")
@@ -75,7 +75,7 @@ describe("Phase D end-to-end", () => {
 		expect(sources).toContain("manual");
 		expect(sources).toContain("debug-join");
 
-		const md = await readFile(join(dir, ".tff-cc/logs/routing-calibration.md"), "utf8");
+		const md = await readFile(join(dir, ".tff/logs/routing-calibration.md"), "utf8");
 		expect(md).toContain("# Routing Calibration Report");
 	});
 });

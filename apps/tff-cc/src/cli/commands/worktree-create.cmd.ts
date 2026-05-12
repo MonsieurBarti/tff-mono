@@ -1,11 +1,10 @@
+import { isOk, resolveBaseBranch, resolveBranchName, type Milestone } from "@tff/core";
 import { createWorktreeUseCase } from "../../application/worktree/create-worktree.js";
-import type { Milestone } from "../../domain/entities/milestone.js";
-import { resolveBaseBranch, resolveBranchName } from "../../domain/helpers/slice-resolvers.js";
-import { isOk } from "../../domain/result.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import {
-	createTffCcSymlink,
+	createTffSymlink,
 	getProjectId,
 	resolveRepoRoot,
 	writeProjectIdFile,
@@ -70,7 +69,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 			if (!isOk(milestoneResult) || !milestoneResult.data) {
 				return JSON.stringify({
 					ok: false,
-					error: { code: "NOT_FOUND", message: `Milestone ${slice.milestoneId} not found` },
+					error: new GenericDomainError("NOT_FOUND", `Milestone ${slice.milestoneId} not found`),
 				});
 			}
 			milestone = milestoneResult.data;
@@ -84,7 +83,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 		} catch (e) {
 			return JSON.stringify({
 				ok: false,
-				error: { code: "PRECONDITION_VIOLATION", message: (e as Error).message },
+				error: new GenericDomainError("PRECONDITION_VIOLATION", (e as Error).message),
 			});
 		}
 
@@ -95,7 +94,7 @@ export const worktreeCreateCmd = async (args: string[]): Promise<string> => {
 		if (isOk(result)) {
 			const projectId = getProjectId(repoRoot);
 			const worktreePath = result.data.worktreePath;
-			createTffCcSymlink(worktreePath, projectId);
+			createTffSymlink(worktreePath, projectId);
 			// Persist the project id in the new worktree so subsequent tff-tools commands
 			// run inside it don't mint a fresh one (e.g. when the branch's HEAD predates
 			// the commit that added .tff-project-id).

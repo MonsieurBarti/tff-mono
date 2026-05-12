@@ -11,7 +11,7 @@ let repo: string;
 
 beforeEach(() => {
 	repo = mkdtempSync(join(tmpdir(), "tff-verv-"));
-	mkdirSync(join(repo, ".tff-cc"), { recursive: true });
+	mkdirSync(join(repo, ".tff"), { recursive: true });
 });
 afterEach(() => rmSync(repo, { recursive: true, force: true }));
 
@@ -63,7 +63,7 @@ describe("tff-tools version --verbose (built CLI)", () => {
 			platform: process.platform,
 			arch: process.arch,
 		};
-		writeFileSync(join(repo, ".tff-cc", ".recovery-marker"), JSON.stringify(marker));
+		writeFileSync(join(repo, ".tff", ".recovery-marker"), JSON.stringify(marker));
 		const out = runJson(["version", "--verbose"]);
 		expect(out.data.lastRecovery).toEqual({
 			status: "skipped",

@@ -1,7 +1,6 @@
-import { createDomainError, type DomainError } from "../../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../../domain/errors/precondition-violation.error.js";
+import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
+import { Err, Ok, type Result } from "@tff/core";
 import type { DiffReader, DiffSummary } from "../../../domain/ports/diff-reader.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
 import type { GitRunner } from "./git-runner.js";
 
 const SHA_RE = /^[0-9a-f]{7,40}$/;
@@ -35,9 +34,11 @@ export class GitDiffReader implements DiffReader {
 	): Promise<Result<DiffSummary, DomainError>> {
 		if (!SHA_RE.test(mergeSha)) {
 			return Err(
-				preconditionViolationError([
+				new GenericDomainError(
+					"PRECONDITION_VIOLATION",
+					`Invalid merge SHA format: "${mergeSha}"`,
 					{ code: "merge_sha.format", expected: "hex 7..40", actual: mergeSha },
-				]),
+				),
 			);
 		}
 
@@ -52,7 +53,7 @@ export class GitDiffReader implements DiffReader {
 			});
 		} catch (err) {
 			return Err(
-				createDomainError("EXTERNAL_CALL_FAILED", "git show failed", {
+				new GenericDomainError("EXTERNAL_CALL_FAILED", "git show failed", {
 					error: err instanceof Error ? err.message : String(err),
 				}),
 			);

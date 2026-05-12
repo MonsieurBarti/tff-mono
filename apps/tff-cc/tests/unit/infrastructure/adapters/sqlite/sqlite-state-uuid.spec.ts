@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { SQLiteStateAdapter } from "../../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
 describe("SQLiteStateAdapter — UUID and branch support", () => {

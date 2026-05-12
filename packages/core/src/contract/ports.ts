@@ -16,9 +16,17 @@ export class ContractError extends BaseDomainError<{
 	readonly errorLabel = "CONTRACT_ERROR";
 	readonly status = 500;
 	readonly context: { port: string; operation: string; cause?: string | undefined };
+	readonly message: string;
 
-	constructor(port: string, operation: string, cause?: string) {
-		super();
+	constructor(
+		message: string,
+		port: string,
+		operation: string,
+		cause?: string,
+		recoveryHint?: string,
+	) {
+		super(recoveryHint);
+		this.message = message;
 		this.context = { port, operation, cause };
 	}
 }

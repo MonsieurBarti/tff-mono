@@ -1,8 +1,10 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { sliceDir } from "../../shared/paths.js";
 import type { CheckpointData } from "./save-checkpoint.js";
+import { Err, Ok, isOk, sliceDir, type Result } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 interface LoadCheckpointDeps {
 	artifactStore: ArtifactStore;
@@ -17,13 +19,15 @@ export const loadCheckpoint = async (
 	const contentResult = await deps.artifactStore.read(path);
 	if (!isOk(contentResult))
 		return Err(
-			createDomainError("NOT_FOUND", `No checkpoint found for slice "${sliceId}"`, { sliceId }),
+			new GenericDomainError("NOT_FOUND", `No checkpoint found for slice "${sliceId}"`, {
+				sliceId,
+			}),
 		);
 
 	const match = contentResult.data.match(/<!-- checkpoint-json: (.+) -->/);
 	if (!match)
 		return Err(
-			createDomainError("VALIDATION_ERROR", `Checkpoint file for "${sliceId}" is corrupted`, {
+			new GenericDomainError("VALIDATION_ERROR", `Checkpoint file for "${sliceId}" is corrupted`, {
 				sliceId,
 			}),
 		);

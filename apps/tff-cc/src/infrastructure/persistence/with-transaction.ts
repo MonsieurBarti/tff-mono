@@ -1,7 +1,6 @@
 import { renameSync, rmdirSync, unlinkSync } from "node:fs";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { partialSuccessWarning } from "../../domain/errors/partial-success.warning.js";
-import { transactionRollbackError } from "../../domain/errors/transaction-rollback.error.js";
+import type { DomainError } from "../errors/generic-domain-error.js";
+import { GenericDomainError } from "../errors/generic-domain-error.js";
 import type { TransactionRunner } from "../../domain/ports/transaction-runner.port.js";
 
 /**
@@ -68,7 +67,7 @@ export const withTransaction = async <T>(
 		// now orphaned). Best-effort: we swallow unlink errors.
 		cleanupTmps(preStagedTmps);
 		cleanupDirs(preStagedDirs);
-		return { ok: false, error: transactionRollbackError(e) };
+		return { ok: false, error: new GenericDomainError("TRANSACTION_ROLLBACK", String(e)) };
 	}
 
 	const warnings: DomainError[] = [];
@@ -77,7 +76,11 @@ export const withTransaction = async <T>(
 			renameSync(tmp, final);
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : String(e);
-			warnings.push(partialSuccessWarning(`rename ${tmp} -> ${final} failed: ${msg}`, final));
+			warnings.push(
+				new GenericDomainError("PARTIAL_SUCCESS", `rename ${tmp} -> ${final} failed: ${msg}`, {
+					target: final,
+				}),
+			);
 			try {
 				unlinkSync(tmp);
 			} catch {

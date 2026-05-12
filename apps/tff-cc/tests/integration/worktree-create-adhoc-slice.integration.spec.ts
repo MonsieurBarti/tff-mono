@@ -12,7 +12,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GitOps } from "../../src/domain/ports/git-ops.port.js";
 import type { JournalRepository } from "../../src/domain/ports/journal-repository.port.js";
-import { Ok } from "../../src/domain/result.js";
+import { Ok } from "@tff/core";
 import type { ClosableStateStores } from "../../src/infrastructure/adapters/sqlite/create-state-stores.js";
 import { SQLiteStateAdapter } from "../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
@@ -55,7 +55,7 @@ vi.mock("../../src/infrastructure/adapters/sqlite/create-state-stores.js", () =>
 }));
 
 vi.mock("../../src/infrastructure/home-directory.js", () => ({
-	createTffCcSymlink: vi.fn(),
+	createTffSymlink: vi.fn(),
 	getProjectId: vi.fn(() => "test-project-id"),
 	resolveRepoRoot: vi.fn((cwd: string) => cwd),
 	resolveProjectRoot: vi.fn((cwd: string) => cwd),
@@ -133,7 +133,7 @@ describe("worktree:create — ad-hoc slice CLI errors", () => {
 		const out = JSON.parse(await wrapped(["--slice-id", sliceId]));
 
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(out.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 		expect(out.error.message).toMatch(/no base_branch and no parent milestone branch/);
 	});
 
@@ -165,7 +165,7 @@ describe("worktree:create — ad-hoc slice CLI errors", () => {
 		const out = JSON.parse(await wrapped(["--slice-id", sliceR.data.id]));
 
 		expect(out.ok).toBe(false);
-		expect(out.error.code).toBe("NOT_FOUND");
+		expect(out.error.errorLabel).toBe("NOT_FOUND");
 		expect(out.error.message).toMatch(/Milestone.*not found/);
 	});
 });

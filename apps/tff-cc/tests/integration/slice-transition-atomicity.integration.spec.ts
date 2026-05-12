@@ -101,7 +101,7 @@ describe("slice-transition atomicity", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("TRANSACTION_ROLLBACK");
+		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
 		// DB: status should still be discussing.
 		spy.mockRestore();
@@ -134,9 +134,11 @@ describe("slice-transition atomicity", () => {
 
 		expect(result.ok).toBe(true);
 		expect(Array.isArray(result.warnings)).toBe(true);
-		const partial = result.warnings.find((w: { code?: string }) => w?.code === "PARTIAL_SUCCESS");
+		const partial = result.warnings.find(
+			(w: { errorLabel?: string }) => w?.errorLabel === "PARTIAL_SUCCESS",
+		);
 		expect(partial).toBeDefined();
-		expect(String(partial.context?.pendingEffect ?? "")).toContain("STATE.md");
+		expect(String(partial.context?.target ?? "")).toContain("STATE.md");
 
 		// DB committed.
 		const slice = adapter.getSlice(sliceId);

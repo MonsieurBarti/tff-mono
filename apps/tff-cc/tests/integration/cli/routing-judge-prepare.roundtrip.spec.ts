@@ -8,10 +8,10 @@ const SLICE = "M01-S02";
 const D1 = "00000000-0000-4000-8000-000000000001";
 
 const seed = (root: string) => {
-	mkdirSync(join(root, ".tff-cc", "logs"), { recursive: true });
-	mkdirSync(join(root, ".tff-cc", "milestones", "M01", "S02-auth"), { recursive: true });
+	mkdirSync(join(root, ".tff", "logs"), { recursive: true });
+	mkdirSync(join(root, ".tff", "milestones", "M01", "S02-auth"), { recursive: true });
 	writeFileSync(
-		join(root, ".tff-cc", "settings.yaml"),
+		join(root, ".tff", "settings.yaml"),
 		`routing:
   enabled: true
   calibration:
@@ -20,7 +20,7 @@ const seed = (root: string) => {
 `,
 	);
 	writeFileSync(
-		join(root, ".tff-cc", "logs", "routing.jsonl"),
+		join(root, ".tff", "logs", "routing.jsonl"),
 		`${JSON.stringify({
 			kind: "route",
 			timestamp: "2026-04-20T09:00:00.000Z",
@@ -49,7 +49,7 @@ const seed = (root: string) => {
 			},
 		})}\n`,
 	);
-	writeFileSync(join(root, ".tff-cc", "milestones", "M01", "S02-auth", "SPEC.md"), "# spec");
+	writeFileSync(join(root, ".tff", "milestones", "M01", "S02-auth", "SPEC.md"), "# spec");
 };
 
 const stubDiffReader = {
@@ -108,6 +108,6 @@ describe("routing:judge-prepare — roundtrip", () => {
 		});
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(parsed.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 });

@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 import { decideUseCase } from "../../../../src/application/routing/decide.js";
-import { createDomainError } from "../../../../src/domain/errors/domain-error.js";
 import type {
 	RoutingConfig,
 	RoutingConfigReader,
@@ -11,9 +10,10 @@ import {
 	DEFAULT_TIER_POLICY,
 	type TierConfigReader,
 } from "../../../../src/domain/ports/tier-config-reader.port.js";
-import { Err, isOk, Ok } from "../../../../src/domain/result.js";
-import type { Signals } from "../../../../src/domain/value-objects/signals.js";
-import type { WorkflowPool } from "../../../../src/domain/value-objects/workflow-pool.js";
+import { Err, isOk, Ok } from "@tff/core";
+import { GenericDomainError } from "../../../../src/infrastructure/errors/generic-domain-error.js";
+import type { Signals } from "../../src/shared/value-objects/signals.js";
+import type { WorkflowPool } from "../../src/shared/value-objects/workflow-pool.js";
 
 const POOL: WorkflowPool = {
 	workflow_id: "tff:ship",
@@ -33,7 +33,7 @@ const SIGNALS: Signals = {
 const CONFIG: RoutingConfig = {
 	enabled: true,
 	confidence_threshold: 0.5,
-	logging: { path: ".tff-cc/logs/routing.jsonl" },
+	logging: { path: ".tff/logs/routing.jsonl" },
 };
 
 const mkDeps = () => {
@@ -114,7 +114,7 @@ describe("decideUseCase", () => {
 		const deps = mkDeps();
 		deps.extractor.extract = vi
 			.fn()
-			.mockResolvedValue(Err(createDomainError("SIGNAL_EXTRACTION", "boom", {})));
+			.mockResolvedValue(Err(new GenericDomainError("SIGNAL_EXTRACTION", "boom", {})));
 		const res = await decideUseCase(
 			{
 				workflow_id: "tff:ship",
@@ -135,7 +135,7 @@ describe("decideUseCase", () => {
 		const deps = mkDeps();
 		deps.configReader.readPool = vi
 			.fn()
-			.mockResolvedValue(Err(createDomainError("ROUTING_CONFIG", "nope", {})));
+			.mockResolvedValue(Err(new GenericDomainError("ROUTING_CONFIG", "nope", {})));
 		const res = await decideUseCase(
 			{
 				workflow_id: "tff:ship",
@@ -175,7 +175,8 @@ describe("decideUseCase", () => {
 		let calls = 0;
 		deps.tierConfigReader.readAgentMinTier = vi.fn().mockImplementation(() => {
 			calls++;
-			if (calls === 2) return Promise.resolve(Err(createDomainError("ROUTING_CONFIG", "boom", {})));
+			if (calls === 2)
+				return Promise.resolve(Err(new GenericDomainError("ROUTING_CONFIG", "boom", {})));
 			return Promise.resolve(Ok("haiku"));
 		});
 		const res = await decideUseCase(

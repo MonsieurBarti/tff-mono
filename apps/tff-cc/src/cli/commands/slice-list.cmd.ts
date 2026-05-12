@@ -1,6 +1,6 @@
 import { resolveMilestoneId } from "../../application/milestone/resolve-milestone-id.js";
 import { reconcileOnRead } from "../../application/reconcile/reconcile-on-read.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 

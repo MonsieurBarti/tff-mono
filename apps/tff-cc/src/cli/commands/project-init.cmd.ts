@@ -1,5 +1,5 @@
 import { initProject } from "../../application/project/init-project.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { MarkdownArtifactAdapter } from "../../infrastructure/adapters/filesystem/markdown-artifact.adapter.js";
 import { GitCliAdapter } from "../../infrastructure/adapters/git/git-cli.adapter.js";
 import { createStateStores } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
@@ -42,7 +42,7 @@ export const projectInitCmd = async (args: string[]): Promise<string> => {
 
 	const repoRoot = resolveRepoRoot(process.cwd());
 	const projectRoot = resolveProjectRoot(process.cwd());
-	// Note: .tff-cc/ symlink is created by getProjectId() called from createStateStores()
+	// Note: .tff/ symlink is created by getProjectId() called from createStateStores()
 	const { projectStore } = createStateStores();
 	const artifactStore = new MarkdownArtifactAdapter(projectRoot);
 	const _gitOps = new GitCliAdapter(repoRoot);

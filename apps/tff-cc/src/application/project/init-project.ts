@@ -1,11 +1,17 @@
-import { createProject, type Project } from "../../domain/entities/project.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { projectExistsError } from "../../domain/errors/project-exists.error.js";
+import {
+	Project,
+	ProjectExistsError,
+	type BaseDomainError,
+	type ProjectStore,
+	type Result,
+	Ok,
+	Err,
+	isOk,
+	MILESTONES_DIR,
+	PROJECT_FILE,
+	TFF_DIR,
+} from "@tff/core";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import type { ProjectStore } from "../../domain/ports/project-store.port.js";
-
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { MILESTONES_DIR, PROJECT_FILE, TFF_CC_DIR } from "../../shared/paths.js";
 
 interface InitProjectInput {
 	name: string;
@@ -22,22 +28,24 @@ interface InitProjectOutput {
 export const initProject = async (
 	input: InitProjectInput,
 	deps: InitProjectDeps,
-): Promise<Result<InitProjectOutput, DomainError>> => {
-	if (await deps.artifactStore.exists(PROJECT_FILE)) return Err(projectExistsError(input.name));
+): Promise<Result<InitProjectOutput, BaseDomainError<unknown>>> => {
+	if (await deps.artifactStore.exists(PROJECT_FILE))
+		return Err(new ProjectExistsError("Project already exists", input.name));
 
 	const existing = deps.projectStore.getProject();
 	if (!isOk(existing)) return existing;
-	if (existing.data !== null) return Err(projectExistsError(input.name));
+	if (existing.data !== null)
+		return Err(new ProjectExistsError("Project already exists", input.name));
 
-	const project = createProject(input);
+	const project = Project.createNew(input);
 
 	const saveResult = deps.projectStore.saveProject({ name: project.name, vision: project.vision });
 	if (!isOk(saveResult)) return saveResult;
 
-	await deps.artifactStore.mkdir(TFF_CC_DIR);
+	await deps.artifactStore.mkdir(TFF_DIR);
 	await deps.artifactStore.mkdir(MILESTONES_DIR);
 
-	// Ensure .tff-cc/ and build/ are in .gitignore so artifacts never land on code branches
+	// Ensure .tff/ and build/ are in .gitignore so artifacts never land on code branches
 	await ensureGitignored(deps.artifactStore);
 
 	const projectMd = `# ${project.name}\n\n## Vision\n\n${project.vision}\n`;
@@ -46,13 +54,13 @@ export const initProject = async (
 	return Ok({ project: saveResult.data });
 };
 
-// Root-anchored, no trailing slash: matches the toplevel `.tff-cc` whether it
+// Root-anchored, no trailing slash: matches the toplevel `.tff` whether it
 // is the canonical symlink, a real dir, or a regular file. The trailing-slash
-// form (`/.tff-cc/`) only matches directories, so it would silently fail to
+// form (`/.tff/`) only matches directories, so it would silently fail to
 // ignore the symlink that `project:init` creates. Anchoring with `/` ensures
-// a stray `<some-dir>/.tff-cc/` (e.g., test pollution in a subdir) is NOT
+// a stray `<some-dir>/.tff/` (e.g., test pollution in a subdir) is NOT
 // hidden — it surfaces in `git status` instead of being masked.
-const REQUIRED_GITIGNORE_ENTRIES = [`/${TFF_CC_DIR}`, "build/"];
+const REQUIRED_GITIGNORE_ENTRIES = [`/${TFF_DIR}`, "build/"];
 
 function gitignoreLineSatisfies(line: string, entry: string): boolean {
 	const trimmed = line.trim();

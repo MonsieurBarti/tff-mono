@@ -3,7 +3,7 @@ import { assertNotOnMilestoneBranch } from "../../../../src/application/guards/m
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
 import type { MilestoneStore } from "../../../../src/domain/ports/milestone-store.port.js";
 import type { SliceStore } from "../../../../src/domain/ports/slice-store.port.js";
-import { Ok } from "../../../../src/domain/result.js";
+import { Ok } from "@tff/core";
 
 const makeGit = (branch: string): GitOps =>
 	({

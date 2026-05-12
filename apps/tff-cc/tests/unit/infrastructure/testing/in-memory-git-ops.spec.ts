@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("InMemoryGitOps — S03 extensions", () => {
@@ -48,15 +48,15 @@ describe("InMemoryGitOps — S03 extensions", () => {
 	});
 
 	it("lsTree should return stored files", async () => {
-		git.setTreeFiles("tff-state/main", [".tff-cc/state.db", ".tff-cc/PROJECT.md"]);
+		git.setTreeFiles("tff-state/main", [".tff/state.db", ".tff/PROJECT.md"]);
 		const r = await git.lsTree("tff-state/main");
-		expect(isOk(r) && r.data).toEqual([".tff-cc/state.db", ".tff-cc/PROJECT.md"]);
+		expect(isOk(r) && r.data).toEqual([".tff/state.db", ".tff/PROJECT.md"]);
 	});
 
 	it("extractFile should return stored buffer", async () => {
 		const buf = Buffer.from("hello");
-		git.setFileContent("tff-state/main", ".tff-cc/PROJECT.md", buf);
-		const r = await git.extractFile("tff-state/main", ".tff-cc/PROJECT.md");
+		git.setFileContent("tff-state/main", ".tff/PROJECT.md", buf);
+		const r = await git.extractFile("tff-state/main", ".tff/PROJECT.md");
 		expect(isOk(r) && r.data).toEqual(buf);
 	});
 

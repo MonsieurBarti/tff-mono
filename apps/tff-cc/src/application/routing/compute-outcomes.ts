@@ -17,18 +17,18 @@ export const computeImplicitOutcomesUseCase = async (
 ): Promise<ComputeImplicitOutcomesResult> => {
 	const existingKeys = new Set<string>();
 	for await (const o of deps.existingOutcomesSource.readOutcomes({ source: "debug-join" })) {
-		existingKeys.add(o.decision_id);
+		existingKeys.add(o.decisionId);
 	}
 
 	let written = 0;
 	let skipped = 0;
 	for await (const o of deps.implicitSource.readOutcomes({})) {
-		if (existingKeys.has(o.decision_id)) {
+		if (existingKeys.has(o.decisionId)) {
 			skipped += 1;
 			continue;
 		}
 		await deps.writer.append(o);
-		existingKeys.add(o.decision_id);
+		existingKeys.add(o.decisionId);
 		written += 1;
 	}
 	return { written, skipped };

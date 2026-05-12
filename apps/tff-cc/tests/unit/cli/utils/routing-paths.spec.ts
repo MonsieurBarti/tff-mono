@@ -5,11 +5,11 @@ describe("resolveRoutingPaths", () => {
 	it("resolves relative logging paths under projectRoot", () => {
 		const { routingPath, outcomesPath, reportPath } = resolveRoutingPaths(
 			"/tmp/proj",
-			".tff-cc/logs/routing.jsonl",
+			".tff/logs/routing.jsonl",
 		);
-		expect(routingPath).toBe("/tmp/proj/.tff-cc/logs/routing.jsonl");
-		expect(outcomesPath).toBe("/tmp/proj/.tff-cc/logs/routing-outcomes.jsonl");
-		expect(reportPath).toBe("/tmp/proj/.tff-cc/logs/routing-calibration.md");
+		expect(routingPath).toBe("/tmp/proj/.tff/logs/routing.jsonl");
+		expect(outcomesPath).toBe("/tmp/proj/.tff/logs/routing-outcomes.jsonl");
+		expect(reportPath).toBe("/tmp/proj/.tff/logs/routing-calibration.md");
 	});
 
 	it("preserves absolute logging paths", () => {

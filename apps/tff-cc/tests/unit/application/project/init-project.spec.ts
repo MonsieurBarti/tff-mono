@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { initProject } from "../../../../src/application/project/init-project.js";
-import { isErr, isOk } from "../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
@@ -30,18 +30,18 @@ describe("initProject", () => {
 			{ name: "my-app", vision: "A great app" },
 			{ projectStore: adapter, artifactStore },
 		);
-		expect(await artifactStore.exists(".tff-cc/PROJECT.md")).toBe(true);
+		expect(await artifactStore.exists(".tff/PROJECT.md")).toBe(true);
 	});
 
-	it("should add /.tff-cc (root-anchored, no trailing slash) and build/ to .gitignore", async () => {
+	it("should add /.tff (root-anchored, no trailing slash) and build/ to .gitignore", async () => {
 		await initProject(
 			{ name: "my-app", vision: "A great app" },
 			{ projectStore: adapter, artifactStore },
 		);
 		expect(await artifactStore.exists(".gitignore")).toBe(true);
 		const content = await artifactStore.read(".gitignore");
-		// `/.tff-cc` — anchored, no trailing slash so it matches the symlink form too.
-		expect(isOk(content) && content.data.split("\n")).toContain("/.tff-cc");
+		// `/.tff` — anchored, no trailing slash so it matches the symlink form too.
+		expect(isOk(content) && content.data.split("\n")).toContain("/.tff");
 		expect(isOk(content) && content.data).toContain("build/");
 	});
 
@@ -53,29 +53,29 @@ describe("initProject", () => {
 		);
 		const content = await artifactStore.read(".gitignore");
 		expect(isOk(content) && content.data).toContain("node_modules/");
-		expect(isOk(content) && content.data.split("\n")).toContain("/.tff-cc");
+		expect(isOk(content) && content.data.split("\n")).toContain("/.tff");
 		expect(isOk(content) && content.data).toContain("build/");
 	});
 
 	it("should not duplicate entries already in .gitignore (anchored form)", async () => {
-		artifactStore.seed({ ".gitignore": "node_modules/\n/.tff-cc\nbuild/\n" });
+		artifactStore.seed({ ".gitignore": "node_modules/\n/.tff\nbuild/\n" });
 		await initProject(
 			{ name: "my-app", vision: "A great app" },
 			{ projectStore: adapter, artifactStore },
 		);
 		const content = await artifactStore.read(".gitignore");
 		if (isOk(content)) {
-			const tffMatches = content.data.split("\n").filter((l) => l.trim() === "/.tff-cc");
+			const tffMatches = content.data.split("\n").filter((l) => l.trim() === "/.tff");
 			const buildMatches = content.data.split("\n").filter((l) => l.trim() === "build/");
 			expect(tffMatches).toHaveLength(1);
 			expect(buildMatches).toHaveLength(1);
 		}
 	});
 
-	it("should treat legacy unanchored .tff-cc/ as satisfying the requirement", async () => {
+	it("should treat legacy unanchored .tff/ as satisfying the requirement", async () => {
 		// Existing projects with the pre-fix unanchored form should not gain a
-		// duplicate `/.tff-cc` line on re-init.
-		artifactStore.seed({ ".gitignore": "node_modules/\n.tff-cc/\nbuild/\n" });
+		// duplicate `/.tff` line on re-init.
+		artifactStore.seed({ ".gitignore": "node_modules/\n.tff/\nbuild/\n" });
 		await initProject(
 			{ name: "my-app", vision: "A great app" },
 			{ projectStore: adapter, artifactStore },
@@ -84,7 +84,7 @@ describe("initProject", () => {
 		if (isOk(content)) {
 			const anyTff = content.data
 				.split("\n")
-				.filter((l) => [".tff-cc", ".tff-cc/", "/.tff-cc", "/.tff-cc/"].includes(l.trim()));
+				.filter((l) => [".tff", ".tff/", "/.tff", "/.tff/"].includes(l.trim()));
 			expect(anyTff).toHaveLength(1);
 		}
 	});
@@ -97,7 +97,7 @@ describe("initProject", () => {
 		);
 		const content = await artifactStore.read(".gitignore");
 		if (isOk(content)) {
-			expect(content.data.split("\n")).toContain("/.tff-cc");
+			expect(content.data.split("\n")).toContain("/.tff");
 			const buildMatches = content.data.split("\n").filter((l) => l.trim() === "build/");
 			expect(buildMatches).toHaveLength(1);
 		}
@@ -113,16 +113,16 @@ describe("initProject", () => {
 			{ projectStore: adapter, artifactStore },
 		);
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("PROJECT_EXISTS");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("PROJECT_EXISTS");
 	});
 
 	it("should reject if PROJECT.md already exists", async () => {
-		artifactStore.seed({ ".tff-cc/PROJECT.md": "# Existing" });
+		artifactStore.seed({ ".tff/PROJECT.md": "# Existing" });
 		const result = await initProject(
 			{ name: "my-app", vision: "Vision" },
 			{ projectStore: adapter, artifactStore },
 		);
 		expect(isErr(result)).toBe(true);
-		if (isErr(result)) expect(result.error.code).toBe("PROJECT_EXISTS");
+		if (isErr(result)) expect(result.error.errorLabel).toBe("PROJECT_EXISTS");
 	});
 });

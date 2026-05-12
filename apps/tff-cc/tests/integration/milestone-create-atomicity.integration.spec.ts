@@ -102,7 +102,7 @@ describe("milestone-create atomicity", () => {
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("TRANSACTION_ROLLBACK");
+		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
 		spy.mockRestore();
 
@@ -119,7 +119,7 @@ describe("milestone-create atomicity", () => {
 		const adapter = setupAdapter();
 		installStores(adapter);
 
-		const slicesDir = join(repo, ".tff-cc", "milestones", "M01", "slices");
+		const slicesDir = join(repo, ".tff", "milestones", "M01", "slices");
 		expect(existsSync(slicesDir)).toBe(false);
 
 		const spy = vi.spyOn(adapter, "createMilestone").mockImplementation(() => {
@@ -133,9 +133,9 @@ describe("milestone-create atomicity", () => {
 		expect(result.ok).toBe(false);
 		spy.mockRestore();
 
-		// The slices dir (and its empty ancestors up to .tff-cc) must be gone.
+		// The slices dir (and its empty ancestors up to .tff) must be gone.
 		expect(existsSync(slicesDir)).toBe(false);
-		expect(existsSync(join(repo, ".tff-cc", "milestones", "M01"))).toBe(false);
+		expect(existsSync(join(repo, ".tff", "milestones", "M01"))).toBe(false);
 	});
 
 	it("returns ok:true with PartialSuccessWarning when git branch creation fails (post-commit)", async () => {
@@ -158,12 +158,12 @@ describe("milestone-create atomicity", () => {
 		expect(result.data.milestone).toBeDefined();
 		expect(Array.isArray(result.warnings)).toBe(true);
 		const partial = result.warnings.find(
-			(w: { code?: string; message?: string }) =>
-				w?.code === "PARTIAL_SUCCESS" && String(w.message ?? "").includes("git branch"),
+			(w: { errorLabel?: string; message?: string }) =>
+				w?.errorLabel === "PARTIAL_SUCCESS" && String(w.message ?? "").includes("git branch"),
 		);
 		expect(partial).toBeDefined();
 		expect(String(partial.message ?? "")).toContain("git branch creation failed");
-		expect(String(partial.context?.pendingEffect ?? "")).toContain("git-branch:");
+		expect(String(partial.recoveryHint ?? "")).toContain("git-branch:");
 
 		// DB commit durable.
 		const ms = adapter.listMilestones();

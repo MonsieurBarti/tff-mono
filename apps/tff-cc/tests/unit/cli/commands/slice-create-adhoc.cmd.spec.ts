@@ -74,16 +74,16 @@ describe("slice:create — kind-aware (quick/debug)", () => {
 		expect(result.ok).toBe(true);
 		const slice = result.data?.slice;
 		expect(slice.kind).toBe("quick");
-		expect(slice.milestoneId).toBeUndefined();
+		expect(slice.milestoneId).toBeNull();
 		expect(slice.baseBranch).toBe("main");
-		expect(slice.branchName).toBeUndefined();
+		expect(slice.branchName).toBe("");
 		expect(slice.number).toBe(1);
 
-		// PLAN.md exists at .tff-cc/quick/Q-01/PLAN.md
-		expect(existsSync(path.join(tmpDir, ".tff-cc", "quick", "Q-01", "PLAN.md"))).toBe(true);
+		// PLAN.md exists at .tff/quick/Q-01/PLAN.md
+		expect(existsSync(path.join(tmpDir, ".tff", "quick", "Q-01", "PLAN.md"))).toBe(true);
 
 		// STATE.md not touched (no milestone-bound slice exists in this repo).
-		expect(existsSync(path.join(tmpDir, ".tff-cc", "STATE.md"))).toBe(false);
+		expect(existsSync(path.join(tmpDir, ".tff", "STATE.md"))).toBe(false);
 	});
 
 	// 3. Ad-hoc debug creation
@@ -95,7 +95,7 @@ describe("slice:create — kind-aware (quick/debug)", () => {
 		const slice = result.data?.slice;
 		expect(slice.kind).toBe("debug");
 		expect(slice.number).toBe(1);
-		expect(existsSync(path.join(tmpDir, ".tff-cc", "debug", "D-01", "PLAN.md"))).toBe(true);
+		expect(existsSync(path.join(tmpDir, ".tff", "debug", "D-01", "PLAN.md"))).toBe(true);
 	});
 
 	// 4. Counter increments per kind, milestone numbering uncoupled

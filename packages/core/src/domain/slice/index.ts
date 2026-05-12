@@ -17,7 +17,7 @@ export {
 	SliceAlreadyArchivedError,
 	PreconditionViolationError,
 } from "./slice.error.js";
-export { SliceRepository } from "./slice.repository.js";
+export { type SliceProps, type SliceUpdateProps } from "./slice-props.js";
 export {
 	type SliceStatus,
 	type ComplexityTier,

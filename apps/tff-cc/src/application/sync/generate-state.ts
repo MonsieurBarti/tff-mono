@@ -1,12 +1,21 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import { sliceLabelFor } from "../../domain/helpers/branch-naming.js";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import type { MilestoneStore } from "../../domain/ports/milestone-store.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Err, isOk, Ok, type Result } from "../../domain/result.js";
-import { DEBUG_DIR, QUICK_DIR, STATE_FILE } from "../../shared/paths.js";
+import {
+	DEBUG_DIR,
+	Err,
+	Ok,
+	QUICK_DIR,
+	STATE_FILE,
+	isOk,
+	sliceLabelFor,
+	type MilestoneStore,
+	type Result,
+	type SliceStore,
+	type TaskStore,
+} from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 export type GenerateStateInput =
 	| { scope: "milestone"; milestoneId: string }
@@ -118,7 +127,9 @@ export const renderStateMd = (
 		const milestoneResult = deps.milestoneStore.getMilestone(normalized.milestoneId);
 		if (!isOk(milestoneResult)) return milestoneResult;
 		if (!milestoneResult.data) {
-			return Err(createDomainError("NOT_FOUND", `Milestone "${normalized.milestoneId}" not found`));
+			return Err(
+				new GenericDomainError("NOT_FOUND", `Milestone "${normalized.milestoneId}" not found`),
+			);
 		}
 		const milestone = milestoneResult.data;
 

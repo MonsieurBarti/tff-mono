@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
-import { SETTINGS_FILE } from "../../shared/paths.js";
+import { SETTINGS_FILE } from "@tff/core";
 
 export interface SpecEditWarning {
 	code: "SPEC_EDIT_DETECTED";
@@ -36,7 +36,7 @@ function areGuardsDisabled(): boolean {
 /**
  * Check if a file path matches SPEC.md (case-insensitive).
  * Matches: SPEC.md, spec.md, Spec.md, sPeC.md, etc.
- * Also matches paths like .tff-cc/milestones/M001/SPEC.md or slices/S01/SPEC.md
+ * Also matches paths like .tff/milestones/M001/SPEC.md or slices/S01/SPEC.md
  */
 function isSpecFile(filePath: string): boolean {
 	if (!filePath || typeof filePath !== "string") {

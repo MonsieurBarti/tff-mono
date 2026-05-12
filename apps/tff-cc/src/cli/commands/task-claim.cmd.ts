@@ -1,10 +1,12 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { partialSuccessWarning } from "../../domain/errors/partial-success.warning.js";
-import { isOk } from "../../domain/result.js";
-import type { TaskStartedEntry } from "../../domain/value-objects/journal-entry.js";
+import type { TaskStartedEntry } from "../../shared/value-objects/journal-entry.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { withTransaction } from "../../infrastructure/persistence/with-transaction.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
+import { isOk } from "@tff/core";
 
 export const taskClaimSchema: CommandSchema = {
 	name: "task:claim",
@@ -46,12 +48,15 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	const { db, taskStore, journalRepository } = closableStores;
 	// Read task to get wave index and sliceId for journal entry
 	const taskResult = taskStore.getTask(taskId);
-	if (!isOk(taskResult)) return JSON.stringify({ ok: false, error: taskResult.error });
-	if (!taskResult.data)
+	if (!isOk(taskResult)) {
+		return JSON.stringify({ ok: false, error: taskResult.error });
+	}
+	if (!taskResult.data) {
 		return JSON.stringify({
 			ok: false,
 			error: { code: "TASK_NOT_FOUND", message: `Task ${taskId} not found` },
 		});
+	}
 
 	const task = taskResult.data;
 	const waveIndex = task.wave ?? 0;
@@ -71,7 +76,7 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	// no rows were changed and no journal entry should be written — we
 	// capture the error outcome via a sentinel rather than throwing (nothing
 	// to rollback) so the public error code is preserved.
-	let businessError: DomainError | null = null;
+	let businessError: unknown = null;
 	const txResult = await withTransaction(db, () => {
 		const r = taskStore.claimTask(taskId, claimedBy);
 		if (!r.ok) {
@@ -94,9 +99,15 @@ export const taskClaimCmd = async (args: string[]): Promise<string> => {
 	const journalResult = journalRepository.append(task.sliceId, journalEntry);
 	if (!isOk(journalResult)) {
 		warnings.push(
-			partialSuccessWarning(`journal append failed: ${journalResult.error.message}`, "journal"),
+			new GenericDomainError(
+				"PARTIAL_SUCCESS",
+				`journal append failed: ${journalResult.error.message}`,
+				undefined,
+				"journal",
+			),
 		);
 	}
 
-	return JSON.stringify({ ok: true, data: null, warnings });
+	const output = JSON.stringify({ ok: true, data: null, warnings });
+	return output;
 };

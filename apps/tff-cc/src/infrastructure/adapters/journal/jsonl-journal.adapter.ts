@@ -7,14 +7,14 @@ import {
 	unlinkSync,
 } from "node:fs";
 import { join } from "node:path";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
-import { createDomainError } from "../../../domain/errors/domain-error.js";
+import type { DomainError } from "../../errors/generic-domain-error.js";
+import { GenericDomainError } from "../../errors/generic-domain-error.js";
 import type { JournalRepository } from "../../../domain/ports/journal-repository.port.js";
-import { Err, Ok, type Result } from "../../../domain/result.js";
+import { Err, Ok, type Result } from "@tff/core";
 import {
 	type JournalEntry,
 	JournalEntrySchema,
-} from "../../../domain/value-objects/journal-entry.js";
+} from "../../../shared/value-objects/journal-entry.js";
 
 function isNodeError(error: unknown): error is Error & { code: string } {
 	if (!(error instanceof Error)) return false;
@@ -42,11 +42,11 @@ export class JsonlJournalAdapter implements JournalRepository {
 		} catch (error: unknown) {
 			if (error instanceof Error && error.name === "ZodError") {
 				return Err(
-					createDomainError("JOURNAL_WRITE_FAILED", `Invalid journal entry: ${error.message}`),
+					new GenericDomainError("JOURNAL_WRITE_FAILED", `Invalid journal entry: ${error.message}`),
 				);
 			}
 			return Err(
-				createDomainError(
+				new GenericDomainError(
 					"JOURNAL_WRITE_FAILED",
 					error instanceof Error ? error.message : String(error),
 				),
@@ -61,7 +61,7 @@ export class JsonlJournalAdapter implements JournalRepository {
 		} catch (error: unknown) {
 			if (isNodeError(error) && error.code === "ENOENT") return Ok([]);
 			return Err(
-				createDomainError(
+				new GenericDomainError(
 					"JOURNAL_READ_FAILED",
 					error instanceof Error ? error.message : String(error),
 				),

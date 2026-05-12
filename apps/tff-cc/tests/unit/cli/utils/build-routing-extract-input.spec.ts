@@ -4,10 +4,10 @@ import {
 	buildRoutingExtractInput,
 	type GitRunner,
 } from "../../../../src/cli/utils/build-routing-extract-input.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
+import type { Slice } from "@tff/core";
 import type { MilestoneStore } from "../../../../src/domain/ports/milestone-store.port.js";
 import type { SliceStore } from "../../../../src/domain/ports/slice-store.port.js";
-import { Ok } from "../../../../src/domain/result.js";
+import { Ok } from "@tff/core";
 
 const stubMilestoneStore = (overrides: Partial<MilestoneStore> = {}): MilestoneStore => {
 	return {
@@ -123,7 +123,7 @@ describe("buildRoutingExtractInput", () => {
 		]);
 		expect(result.affected_files.length).toBeGreaterThanOrEqual(5); // → medium tier downstream
 		expect(result.spec_path).toBe(
-			join("/repo", ".tff-cc", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
+			join("/repo", ".tff", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
 		);
 	});
 
@@ -183,7 +183,7 @@ describe("buildRoutingExtractInput", () => {
 		expect(result.affected_files).toEqual([]);
 		// spec_path is still set so the keyword scan can still pick up SPEC.md
 		expect(result.spec_path).toBe(
-			join("/repo", ".tff-cc", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
+			join("/repo", ".tff", "milestones", "M01", "slices", "M01-S01", "SPEC.md"),
 		);
 	});
 });

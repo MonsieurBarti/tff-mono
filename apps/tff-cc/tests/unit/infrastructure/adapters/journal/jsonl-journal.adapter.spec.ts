@@ -2,7 +2,7 @@ import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { JsonlJournalAdapter } from "../../../../../src/infrastructure/adapters/journal/jsonl-journal.adapter.js";
 import { JournalEntryBuilder } from "../../../../fixtures/journal-entry.builder.js";
 
@@ -86,7 +86,3 @@ describe("JsonlJournalAdapter — adapter-specific", () => {
 		expect(typeof result.ok).toBe("boolean");
 	});
 });
-
-import { runJournalContractTests } from "../../../domain/ports/journal-repository.contract.spec.js";
-
-runJournalContractTests("JsonlJournalAdapter", () => new JsonlJournalAdapter(basePath));

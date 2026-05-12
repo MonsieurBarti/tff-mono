@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS slice (
   kind TEXT NOT NULL DEFAULT 'milestone' CHECK (kind IN ('milestone', 'quick', 'debug')),
   number INTEGER NOT NULL,
   title TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'discussing' CHECK (status IN ('discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'completing', 'closed')),
+  status TEXT NOT NULL DEFAULT 'discussing' CHECK (status IN ('discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'shipping', 'closed')),
   tier TEXT CHECK (tier IN ('S', 'SS', 'SSS')),
   base_branch TEXT,
   branch_name TEXT,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS review (
   slice_id TEXT NOT NULL REFERENCES slice(id),
   type TEXT NOT NULL CHECK (type IN ('code', 'security', 'spec')),
   reviewer TEXT NOT NULL,
-  verdict TEXT NOT NULL CHECK (verdict IN ('approve', 'request_changes', 'reject')),
+  verdict TEXT NOT NULL CHECK (verdict IN ('approved', 'changes_requested', 'commented')),
   commit_sha TEXT NOT NULL,
   notes TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
@@ -122,8 +122,7 @@ CREATE TABLE IF NOT EXISTS review (
 -- Milestone audit
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS milestone_audit (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  milestone_id TEXT NOT NULL REFERENCES milestone(id),
+  milestone_id TEXT PRIMARY KEY REFERENCES milestone(id),
   verdict TEXT NOT NULL CHECK (verdict IN ('ready', 'not_ready')),
   audited_at INTEGER NOT NULL,
   notes TEXT,
@@ -193,7 +192,6 @@ CREATE INDEX IF NOT EXISTS idx_task_slice ON task(slice_id);
 CREATE INDEX IF NOT EXISTS idx_task_status ON task(status);
 CREATE INDEX IF NOT EXISTS idx_task_wave ON task(slice_id, wave);
 CREATE INDEX IF NOT EXISTS idx_review_slice ON review(slice_id, type);
-CREATE INDEX IF NOT EXISTS idx_milestone_audit_verdict ON milestone_audit(verdict);
 CREATE INDEX IF NOT EXISTS idx_pending_judgments_created ON pending_judgments(created_at);
 CREATE INDEX IF NOT EXISTS idx_event_log_entity ON event_log(entity_type, entity_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_phase_run_slice ON phase_run(slice_id);

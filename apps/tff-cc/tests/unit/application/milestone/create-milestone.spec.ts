@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMilestoneUseCase } from "../../../../src/application/milestone/create-milestone.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
@@ -49,7 +49,7 @@ describe("createMilestoneUseCase", () => {
 		);
 
 		// Directory uses label format M##, not UUID
-		expect(await artifactStore.exists(".tff-cc/milestones/M01/REQUIREMENTS.md")).toBe(true);
+		expect(await artifactStore.exists(".tff/milestones/M01/REQUIREMENTS.md")).toBe(true);
 	});
 
 	it("should create slices directory with label format", async () => {
@@ -60,6 +60,6 @@ describe("createMilestoneUseCase", () => {
 
 		// The slices directory is created by mkdir, and REQUIREMENTS.md is written
 		// We verify the directory structure by checking that the file exists
-		expect(await artifactStore.exists(".tff-cc/milestones/M01/REQUIREMENTS.md")).toBe(true);
+		expect(await artifactStore.exists(".tff/milestones/M01/REQUIREMENTS.md")).toBe(true);
 	});
 });

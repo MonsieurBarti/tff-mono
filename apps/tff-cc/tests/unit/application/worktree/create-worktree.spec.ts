@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createWorktreeUseCase } from "../../../../src/application/worktree/create-worktree.js";
-import type { Milestone } from "../../../../src/domain/entities/milestone.js";
-import type { Slice } from "../../../../src/domain/entities/slice.js";
-import { isOk } from "../../../../src/domain/result.js";
+import type { Milestone } from "@tff/core";
+import type { Slice } from "@tff/core";
+import { isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("createWorktreeUseCase", () => {
@@ -49,7 +49,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("slice/a1b2c3d4");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/M01-S03");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/M01-S03");
 			expect(gitOps.hasBranch("slice/a1b2c3d4")).toBe(true);
 		}
 	});
@@ -75,7 +75,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("fix/payload");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/Q-07");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/Q-07");
 			expect(gitOps.hasBranch("fix/payload")).toBe(true);
 		}
 	});
@@ -101,7 +101,7 @@ describe("createWorktreeUseCase", () => {
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
 			expect(result.data.branchName).toBe("slice/12345678");
-			expect(result.data.worktreePath).toBe(".tff-cc/worktrees/D-03");
+			expect(result.data.worktreePath).toBe(".tff/worktrees/D-03");
 			expect(gitOps.hasBranch("slice/12345678")).toBe(true);
 		}
 	});

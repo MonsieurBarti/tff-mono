@@ -1,17 +1,22 @@
 import { existsSync, mkdirSync, renameSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import type { Milestone } from "../../domain/entities/milestone.js";
-import type { Slice } from "../../domain/entities/slice.js";
-import { milestoneLabel, sliceLabelFor } from "../../domain/helpers/branch-naming.js";
-import { milestoneDir, sliceDirFor, tffCcPath } from "../../shared/paths.js";
+import {
+	milestoneDir,
+	milestoneLabel,
+	sliceDirFor,
+	sliceLabelFor,
+	tffPath,
+	type Milestone,
+	type Slice,
+} from "@tff/core";
 
 /**
- * Repo-relative archive root: .tff-cc/archive
+ * Repo-relative archive root: .tff/archive
  *
  * Buckets are created lazily under this root by the FS helpers below
- * (.tff-cc/archive/{milestones,quick,debug}/<label>/).
+ * (.tff/archive/{milestones,quick,debug}/<label>/).
  */
-export const ARCHIVE_DIR = tffCcPath("archive");
+export const ARCHIVE_DIR = tffPath("archive");
 
 type FsResult = { ok: true } | { ok: false; reason: string };
 

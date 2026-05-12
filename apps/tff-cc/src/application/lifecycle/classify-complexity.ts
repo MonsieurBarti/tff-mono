@@ -1,4 +1,4 @@
-import type { ComplexityTier } from "../../domain/value-objects/complexity-tier.js";
+import type { ComplexityTier } from "../../shared/value-objects/complexity-tier.js";
 
 export type RiskLevel = "low" | "medium" | "high";
 

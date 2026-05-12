@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
+import type { DomainError } from "../../errors/generic-domain-error.js";
 import type { ExtractInput, SignalExtractor } from "../../../domain/ports/signal-extractor.port.js";
-import { Ok, type Result } from "../../../domain/result.js";
-import type { ComplexityLevel, Signals } from "../../../domain/value-objects/signals.js";
+import { Ok, type Result } from "@tff/core";
+import type { ComplexityLevel, Signals } from "../../../shared/value-objects/signals.js";
 
 const RISK_KEYWORDS: Record<string, string> = {
 	auth: "auth",

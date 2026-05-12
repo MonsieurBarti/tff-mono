@@ -12,12 +12,12 @@ let home: string;
 
 beforeEach(() => {
 	repo = mkdtempSync(join(tmpdir(), "tff-events-"));
-	home = join(repo, ".tff-cc");
+	home = join(repo, ".tff");
 });
 afterEach(() => rmSync(repo, { recursive: true, force: true }));
 
 describe("appendRecoveryFailedEntry", () => {
-	it("appends a recovery-failed event when .tff-cc/ exists", async () => {
+	it("appends a recovery-failed event when .tff/ exists", async () => {
 		mkdirSync(home, { recursive: true });
 		await appendRecoveryFailedEntry(home, new Error("boom"));
 		const raw = readFileSync(join(home, RECOVERY_EVENTS_FILE), "utf-8");
@@ -30,7 +30,7 @@ describe("appendRecoveryFailedEntry", () => {
 		expect((parsed.context as Record<string, unknown>).platform).toBe(process.platform);
 	});
 
-	it("does not create .tff-cc/ when absent (skips append silently)", async () => {
+	it("does not create .tff/ when absent (skips append silently)", async () => {
 		await appendRecoveryFailedEntry(home, new Error("boom"));
 		expect(existsSync(home)).toBe(false);
 	});

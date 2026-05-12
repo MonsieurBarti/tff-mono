@@ -6,8 +6,8 @@ import type {
 	KnownDecision,
 	RoutingDecisionReader,
 } from "../../../domain/ports/routing-decision-reader.port.js";
-import type { RoutingDecision } from "../../../domain/value-objects/routing-decision.js";
-import type { ModelTier } from "../../../domain/value-objects/tier-decision.js";
+import type { RoutingDecision } from "../../../shared/value-objects/routing-decision.js";
+import type { ModelTier } from "../../../shared/value-objects/tier-decision.js";
 
 export class JsonlRoutingDecisionReader implements RoutingDecisionReader {
 	constructor(private readonly path: string) {}

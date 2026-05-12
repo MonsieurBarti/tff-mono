@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { deleteWorktreeUseCase } from "../../../../src/application/worktree/delete-worktree.js";
-import { isErr, isOk } from "../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 
 describe("deleteWorktreeUseCase", () => {
@@ -10,7 +10,7 @@ describe("deleteWorktreeUseCase", () => {
 	});
 
 	it("should delete an existing worktree", async () => {
-		await gitOps.createWorktree(".tff-cc/worktrees/M01-S01", "slice/M01-S01");
+		await gitOps.createWorktree(".tff/worktrees/M01-S01", "slice/M01-S01");
 		const result = await deleteWorktreeUseCase({ sliceId: "M01-S01" }, { gitOps });
 		expect(isOk(result)).toBe(true);
 	});

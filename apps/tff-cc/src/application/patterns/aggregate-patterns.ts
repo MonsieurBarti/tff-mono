@@ -1,4 +1,4 @@
-import type { Pattern } from "../../domain/value-objects/pattern.js";
+import type { Pattern } from "../../shared/value-objects/pattern.js";
 
 interface AggregateOptions {
 	minCount?: number;

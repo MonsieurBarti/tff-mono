@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_TIER_POLICY } from "../../../../../src/domain/ports/tier-config-reader.port.js";
-import { isOk } from "../../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { FilesystemTierConfigReader } from "../../../../../src/infrastructure/adapters/filesystem/filesystem-tier-config-reader.js";
 
 let tmpDir: string;
@@ -25,7 +25,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("reads tier_policy block from settings.yaml", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(
 			join(tffDir, "settings.yaml"),
@@ -40,7 +40,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("returns defaults when routing block absent", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(join(tffDir, "settings.yaml"), `other_setting: true\n`);
 		const reader = new FilesystemTierConfigReader({ projectRoot: tmpDir, agentsDir: tmpDir });
@@ -51,7 +51,7 @@ describe("FilesystemTierConfigReader.readTierPolicy", () => {
 	});
 
 	it("falls back per-level defaults for invalid tier values", async () => {
-		const tffDir = join(tmpDir, ".tff-cc");
+		const tffDir = join(tmpDir, ".tff");
 		mkdirSync(tffDir, { recursive: true });
 		writeFileSync(
 			join(tffDir, "settings.yaml"),

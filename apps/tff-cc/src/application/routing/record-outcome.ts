@@ -1,13 +1,15 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
 import type { KnownDecision } from "../../domain/ports/routing-decision-reader.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
 import {
+	Err,
+	Ok,
+	PreconditionViolationError,
+	RoutingOutcome,
+	type BaseDomainError,
 	type OutcomeDimension,
 	type OutcomeVerdict,
-	RoutingOutcomeSchema,
-} from "../../domain/value-objects/routing-outcome.js";
+	type Result,
+} from "@tff/core";
 
 export type { KnownDecision };
 
@@ -28,41 +30,40 @@ export interface RecordOutcomeDeps {
 export const recordOutcomeUseCase = async (
 	input: RecordOutcomeInput,
 	deps: RecordOutcomeDeps,
-): Promise<Result<{ outcome_id: string }, DomainError>> => {
+): Promise<Result<{ outcome_id: string }, BaseDomainError<unknown>>> => {
 	const known = deps.knownDecisions.find((d) => d.decision_id === input.decision_id);
 	if (!known) {
 		return Err(
-			preconditionViolationError([
-				{ code: "decision_id.unknown", expected: "known decision_id", actual: input.decision_id },
+			new PreconditionViolationError("Unknown decision_id", [
+				`decision_id.unknown: expected known decision_id, actual ${input.decision_id}`,
 			]),
 		);
 	}
 
 	const candidate = {
-		outcome_id: deps.uuid(),
-		decision_id: input.decision_id,
+		outcomeId: deps.uuid(),
+		decisionId: input.decision_id,
 		dimension: input.dimension,
 		verdict: input.verdict,
 		source: "manual" as const,
-		slice_id: known.slice_id,
-		workflow_id: known.workflow_id,
+		sliceId: known.slice_id,
+		workflowId: known.workflow_id,
 		reason: input.reason,
-		emitted_at: deps.now(),
+		emittedAt: deps.now(),
 	};
 
-	const parsed = RoutingOutcomeSchema.safeParse(candidate);
-	if (!parsed.success) {
+	let outcome: RoutingOutcome;
+	try {
+		outcome = RoutingOutcome.create(candidate);
+	} catch (error) {
 		return Err(
-			preconditionViolationError(
-				parsed.error.issues.map((issue) => ({
-					code: issue.path.join(".") || "schema",
-					expected: "valid dimension×verdict combo",
-					actual: issue.message,
-				})),
+			new PreconditionViolationError(
+				error instanceof Error ? error.message : "Invalid routing outcome",
+				["valid dimension×verdict combination"],
 			),
 		);
 	}
 
-	await deps.writer.append(parsed.data);
-	return Ok({ outcome_id: parsed.data.outcome_id });
+	await deps.writer.append(outcome);
+	return Ok({ outcome_id: outcome.outcomeId });
 };

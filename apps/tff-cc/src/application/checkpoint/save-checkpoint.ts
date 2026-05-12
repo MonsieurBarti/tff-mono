@@ -1,7 +1,6 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
 import type { ArtifactStore } from "../../domain/ports/artifact-store.port.js";
-import { isOk, Ok, type Result } from "../../domain/result.js";
-import { sliceDir } from "../../shared/paths.js";
+import { Ok, isOk, sliceDir, type Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 export interface CheckpointData {
 	sliceId: string;

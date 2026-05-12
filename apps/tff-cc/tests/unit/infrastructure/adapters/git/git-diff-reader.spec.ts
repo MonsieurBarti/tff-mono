@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isErr, isOk } from "../../../../../src/domain/result.js";
+import { isErr, isOk } from "@tff/core";
 import { GitDiffReader } from "../../../../../src/infrastructure/adapters/git/git-diff-reader.js";
 
 const VALID_SHA = "abc1234567890abcdef1234567890abcdef1234";

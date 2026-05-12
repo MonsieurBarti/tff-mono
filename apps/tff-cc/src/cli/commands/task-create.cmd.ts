@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { renderStateMd } from "../../application/sync/generate-state.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
+import { GenericDomainError } from "../../infrastructure/errors/generic-domain-error.js";
 import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { stageStateMdTmp } from "../../infrastructure/persistence/stage-state-md.js";
@@ -86,7 +87,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 		if (!sliceResult.data) {
 			return JSON.stringify({
 				ok: false,
-				error: { code: "NOT_FOUND", message: `Slice "${sliceLabel}" not found` },
+				error: new GenericDomainError("NOT_FOUND", `Slice "${sliceLabel}" not found`),
 			});
 		}
 		const slice = sliceResult.data;
@@ -114,7 +115,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 					wave,
 				});
 				if (!created.ok) {
-					throw new Error(`${created.error.code}: ${created.error.message}`);
+					throw new Error(`${created.error.errorLabel}: ${created.error.message}`);
 				}
 
 				const tmpRenames: Array<[string, string]> = [];
@@ -124,7 +125,7 @@ export const taskCreateCmd = async (args: string[]): Promise<string> => {
 						{ milestoneStore, sliceStore, taskStore },
 					);
 					if (!stateContent.ok) {
-						throw new Error(`${stateContent.error.code}: ${stateContent.error.message}`);
+						throw new Error(`${stateContent.error.errorLabel}: ${stateContent.error.message}`);
 					}
 					writeFileSync(stateTmpAbs, stateContent.data, "utf8");
 					tmpRenames.push([stateTmpAbs, stateFinalAbs]);

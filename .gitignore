@@ -6,5 +6,6 @@ coverage/
 *.log
 .DS_Store
 /.tff-cc
+/.tff
 build/
 .claude/

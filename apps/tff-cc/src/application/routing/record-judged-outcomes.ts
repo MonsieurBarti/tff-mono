@@ -1,12 +1,16 @@
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { preconditionViolationError } from "../../domain/errors/precondition-violation.error.js";
-import { sanitizeReason } from "../../domain/helpers/sanitize-reason.js";
+import {
+	type BaseDomainError,
+	type JudgeVerdictProps,
+	type Result,
+	Err,
+	Ok,
+	PreconditionViolationError,
+	JudgeVerdict,
+	RoutingOutcome,
+	sanitizeReason,
+} from "@tff/core";
 import type { OutcomeSource } from "../../domain/ports/outcome-source.port.js";
 import type { OutcomeWriter } from "../../domain/ports/outcome-writer.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { JudgeVerdict } from "../../domain/value-objects/judge-verdict.js";
-import { JudgeVerdictSchema } from "../../domain/value-objects/judge-verdict.js";
-import type { RoutingOutcome } from "../../domain/value-objects/routing-outcome.js";
 
 export interface RecordJudgedOutcomesInput {
 	slice_id: string;
@@ -39,18 +43,18 @@ export interface RecordJudgedOutcomesResult {
 export const recordJudgedOutcomesUseCase = async (
 	input: RecordJudgedOutcomesInput,
 	deps: RecordJudgedOutcomesDeps,
-): Promise<Result<RecordJudgedOutcomesResult, DomainError>> => {
+): Promise<Result<RecordJudgedOutcomesResult, BaseDomainError<unknown>>> => {
 	if (!deps.modelJudgeEnabled) {
 		return Err(
-			preconditionViolationError([
-				{ code: "model_judge.enabled", expected: "true", actual: "false" },
+			new PreconditionViolationError("Precondition violated: model_judge.enabled", [
+				"model_judge.enabled: expected true, actual false",
 			]),
 		);
 	}
 	if (deps.sliceStatus !== "closed") {
 		return Err(
-			preconditionViolationError([
-				{ code: "slice.status", expected: "closed", actual: deps.sliceStatus },
+			new PreconditionViolationError("Precondition violated: slice.status", [
+				`slice.status: expected closed, actual ${deps.sliceStatus}`,
 			]),
 		);
 	}
@@ -60,32 +64,40 @@ export const recordJudgedOutcomesUseCase = async (
 	const rawList = envelope?.verdicts;
 	if (!Array.isArray(rawList)) {
 		return Err(
-			preconditionViolationError([
-				{ code: "verdicts.shape", expected: '{ "verdicts": [] }', actual: typeof rawList },
+			new PreconditionViolationError("Precondition violated: verdicts.shape", [
+				`verdicts.shape: expected { "verdicts": [] }, actual ${typeof rawList}`,
 			]),
 		);
 	}
 
 	const validated: JudgeVerdict[] = [];
 	for (const raw of rawList) {
-		const parsed = JudgeVerdictSchema.safeParse(raw);
-		if (!parsed.success) {
+		try {
+			const r = raw as {
+				decision_id?: string;
+				dimension?: string;
+				verdict?: string;
+				reason?: string;
+			};
+			const verdict = JudgeVerdict.create({
+				decisionId: r.decision_id ?? "",
+				dimension: r.dimension as JudgeVerdictProps["dimension"],
+				verdict: r.verdict as JudgeVerdictProps["verdict"],
+				reason: r.reason ?? "",
+			});
+			validated.push(verdict);
+		} catch (error) {
 			return Err(
-				preconditionViolationError(
-					parsed.error.issues.map((i) => ({
-						code: i.path.join(".") || "verdicts.item",
-						expected: "valid JudgeVerdict",
-						actual: i.message,
-					})),
-				),
+				new PreconditionViolationError(error instanceof Error ? error.message : "Invalid verdict", [
+					"valid JudgeVerdict",
+				]),
 			);
 		}
-		validated.push(parsed.data);
 	}
 
 	const alreadyJudged = new Set<string>();
 	for await (const o of deps.outcomesSource.readOutcomes({ source: "model-judge" })) {
-		alreadyJudged.add(o.decision_id);
+		alreadyJudged.add(o.decisionId);
 	}
 	const unjudgedIds = new Set(
 		deps.decisions.filter((d) => !alreadyJudged.has(d.decision_id)).map((d) => d.decision_id),
@@ -95,21 +107,32 @@ export const recordJudgedOutcomesUseCase = async (
 	const reasonPrefix = input.evidence_truncated ? "[evidence_truncated] " : "";
 	let emitted = 0;
 	for (const v of validated) {
-		if (!unjudgedIds.has(v.decision_id)) continue;
-		const dec = decisionMap.get(v.decision_id);
+		if (!unjudgedIds.has(v.decisionId)) continue;
+		const dec = decisionMap.get(v.decisionId);
 		if (!dec) continue;
 		const cleanReason = sanitizeReason(v.reason) ?? "";
-		const outcome: RoutingOutcome = {
-			outcome_id: deps.uuid(),
-			decision_id: v.decision_id,
+		const candidate = {
+			outcomeId: deps.uuid(),
+			decisionId: v.decisionId,
 			dimension: v.dimension,
 			verdict: v.verdict,
-			source: "model-judge",
-			slice_id: dec.slice_id,
-			workflow_id: dec.workflow_id ?? "tff:ship",
+			source: "model-judge" as const,
+			sliceId: dec.slice_id,
+			workflowId: dec.workflow_id ?? "tff:ship",
 			reason: `${reasonPrefix}${cleanReason}`,
-			emitted_at: deps.now(),
+			emittedAt: deps.now(),
 		};
+		let outcome: RoutingOutcome;
+		try {
+			outcome = RoutingOutcome.create(candidate);
+		} catch (error) {
+			return Err(
+				new PreconditionViolationError(
+					error instanceof Error ? error.message : "Invalid routing outcome",
+					["valid dimension×verdict combination"],
+				),
+			);
+		}
 		await deps.writer.append(outcome);
 		emitted += 1;
 	}

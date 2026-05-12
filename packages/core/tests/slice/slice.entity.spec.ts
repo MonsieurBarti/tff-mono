@@ -18,7 +18,6 @@ import {
 	HumanGateRequiredError,
 	ReviewNotFoundError,
 } from "../../src/domain/slice/slice.error.js";
-import { SliceRepository } from "../../src/domain/slice/slice.repository.js";
 import { SLICE_TRANSITIONS, type SliceStatus } from "../../src/domain/slice/transitions.js";
 import { FakeDateProvider } from "../../src/domain/shared/date-provider.js";
 
@@ -887,53 +886,59 @@ describe("SliceArchivedEvent", () => {
 });
 
 describe("Slice errors", () => {
-	it("InvalidTransitionError has correct label and status", () => {
-		const error = new InvalidTransitionError("created", "closed", ["discussing"]);
+	it("InvalidTransitionError has correct label, status, and message", () => {
+		const error = new InvalidTransitionError(
+			"Invalid transition from created to closed",
+			"created",
+			"closed",
+			["discussing"],
+		);
 		expect(error.errorLabel).toBe("INVALID_TRANSITION");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ from: "created", to: "closed", expected: ["discussing"] });
+		expect(error.message).toBe("Invalid transition from created to closed");
 	});
 
-	it("TierClassificationError has correct label and status", () => {
-		const error = new TierClassificationError("X", "Invalid tier value");
+	it("TierClassificationError has correct label, status, and message", () => {
+		const error = new TierClassificationError("Invalid tier value: X", "X", "Invalid tier value");
 		expect(error.errorLabel).toBe("TIER_CLASSIFICATION_INVALID");
 		expect(error.status).toBe(400);
 		expect(error.context).toEqual({ tier: "X", reason: "Invalid tier value" });
+		expect(error.message).toBe("Invalid tier value: X");
 	});
 
-	it("SliceNotFoundError has correct label and status", () => {
-		const error = new SliceNotFoundError("sl-1");
+	it("SliceNotFoundError has correct label, status, and message", () => {
+		const error = new SliceNotFoundError("Slice sl-1 not found", "sl-1");
 		expect(error.errorLabel).toBe("SLICE_NOT_FOUND");
 		expect(error.status).toBe(404);
 		expect(error.context).toEqual({ sliceId: "sl-1" });
+		expect(error.message).toBe("Slice sl-1 not found");
 	});
 
-	it("SliceAlreadyArchivedError has correct label and status", () => {
-		const error = new SliceAlreadyArchivedError("sl-1");
+	it("SliceAlreadyArchivedError has correct label, status, and message", () => {
+		const error = new SliceAlreadyArchivedError("Slice is already archived", "sl-1");
 		expect(error.errorLabel).toBe("SLICE_ALREADY_ARCHIVED");
 		expect(error.status).toBe(409);
 		expect(error.context).toEqual({ sliceId: "sl-1" });
+		expect(error.message).toBe("Slice is already archived");
 	});
 
-	it("PreconditionViolationError has correct label and status", () => {
-		const error = new PreconditionViolationError(["No review exists on this slice"]);
+	it("PreconditionViolationError has correct label, status, and message", () => {
+		const error = new PreconditionViolationError("Precondition failed", [
+			"No review exists on this slice",
+		]);
 		expect(error.errorLabel).toBe("PRECONDITION_VIOLATION");
 		expect(error.status).toBe(422);
 		expect(error.context).toEqual({ preconditions: ["No review exists on this slice"] });
+		expect(error.message).toBe("Precondition failed");
 	});
 
-	it("HumanGateRequiredError has correct label and status", () => {
-		const error = new HumanGateRequiredError("shipping", "Approval required");
+	it("HumanGateRequiredError has correct label, status, and message", () => {
+		const error = new HumanGateRequiredError("Approval required", "shipping", "Approval required");
 		expect(error.errorLabel).toBe("HUMAN_GATE_REQUIRED");
 		expect(error.status).toBe(403);
 		expect(error.context).toEqual({ status: "shipping", message: "Approval required" });
-	});
-});
-
-describe("SliceRepository", () => {
-	it("is an abstract class extending RepositoryPort", () => {
-		expect(typeof SliceRepository).toBe("function");
-		expect(Object.getPrototypeOf(SliceRepository).name).toBe("RepositoryPort");
+		expect(error.message).toBe("Approval required");
 	});
 });
 

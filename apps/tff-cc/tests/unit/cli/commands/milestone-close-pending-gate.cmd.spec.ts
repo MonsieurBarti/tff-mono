@@ -148,7 +148,7 @@ describe("milestone:close — pending-judgment gate", () => {
 			"executing",
 			"verifying",
 			"reviewing",
-			"completing",
+			"shipping",
 		] as const) {
 			stores.sliceStore.transitionSlice(sliceUuid, target);
 		}
@@ -176,11 +176,11 @@ describe("milestone:close — pending-judgment gate", () => {
 		stores.close();
 
 		// Enable routing so the scorecard branch runs.
-		const settingsDir = path.join(tmpDir, ".tff-cc");
+		const settingsDir = path.join(tmpDir, ".tff");
 		mkdirSync(settingsDir, { recursive: true });
 		writeFileSync(
 			path.join(settingsDir, "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 		);
 
 		const out = JSON.parse(await milestoneCloseCmd(["--milestone-id", "M01"]));

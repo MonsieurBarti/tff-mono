@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CalibrationReport } from "../../../../../src/domain/value-objects/calibration-report.js";
+import type { CalibrationReport } from "../../../../../src/shared/value-objects/calibration-report.js";
 import { renderCalibrationReport } from "../../../../../src/infrastructure/adapters/markdown/calibration-report-renderer.js";
 
 const base: CalibrationReport = {

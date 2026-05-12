@@ -2,6 +2,7 @@ import { realpathSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleStartupRecovery } from "../application/recovery/handle-startup-recovery.js";
+import { GenericDomainError } from "../infrastructure/errors/generic-domain-error.js";
 import { NativeBindingError } from "../infrastructure/adapters/sqlite/native-binding-error.js";
 import {
 	getProjectHome,
@@ -422,12 +423,12 @@ function flagToJsonSchema(flag: {
 /**
  * Resolve the directory that startup recovery should sweep.
  *
- * Preferred: the real project home (`~/.tff-cc/<projectId>/`), resolved via
+ * Preferred: the real project home (`~/.tff/<projectId>/`), resolved via
  * the project id persisted at the git toplevel. This avoids walking through
- * the `cwd/.tff-cc` symlink, which — in multi-worktree setups — lives inside
+ * the `cwd/.tff` symlink, which — in multi-worktree setups — lives inside
  * the same home directory and can create cyclic descents.
  *
- * Fallback: `cwd/.tff-cc` for repos that haven't run `project:init` yet.
+ * Fallback: `cwd/.tff` for repos that haven't run `project:init` yet.
  * These are legitimately non-cyclic (they're either missing or a plain dir),
  * so the legacy path remains safe.
  */
@@ -442,9 +443,9 @@ function resolveStartupHomeDir(): string {
 		return getProjectHome(projectId);
 	} catch (err) {
 		process.stderr.write(
-			`tff-cc: could not resolve project home, falling back to cwd/.tff-cc — ${String(err)}\n`,
+			`tff-cc: could not resolve project home, falling back to cwd/.tff — ${String(err)}\n`,
 		);
-		return join(cwd, ".tff-cc");
+		return join(cwd, ".tff");
 	}
 }
 
@@ -495,11 +496,11 @@ const main = async () => {
 		console.log(
 			JSON.stringify({
 				ok: false,
-				error: {
-					code: "UNKNOWN_COMMAND",
-					message: `Unknown command "${command}". Run --help for available commands.`,
-					availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema"),
-				},
+				error: new GenericDomainError(
+					"UNKNOWN_COMMAND",
+					`Unknown command "${command}". Run --help for available commands.`,
+					{ availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema") },
+				),
 			}),
 		);
 		return;
@@ -510,11 +511,11 @@ const main = async () => {
 		console.log(
 			JSON.stringify({
 				ok: false,
-				error: {
-					code: "UNKNOWN_COMMAND",
-					message: `Unknown command "${command}". Run --help for available commands.`,
-					availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema"),
-				},
+				error: new GenericDomainError(
+					"UNKNOWN_COMMAND",
+					`Unknown command "${command}". Run --help for available commands.`,
+					{ availableCommands: Object.keys(COMMAND_REGISTRY).filter((c) => c !== "schema") },
+				),
 			}),
 		);
 		return;
@@ -550,3 +551,5 @@ if (isEntryPoint()) {
 		process.exit(1);
 	});
 }
+
+export { runMigrations, Milestone } from "@tff/core";

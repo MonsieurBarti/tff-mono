@@ -59,6 +59,6 @@ describe("branch-guard fan-out", () => {
 		const lines = out.trim().split("\n").filter(Boolean);
 		const parsed = JSON.parse(lines[lines.length - 1]);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("REFUSED_ON_DEFAULT_BRANCH");
+		expect(parsed.error.errorLabel).toBe("REFUSED_ON_DEFAULT_BRANCH");
 	});
 });

@@ -40,7 +40,7 @@ const driveSliceToClosed = (sliceId: string): void => {
 		"executing",
 		"verifying",
 		"reviewing",
-		"completing",
+		"shipping",
 	] as const) {
 		stores.sliceStore.transitionSlice(sliceId, target);
 	}
@@ -114,11 +114,11 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 
 		await projectInitCmd(["--name", "p", "--vision", "v"]);
 
-		// Routing + model_judge enabled (settings.yaml goes inside .tff-cc which
+		// Routing + model_judge enabled (settings.yaml goes inside .tff which
 		// project-init created/symlinked).
-		mkdirSync(path.join(tmpDir, ".tff-cc", "logs"), { recursive: true });
+		mkdirSync(path.join(tmpDir, ".tff", "logs"), { recursive: true });
 		writeFileSync(
-			path.join(tmpDir, ".tff-cc", "settings.yaml"),
+			path.join(tmpDir, ".tff", "settings.yaml"),
 			`routing:
   enabled: true
   calibration:
@@ -155,7 +155,7 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 		// Seed an unjudged routing decision so prepare reaches the merge-lookup branch.
 		const decisionId = "00000000-0000-4000-8000-000000000001";
 		writeFileSync(
-			path.join(tmpDir, ".tff-cc", "logs", "routing.jsonl"),
+			path.join(tmpDir, ".tff", "logs", "routing.jsonl"),
 			`${JSON.stringify({
 				kind: "route",
 				timestamp: "2026-04-20T09:00:00.000Z",
@@ -218,7 +218,7 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 		// Seed an unjudged routing decision under D-01 so prepare reaches merge lookup.
 		const decisionId = "00000000-0000-4000-8000-000000000002";
 		writeFileSync(
-			path.join(tmpDir, ".tff-cc", "logs", "routing.jsonl"),
+			path.join(tmpDir, ".tff", "logs", "routing.jsonl"),
 			`${JSON.stringify({
 				kind: "route",
 				timestamp: "2026-04-20T09:00:00.000Z",
@@ -268,7 +268,7 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 		// Seed a routing decision under the Q-01 label so record finds it.
 		const decisionId = "00000000-0000-4000-8000-000000000099";
 		writeFileSync(
-			path.join(tmpDir, ".tff-cc", "logs", "routing.jsonl"),
+			path.join(tmpDir, ".tff", "logs", "routing.jsonl"),
 			`${JSON.stringify({
 				kind: "route",
 				timestamp: "2026-04-20T09:00:00.000Z",
@@ -306,16 +306,13 @@ describe("routing:judge-prepare / routing:judge-record — ad-hoc slices", () =>
 		expect(parsed.data.slice_label).toBe("Q-01");
 		expect(parsed.data.outcomes_emitted).toBe(1);
 
-		const lines = readFileSync(
-			path.join(tmpDir, ".tff-cc", "logs", "routing-outcomes.jsonl"),
-			"utf8",
-		)
+		const lines = readFileSync(path.join(tmpDir, ".tff", "logs", "routing-outcomes.jsonl"), "utf8")
 			.trim()
 			.split("\n")
 			.filter(Boolean);
 		expect(lines).toHaveLength(1);
 		const outcome = JSON.parse(lines[0]);
 		expect(outcome.source).toBe("model-judge");
-		expect(outcome.decision_id).toBe(decisionId);
+		expect(outcome.decisionId).toBe(decisionId);
 	});
 });

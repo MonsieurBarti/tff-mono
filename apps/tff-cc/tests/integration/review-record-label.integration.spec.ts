@@ -114,6 +114,6 @@ describe("review:record label resolution", () => {
 			]),
 		);
 		expect(result.ok).toBe(false);
-		expect(result.error.code).toBe("NOT_FOUND");
+		expect(result.error.errorLabel).toBe("NOT_FOUND");
 	});
 });

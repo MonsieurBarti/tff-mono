@@ -1,8 +1,10 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
 import type { DependencyStore } from "../../domain/ports/dependency-store.port.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
-import type { Wave } from "../../domain/value-objects/wave.js";
+import type { Wave } from "../../shared/value-objects/wave.js";
+import { Err, Ok, type Result, type TaskStore } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 interface TaskDep {
 	id: string;
@@ -60,7 +62,7 @@ export const detectWaves = (tasks: TaskDep[]): Result<Wave[], DomainError> => {
 			.map(([id]) => id)
 			.sort();
 		return Err(
-			createDomainError(
+			new GenericDomainError(
 				"INVALID_TRANSITION",
 				`Circular dependency detected among tasks: ${cycleIds.join(", ")}`,
 				{

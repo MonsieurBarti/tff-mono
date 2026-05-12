@@ -3,14 +3,14 @@ import {
 	type GenerateReminderDeps,
 	generateReminder,
 } from "../../../../src/application/session/generate-reminder.js";
-import type { Task } from "../../../../src/domain/entities/task.js";
-import type { DomainError } from "../../../../src/domain/errors/domain-error.js";
+import type { Task } from "@tff/core";
+import type { DomainError } from "../../src/infrastructure/errors/generic-domain-error.js";
 import type { DependencyStore } from "../../../../src/domain/ports/dependency-store.port.js";
 import type { SessionStore } from "../../../../src/domain/ports/session-store.port.js";
 import type { TaskStore } from "../../../../src/domain/ports/task-store.port.js";
-import { Err, Ok } from "../../../../src/domain/result.js";
-import type { Dependency } from "../../../../src/domain/value-objects/dependency.js";
-import type { WorkflowSession } from "../../../../src/domain/value-objects/workflow-session.js";
+import { Err, Ok } from "@tff/core";
+import type { Dependency } from "../../src/shared/value-objects/dependency.js";
+import type { WorkflowSession } from "../../src/shared/value-objects/workflow-session.js";
 
 type MockResult<T> = Result<T, DomainError>;
 
@@ -223,9 +223,9 @@ describe("generateReminder", () => {
 		expect(result).toContain("Next: /tff:verify");
 	});
 
-	it("suggests correct command for completing phase", () => {
+	it("suggests correct command for shipping phase", () => {
 		const session: WorkflowSession = {
-			phase: "completing",
+			phase: "shipping",
 			activeSliceId: "S01",
 			activeMilestoneId: "M001",
 		};

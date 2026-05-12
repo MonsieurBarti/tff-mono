@@ -1,5 +1,5 @@
 import { checkAuditPassed } from "../../application/milestone/check-audit-passed.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { resolveMilestoneId } from "../utils/resolve-id.js";

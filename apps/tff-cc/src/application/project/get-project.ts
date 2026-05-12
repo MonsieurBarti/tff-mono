@@ -1,7 +1,5 @@
-import type { Project } from "../../domain/entities/project.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import type { ProjectStore } from "../../domain/ports/project-store.port.js";
-import type { Result } from "../../domain/result.js";
+import type { Project, ProjectStore, Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface GetProjectDeps {
 	projectStore: ProjectStore;

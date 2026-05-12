@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { generateState, renderStateMd } from "../../../../src/application/sync/generate-state.js";
-import { isOk } from "../../../../src/domain/result.js";
+import { isOk } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
@@ -29,7 +29,7 @@ describe("generateState", () => {
 		adapter.transitionSlice(slice1Id, "planning");
 		adapter.transitionSlice(slice1Id, "executing");
 		adapter.transitionSlice(slice1Id, "reviewing");
-		adapter.transitionSlice(slice1Id, "completing");
+		adapter.transitionSlice(slice1Id, "shipping");
 		adapter.transitionSlice(slice1Id, "closed");
 		adapter.transitionSlice(slice2Id, "researching");
 		adapter.transitionSlice(slice2Id, "planning");
@@ -47,7 +47,7 @@ describe("generateState", () => {
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/STATE.md");
+		const content = await artifactStore.read(".tff/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — MVP");
@@ -113,13 +113,13 @@ describe("generateState — kind scope", () => {
 		adapter.saveProject({ name: "Test", vision: "v" });
 	});
 
-	it("renders quick STATE with no slices and writes to .tff-cc/quick/STATE.md", async () => {
+	it("renders quick STATE with no slices and writes to .tff/quick/STATE.md", async () => {
 		const result = await generateState(
 			{ scope: "kind", kind: "quick" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/quick/STATE.md");
+		const content = await artifactStore.read(".tff/quick/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — Quick Slices");
@@ -127,13 +127,13 @@ describe("generateState — kind scope", () => {
 		}
 	});
 
-	it("renders debug STATE and writes to .tff-cc/debug/STATE.md", async () => {
+	it("renders debug STATE and writes to .tff/debug/STATE.md", async () => {
 		const result = await generateState(
 			{ scope: "kind", kind: "debug" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/debug/STATE.md");
+		const content = await artifactStore.read(".tff/debug/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("# State — Debug Slices");
@@ -146,13 +146,13 @@ describe("generateState — kind scope", () => {
 		const q1Id = isOk(q1) ? q1.data.id : "";
 		const q2Id = isOk(q2) ? q2.data.id : "";
 
-		// q1 → completing (closed requires approved reviews — completing exercises mixed-status path)
+		// q1 → shipping (closed requires approved reviews — shipping exercises mixed-status path)
 		adapter.transitionSlice(q1Id, "researching");
 		adapter.transitionSlice(q1Id, "planning");
 		adapter.transitionSlice(q1Id, "executing");
 		adapter.transitionSlice(q1Id, "verifying");
 		adapter.transitionSlice(q1Id, "reviewing");
-		adapter.transitionSlice(q1Id, "completing");
+		adapter.transitionSlice(q1Id, "shipping");
 		// q2 → executing
 		adapter.transitionSlice(q2Id, "researching");
 		adapter.transitionSlice(q2Id, "planning");
@@ -167,14 +167,14 @@ describe("generateState — kind scope", () => {
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
 		expect(isOk(result)).toBe(true);
-		const content = await artifactStore.read(".tff-cc/quick/STATE.md");
+		const content = await artifactStore.read(".tff/quick/STATE.md");
 		expect(isOk(content)).toBe(true);
 		if (isOk(content)) {
 			expect(content.data).toContain("Q-01");
 			expect(content.data).toContain("Q-02");
 			expect(content.data).toContain("Quick One");
 			expect(content.data).toContain("Quick Two");
-			expect(content.data).toContain("completing");
+			expect(content.data).toContain("shipping");
 			expect(content.data).toContain("executing");
 		}
 	});
@@ -184,7 +184,7 @@ describe("generateState — kind scope", () => {
 			{ scope: "kind", kind: "quick" },
 			{ milestoneStore: adapter, sliceStore: adapter, taskStore: adapter, artifactStore },
 		);
-		const milestoneState = await artifactStore.read(".tff-cc/STATE.md");
+		const milestoneState = await artifactStore.read(".tff/STATE.md");
 		expect(isOk(milestoneState)).toBe(false);
 	});
 });

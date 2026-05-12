@@ -13,13 +13,13 @@ describe("routing:outcome CLI integration", () => {
 		dir = await mkdtemp(join(tmpdir(), "routing-outcome-"));
 		process.chdir(dir);
 
-		await mkdir(join(dir, ".tff-cc"), { recursive: true });
+		await mkdir(join(dir, ".tff"), { recursive: true });
 		await writeFile(
-			join(dir, ".tff-cc", "settings.yaml"),
-			"routing:\n  enabled: true\n  logging:\n    path: .tff-cc/logs/routing.jsonl\n",
+			join(dir, ".tff", "settings.yaml"),
+			"routing:\n  enabled: true\n  logging:\n    path: .tff/logs/routing.jsonl\n",
 			"utf8",
 		);
-		const routingPath = join(dir, ".tff-cc/logs/routing.jsonl");
+		const routingPath = join(dir, ".tff/logs/routing.jsonl");
 		await mkdir(dirname(routingPath), { recursive: true });
 		await appendFile(
 			routingPath,
@@ -60,7 +60,7 @@ describe("routing:outcome CLI integration", () => {
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(true);
 
-		const raw = await readFile(join(dir, ".tff-cc/logs/routing-outcomes.jsonl"), "utf8");
+		const raw = await readFile(join(dir, ".tff/logs/routing-outcomes.jsonl"), "utf8");
 		const entry = JSON.parse(raw.trim());
 		expect(entry.dimension).toBe("tier");
 		expect(entry.verdict).toBe("too-low");
@@ -79,7 +79,7 @@ describe("routing:outcome CLI integration", () => {
 		]);
 		const parsed = JSON.parse(out);
 		expect(parsed.ok).toBe(false);
-		expect(parsed.error.code).toBe("PRECONDITION_VIOLATION");
+		expect(parsed.error.errorLabel).toBe("PRECONDITION_VIOLATION");
 	});
 
 	it("rejects invalid dimension × verdict combo", async () => {

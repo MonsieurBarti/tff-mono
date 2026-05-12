@@ -1,7 +1,5 @@
-import type { Task } from "../../domain/entities/task.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import type { TaskStore } from "../../domain/ports/task-store.port.js";
-import { Ok, type Result } from "../../domain/result.js";
+import { Ok, type Result, type Task, type TaskStore } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 interface CheckStaleClaimsInput {
 	ttlMinutes?: number;

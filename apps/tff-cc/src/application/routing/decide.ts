@@ -1,17 +1,16 @@
 import { randomUUID } from "node:crypto";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { scoreAgents } from "../../domain/helpers/routing-rubric.js";
 import type { RoutingConfigReader } from "../../domain/ports/routing-config-reader.port.js";
 import type { RoutingDecisionLogger } from "../../domain/ports/routing-decision-logger.port.js";
 import type { ExtractInput, SignalExtractor } from "../../domain/ports/signal-extractor.port.js";
 import type { TierConfigReader } from "../../domain/ports/tier-config-reader.port.js";
-import { isOk, Ok, type Result } from "../../domain/result.js";
-import type { RoutingDecision } from "../../domain/value-objects/routing-decision.js";
-import type { Signals } from "../../domain/value-objects/signals.js";
-import type { ModelTier } from "../../domain/value-objects/tier-decision.js";
-import type { WorkflowPool } from "../../domain/value-objects/workflow-pool.js";
+import type { Signals } from "../../shared/value-objects/signals.js";
+import type { ModelTier } from "../../shared/value-objects/tier-decision.js";
+import type { WorkflowPool } from "../../shared/value-objects/workflow-pool.js";
+import type { RoutingDecision } from "../../shared/value-objects/routing-decision.js";
 import { extractSignalsUseCase } from "./extract-signals.js";
 import { selectTierUseCase } from "./select-tier.js";
+import { Ok, isOk, scoreAgents, type Result } from "@tff/core";
+import { type DomainError } from "../../infrastructure/errors/generic-domain-error.js";
 
 export interface DecideInput {
 	workflow_id: string;

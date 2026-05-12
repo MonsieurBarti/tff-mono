@@ -1,5 +1,8 @@
-import { createDomainError, type DomainError } from "../../domain/errors/domain-error.js";
-import { Err, Ok, type Result } from "../../domain/result.js";
+import { Err, Ok, type Result } from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 export type CompressionLevel = "off" | "lite" | "standard" | "ultra" | "symbolic";
 
@@ -33,7 +36,7 @@ export const validateSkill = (input: SkillInput): Result<ValidationResult, Domai
 	// Name validation
 	if (input.name.length === 0 || input.name.length > 64) {
 		return Err(
-			createDomainError(
+			new GenericDomainError(
 				"VALIDATION_ERROR",
 				`Skill name must be 1-64 characters, got ${input.name.length}`,
 			),
@@ -42,7 +45,7 @@ export const validateSkill = (input: SkillInput): Result<ValidationResult, Domai
 
 	if (!NAME_REGEX.test(input.name)) {
 		return Err(
-			createDomainError(
+			new GenericDomainError(
 				"VALIDATION_ERROR",
 				`Skill name "${input.name}" must be lowercase letters, numbers, and single hyphens only`,
 			),
@@ -51,7 +54,7 @@ export const validateSkill = (input: SkillInput): Result<ValidationResult, Domai
 
 	if (input.name.includes("--")) {
 		return Err(
-			createDomainError("VALIDATION_ERROR", "Skill name must not contain consecutive hyphens"),
+			new GenericDomainError("VALIDATION_ERROR", "Skill name must not contain consecutive hyphens"),
 		);
 	}
 
@@ -68,7 +71,7 @@ export const validateSkill = (input: SkillInput): Result<ValidationResult, Domai
 	// Compression level — body-only contract; runtime application lives in ultra-compress
 	if (input.compression !== undefined && !COMPRESSION_LEVELS.includes(input.compression)) {
 		return Err(
-			createDomainError(
+			new GenericDomainError(
 				"VALIDATION_ERROR",
 				`Invalid compression level "${input.compression}" — must be one of: ${COMPRESSION_LEVELS.join(", ")}`,
 			),

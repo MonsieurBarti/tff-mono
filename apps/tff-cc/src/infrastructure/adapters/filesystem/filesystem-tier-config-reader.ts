@@ -2,14 +2,14 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
-import type { DomainError } from "../../../domain/errors/domain-error.js";
+import type { DomainError } from "../../errors/generic-domain-error.js";
 import {
 	DEFAULT_TIER_POLICY,
 	type TierConfigReader,
 } from "../../../domain/ports/tier-config-reader.port.js";
-import { Ok, type Result } from "../../../domain/result.js";
-import type { RiskLevel } from "../../../domain/value-objects/signals.js";
-import { type ModelTier, ModelTierSchema } from "../../../domain/value-objects/tier-decision.js";
+import { Ok, type Result } from "@tff/core";
+import type { RiskLevel } from "../../../shared/value-objects/signals.js";
+import { type ModelTier, ModelTierSchema } from "../../../shared/value-objects/tier-decision.js";
 
 interface FilesystemTierConfigReaderOpts {
 	projectRoot: string;
@@ -34,7 +34,7 @@ export class FilesystemTierConfigReader implements TierConfigReader {
 
 	async readTierPolicy(): Promise<Result<Record<RiskLevel, ModelTier>, DomainError>> {
 		const MAX_SETTINGS_SIZE = 1024 * 1024; // 1 MB
-		const path = join(this.opts.projectRoot, ".tff-cc", "settings.yaml");
+		const path = join(this.opts.projectRoot, ".tff", "settings.yaml");
 		let raw = "";
 		try {
 			raw = await readFile(path, "utf8");

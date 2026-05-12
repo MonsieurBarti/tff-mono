@@ -1,11 +1,17 @@
-import type { Slice } from "../../domain/entities/slice.js";
-import type { DomainError } from "../../domain/errors/domain-error.js";
-import { createDomainError } from "../../domain/errors/domain-error.js";
-import type { DomainEvent } from "../../domain/events/domain-event.js";
 import type { EventBus } from "../../domain/ports/event-bus.port.js";
-import type { SliceStore } from "../../domain/ports/slice-store.port.js";
-import { Err, isOk, type Result } from "../../domain/result.js";
-import type { SliceStatus } from "../../domain/value-objects/slice-status.js";
+import {
+	Err,
+	isOk,
+	type DomainEvent,
+	type Result,
+	type Slice,
+	type SliceStatus,
+	type SliceStore,
+} from "@tff/core";
+import {
+	GenericDomainError,
+	type DomainError,
+} from "../../infrastructure/errors/generic-domain-error.js";
 
 interface TransitionInput {
 	sliceId: string;
@@ -17,7 +23,7 @@ interface TransitionDeps {
 }
 interface TransitionOutput {
 	slice: Slice;
-	events: DomainEvent[];
+	events: DomainEvent<unknown>[];
 }
 
 export const transitionSliceUseCase = async (
@@ -37,7 +43,7 @@ export const transitionSliceUseCase = async (
 	if (!isOk(sliceResult)) return sliceResult;
 	if (!sliceResult.data) {
 		return Err(
-			createDomainError("NOT_FOUND", `Slice "${input.sliceId}" not found after transition`),
+			new GenericDomainError("NOT_FOUND", `Slice "${input.sliceId}" not found after transition`),
 		);
 	}
 

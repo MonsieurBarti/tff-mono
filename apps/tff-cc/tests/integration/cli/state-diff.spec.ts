@@ -69,7 +69,7 @@ describe("state:diff command", () => {
 			await syncStateCmd(["--milestone-id", milestoneId]);
 
 			// Manually corrupt STATE.md
-			const stateFile = join(projectDir, ".tff-cc", "STATE.md");
+			const stateFile = join(projectDir, ".tff", "STATE.md");
 			const original = readFileSync(stateFile, "utf8");
 			writeFileSync(stateFile, `${original}\n<!-- hand-edit -->\n`);
 

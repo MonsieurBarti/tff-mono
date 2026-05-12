@@ -9,7 +9,7 @@
  * 3. Commit
  */
 
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -19,7 +19,7 @@ describe("T15: SQLiteStateAdapter home directory integration", () => {
 	let originalTffCcHome: string | undefined;
 
 	beforeEach(() => {
-		tempDir = mkdirSync(join(tmpdir(), `tff-test-${Date.now()}`), { recursive: true });
+		tempDir = mkdtempSync(join(tmpdir(), "tff-test-"));
 		originalTffCcHome = process.env.TFF_CC_HOME;
 	});
 

@@ -1,5 +1,5 @@
 import { enforceFreshReviewer } from "../../application/review/enforce-fresh-reviewer.js";
-import { isOk } from "../../domain/result.js";
+import { isOk } from "@tff/core";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
