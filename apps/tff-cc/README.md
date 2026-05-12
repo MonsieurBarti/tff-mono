@@ -345,7 +345,7 @@ packages/core/
 - `apps/tff-cc` owns the CLI entry point, Claude-Code-specific adapters, and local port wiring.
 - `@tff/core` is bundled into the CLI at build time via esbuild (`external: []`); no runtime `node_modules` resolution is needed.
 - Local port definitions remain in `apps/tff-cc/src/domain/ports/` for app-specific contracts not provided by `@tff/core`.
-- **Tests** are colocated as `.spec.ts`. Unit tests use in-memory adapters.
+- **Tests** are organized as `.spec.ts`. Unit tests use in-memory adapters.
 
 ## Agents
 

@@ -101,7 +101,7 @@ describe("S02 + S03: Deleted domain and migration files", () => {
 	}
 });
 
-describe("Retained local port contracts", () => {
+describe("Retained paths", () => {
 	const projectRoot = process.cwd();
 
 	for (const file of RETAINED_PATHS) {
