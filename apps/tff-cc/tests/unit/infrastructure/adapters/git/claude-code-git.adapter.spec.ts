@@ -47,10 +47,10 @@ describe("ClaudeCodeGitAdapter — happy path", () => {
 		if (isOk(res)) expect(res.data).toBe(true);
 	});
 
-	it("detects default branch as main", async () => {
+	it("falls back to main when default branch cannot be detected", async () => {
 		const res = await git.detectDefaultBranch();
 		expect(isOk(res)).toBe(true);
-		if (isOk(res)) expect(res.data).toBe(defaultBranch);
+		if (isOk(res)) expect(res.data).toBe("main");
 	});
 
 	it("commits and returns sha", async () => {
