@@ -15,6 +15,16 @@ export class ClaudeCodePromptAdapter implements PromptLoader {
 	constructor(private readonly repoRoot: string) {}
 
 	async load(kind: ContentKind, name: string) {
+		if (name.includes("\0") || name.includes("/") || name.includes("\\") || name.includes("..")) {
+			return Err(
+				new ContractError(
+					`Invalid prompt name: ${kind}/${name}`,
+					"PromptLoader",
+					"load",
+					"Prompt name contains forbidden characters",
+				),
+			);
+		}
 		try {
 			const dirName = CONTENT_KIND_DIRS[kind];
 			const contentDir = resolve(this.repoRoot, "packages", "core", "src", "content", dirName);

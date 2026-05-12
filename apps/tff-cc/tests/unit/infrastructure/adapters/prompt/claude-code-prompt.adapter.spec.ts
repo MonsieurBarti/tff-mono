@@ -59,4 +59,36 @@ describe("ClaudeCodePromptAdapter — error path", () => {
 			expect(res.error.message).toContain("Failed to load prompt");
 		}
 	});
+
+	it("rejects names containing path traversal (..)", async () => {
+		const res = await adapter.load("agent", "../../../etc/passwd");
+		expect(isErr(res)).toBe(true);
+		if (isErr(res)) {
+			expect(res.error.message).toContain("Invalid prompt name");
+		}
+	});
+
+	it("rejects names containing forward slash", async () => {
+		const res = await adapter.load("skill", "foo/bar");
+		expect(isErr(res)).toBe(true);
+		if (isErr(res)) {
+			expect(res.error.message).toContain("Invalid prompt name");
+		}
+	});
+
+	it("rejects names containing backslash", async () => {
+		const res = await adapter.load("command", "foo\\bar");
+		expect(isErr(res)).toBe(true);
+		if (isErr(res)) {
+			expect(res.error.message).toContain("Invalid prompt name");
+		}
+	});
+
+	it("rejects names containing null byte", async () => {
+		const res = await adapter.load("protocol", "foo\x00bar");
+		expect(isErr(res)).toBe(true);
+		if (isErr(res)) {
+			expect(res.error.message).toContain("Invalid prompt name");
+		}
+	});
 });
