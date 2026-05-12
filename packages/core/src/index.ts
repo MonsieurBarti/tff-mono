@@ -102,3 +102,5 @@ export {
 	debugSliceDir,
 	sliceDirFor,
 } from "./shared/paths.js";
+
+export * from "./contract/index.js";

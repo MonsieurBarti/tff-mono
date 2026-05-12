@@ -1,13 +1,13 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import path from "node:path";
-import { SETTINGS_FILE, TFF_DIR, isOk } from "@tff/core";
-import { parse as parseYaml } from "yaml";
+import { TFF_DIR, isOk } from "@tff/core";
 import {
 	OperationBlockedError,
 	validateOperation,
 } from "../../application/guard/validate-operation.js";
 import { isValidOperation } from "../../application/index.js";
 import { createClosableStateStoresUnchecked } from "../../infrastructure/adapters/sqlite/create-state-stores.js";
+import { createAdapters } from "../../infrastructure/adapters/index.js";
 import { resolveRepoRoot } from "../../infrastructure/home-directory.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 import { withSyncLock } from "../with-sync-lock.js";
@@ -16,19 +16,10 @@ import { withSyncLock } from "../with-sync-lock.js";
  * Check if pre-operation guards are disabled in settings.yaml.
  * Returns true if workflow.guards is explicitly false.
  */
-function areGuardsDisabled(repoRoot: string): boolean {
-	const settingsPath = path.join(repoRoot, SETTINGS_FILE);
-	if (!existsSync(settingsPath)) {
-		return false; // Default to enabled if no settings file
-	}
-	try {
-		const content = readFileSync(settingsPath, "utf8");
-		if (!content.trim()) return false;
-		const parsed = parseYaml(content) as Record<string, unknown>;
-		return (parsed?.workflow as Record<string, unknown> | undefined)?.guards === false;
-	} catch {
-		return false; // On any error, default to enabled
-	}
+async function areGuardsDisabled(repoRoot: string): Promise<boolean> {
+	const { configReader } = createAdapters(repoRoot);
+	const result = await configReader.readConfig("workflow.guards");
+	return isOk(result) && result.data === false;
 }
 
 /**
@@ -75,7 +66,7 @@ export const preOpGuardCmd = async (args: string[]): Promise<string> => {
 	const repoRoot = resolveRepoRoot(process.cwd());
 
 	// Fast path: check if guards are disabled
-	if (areGuardsDisabled(repoRoot)) {
+	if (await areGuardsDisabled(repoRoot)) {
 		return JSON.stringify({
 			ok: true,
 			data: { blocked: false },
