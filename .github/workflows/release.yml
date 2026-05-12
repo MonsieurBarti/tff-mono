@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      apps/tff-cc--tag_name: ${{ steps.release.outputs['apps/tff-cc--tag_name'] }}
+      apps/tff-cc--release_created: ${{ steps.release.outputs['apps/tff-cc--release_created'] }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  attach-artifact:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs['apps/tff-cc--release_created'] == 'true' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-forge-flow/tff-cc... build
+      - name: Package artifact
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs['apps/tff-cc--tag_name'] }}
+        run: |
+          set -e
+          cd apps/tff-cc
+          tar czf ../../tff-cc-"$TAG_NAME".tar.gz \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='docs' \
+            --exclude='*.db' \
+            --exclude='*.map' \
+            --exclude='.env*' \
+            --exclude='.gitignore' \
+            dist/ bin/ package.json README.md \
+            skills/ commands/ workflows/ agents/ references/ \
+            plugin/ native/ hooks/ .tff-cc/ .claude-plugin/
+      - name: Upload to release
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs['apps/tff-cc--tag_name'] }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          gh release upload \
+            "$TAG_NAME" \
+            tff-cc-"$TAG_NAME".tar.gz
