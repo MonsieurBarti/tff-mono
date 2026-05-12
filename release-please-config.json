@@ -1,0 +1,20 @@
+{
+	"packages": {
+		"apps/tff-cc": {
+			"package-name": "@the-forge-flow/tff-cc",
+			"component": "tff-cc"
+		},
+		"packages/core": {
+			"package-name": "@tff/core",
+			"component": "tff-core"
+		}
+	},
+	"plugins": [
+		"node-workspace",
+		{
+			"type": "linked-versions",
+			"groupName": "tff",
+			"components": ["tff-cc", "tff-core"]
+		}
+	]
+}
