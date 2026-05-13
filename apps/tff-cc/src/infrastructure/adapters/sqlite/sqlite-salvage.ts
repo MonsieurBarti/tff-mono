@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
-import type { Milestone, Project, Result, Slice, Task } from "@tff/core";
-import { Err, Ok } from "@tff/core";
+import type { Result } from "@tff/core";
+import { Err, Milestone, Ok, Project, Slice, Task } from "@tff/core";
 import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type { Dependency } from "../../../shared/value-objects/dependency.js";
 import type { ReviewRecord } from "../../../shared/value-objects/review-record.js";
@@ -202,12 +202,13 @@ export class SQLiteSalvage {
 			metadata.tablesSalvaged.push("project");
 			metadata.rowsRecovered += 1;
 
-			return {
+			return Project.reconstruct({
 				id: row.id,
 				name: row.name,
 				vision: row.vision ?? "",
 				createdAt,
-			} as unknown as Project;
+				updatedAt: createdAt,
+			});
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			metadata.corruptionNotes.push(`Project: Query failed - ${message}`);
@@ -262,16 +263,20 @@ export class SQLiteSalvage {
 						createdAt = new Date();
 					}
 
-					milestones.push({
-						id: row.id,
-						projectId: row.project_id ?? "singleton",
-						number: row.number,
-						name: row.name,
-						status: (row.status as Milestone["status"]) ?? "open",
-						branch: row.branch ?? "",
-						closeReason: row.close_reason ?? null,
-						createdAt,
-					} as unknown as Milestone);
+					milestones.push(
+						Milestone.reconstruct({
+							id: row.id,
+							projectId: row.project_id ?? "singleton",
+							number: row.number,
+							name: row.name,
+							status: (row.status as Milestone["status"]) ?? "open",
+							branch: row.branch ?? "",
+							closeReason: row.close_reason ?? null,
+							createdAt,
+							updatedAt: createdAt,
+							archivedAt: null,
+						}),
+					);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Milestone row: ${message}`);
@@ -337,18 +342,22 @@ export class SQLiteSalvage {
 						createdAt = new Date();
 					}
 
-					slices.push({
-						id: row.id,
-						milestoneId: row.milestone_id ?? null,
-						kind: (row.kind as Slice["kind"]) ?? "milestone",
-						number: row.number,
-						title: row.title,
-						status: (row.status as Slice["status"]) ?? "discussing",
-						tier: (row.tier as Slice["tier"]) ?? null,
-						baseBranch: row.base_branch ?? "",
-						branchName: row.branch_name ?? "",
-						createdAt,
-					} as unknown as Slice);
+					slices.push(
+						Slice.reconstruct({
+							id: row.id,
+							milestoneId: row.milestone_id ?? null,
+							kind: (row.kind as Slice["kind"]) ?? "milestone",
+							number: row.number,
+							title: row.title,
+							status: (row.status as Slice["status"]) ?? "discussing",
+							tier: (row.tier as Slice["tier"]) ?? null,
+							baseBranch: row.base_branch ?? "",
+							branchName: row.branch_name ?? "",
+							createdAt,
+							updatedAt: createdAt,
+							archivedAt: null,
+						}),
+					);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Slice row: ${message}`);
@@ -432,19 +441,23 @@ export class SQLiteSalvage {
 						}
 					}
 
-					tasks.push({
-						id: row.id,
-						sliceId: row.slice_id,
-						number: row.number,
-						title: row.title,
-						description: row.description ?? "",
-						status: (row.status as Task["status"]) ?? "open",
-						wave: row.wave ?? null,
-						claimedAt,
-						claimedBy: row.claimed_by ?? null,
-						closedReason: row.closed_reason ?? null,
-						createdAt,
-					} as unknown as Task);
+					tasks.push(
+						Task.reconstruct({
+							id: row.id,
+							sliceId: row.slice_id,
+							number: row.number,
+							title: row.title,
+							description: row.description ?? "",
+							status: (row.status as Task["status"]) ?? "open",
+							wave: row.wave ?? null,
+							difficulty: null,
+							claimedAt,
+							claimedBy: row.claimed_by ?? null,
+							closedReason: row.closed_reason ?? null,
+							createdAt,
+							updatedAt: createdAt,
+						}),
+					);
 				} catch (rowError) {
 					const message = rowError instanceof Error ? rowError.message : String(rowError);
 					metadata.corruptionNotes.push(`Task row: ${message}`);

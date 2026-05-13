@@ -101,4 +101,6 @@ export const withMutatingCommand = (handler: Handler, deps?: WrapperDeps): Tagge
 
 export const isWrappedMutating = (h: unknown): boolean =>
 	typeof h === "function" &&
+	// Intentional: TypeScript lacks a type for symbol-indexed functions.
+	// This cast is required to read the mutating-command tag at runtime.
 	(h as unknown as Record<symbol, unknown>)[WITH_MUTATING_COMMAND_TAG] === true;

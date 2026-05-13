@@ -157,7 +157,6 @@ export function readProjectIdFile(repoRoot: string): string | null {
 	}
 	// Validate UUID v4 format to prevent path traversal
 	if (!isValidUuidV4(content)) {
-		console.warn(`Invalid project ID format in ${idPath}: expected UUID v4, got "${content}"`);
 		return null;
 	}
 	return content;

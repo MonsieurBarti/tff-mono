@@ -57,7 +57,6 @@ export function parseProjectSettings(raw: unknown): ProjectSettings {
 	}
 	const result = ProjectSettingsSchema.safeParse(raw);
 	if (result.success) return result.data;
-	console.warn("[tff] settings parse failed, using defaults:", result.error.message);
 	return ProjectSettingsSchema.parse(undefined);
 }
 
@@ -72,8 +71,7 @@ export function loadProjectSettings(yamlContent: string): ProjectSettings {
 	try {
 		const parsed = parseYaml(yamlContent);
 		return parseProjectSettings(parsed);
-	} catch (err) {
-		console.warn("[tff] failed to parse settings.yaml, using defaults:", String(err));
+	} catch {
 		return ProjectSettingsSchema.parse(undefined);
 	}
 }
