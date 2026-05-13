@@ -120,7 +120,6 @@ export class InMemoryStateAdapter
 	}
 
 	saveProject(props: ProjectProps): Result<Project, DomainError> {
-		// TODO(S04): Replace with Project.reconstruct() once in-memory adapter aligns with core entities
 		const project = Project.reconstruct({
 			id: "singleton",
 			name: props.name,
@@ -490,7 +489,6 @@ export class InMemoryStateAdapter
 	// TaskStore
 	createTask(props: TaskProps): Result<Task, DomainError> {
 		const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
-		// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
 		const task = Task.reconstruct({
 			id,
 			sliceId: props.sliceId,
