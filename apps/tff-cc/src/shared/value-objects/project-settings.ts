@@ -72,6 +72,7 @@ export function loadProjectSettings(yamlContent: string): ProjectSettings {
 		const parsed = parseYaml(yamlContent);
 		return parseProjectSettings(parsed);
 	} catch {
+		// intentional: corrupted YAML falls back to field-level defaults.
 		return ProjectSettingsSchema.parse(undefined);
 	}
 }

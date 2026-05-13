@@ -261,6 +261,9 @@ export class SQLiteSalvage {
 						}
 					} catch {
 						createdAt = new Date();
+						metadata.corruptionNotes.push(
+							`Milestone: Failed to parse created_at "${row.created_at}", using current time`,
+						);
 					}
 
 					milestones.push(
@@ -340,6 +343,9 @@ export class SQLiteSalvage {
 						}
 					} catch {
 						createdAt = new Date();
+						metadata.corruptionNotes.push(
+							`Slice: Failed to parse created_at "${row.created_at}", using current time`,
+						);
 					}
 
 					slices.push(
