@@ -183,3 +183,9 @@ When the plugin is installed in the client, `$PLUGIN_ROOT/bin` is automatically 
 Fallback (hooks / scripts running outside an interactive shell, where PATH may differ): `node "$PLUGIN_ROOT/dist/cli/index.js" <command> [args]`.
 
 Returns JSON: `{ "ok": true, "data": ... }` ∨ `{ "ok": false, "error": { "code": "...", "message": "..." } }`
+
+## Release Conventions
+
+- **tff NEVER merges.** Only creates PRs. User merges via GitHub.
+- **PR links ALWAYS shown** to user when created.
+- **CHANGELOG ALWAYS updated** for every release — no exceptions.
