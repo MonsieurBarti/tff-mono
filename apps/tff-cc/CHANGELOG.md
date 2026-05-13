@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v0.9.25...tff-cc-v1.0.0) (2026-05-13)
+
+
+### Features
+
+* **M01:** monorepo bootstrap ([e878f87](https://github.com/MonsieurBarti/tff-mono/commit/e878f877e662da5db84d8eeaa11af48c841920c0))
+* **M02:** Shared core foundation ([610d884](https://github.com/MonsieurBarti/tff-mono/commit/610d88405bb2e5861b0f590c4e17953c20b03431))
+* **M03:** tff-cc on shared core + ~/.tff/ migration ([#25](https://github.com/MonsieurBarti/tff-mono/issues/25)) ([9c54b56](https://github.com/MonsieurBarti/tff-mono/commit/9c54b56bfcc810ce730da1220f2423af9c4ded54))
+* **M04:** tff-cc release pipeline + 1.0 ([#31](https://github.com/MonsieurBarti/tff-mono/issues/31)) ([428090a](https://github.com/MonsieurBarti/tff-mono/commit/428090a5f23f21ff432f23f65678dbd3da8914ad))
+* **S01:** shared schema baseline and migration runner ([610d884](https://github.com/MonsieurBarti/tff-mono/commit/610d88405bb2e5861b0f590c4e17953c20b03431))
+* **S02:** import tff-cc as apps/tff-cc on pnpm ([#2](https://github.com/MonsieurBarti/tff-mono/issues/2)) ([4591b54](https://github.com/MonsieurBarti/tff-mono/commit/4591b54d0f9b09d626d8ab29591a119ae3e7e474))
+* **S04:** port release branch sync, validation, and rebuild-diff; fix plugin symlinks ([#28](https://github.com/MonsieurBarti/tff-mono/issues/28)) ([2e5fb42](https://github.com/MonsieurBarti/tff-mono/commit/2e5fb42785e6a8ad1a1f8f2e3a87f5a9c4ff7416))
+* **S06:** declare v1.0.0 release readiness ([#30](https://github.com/MonsieurBarti/tff-mono/issues/30)) ([be781ff](https://github.com/MonsieurBarti/tff-mono/commit/be781ff2aad8be1ca1bde35e60787fc1826eb0d2))
+
+
+### Bug Fixes
+
+* **security:** avoid shell expansion in phase guard hook ([d270905](https://github.com/MonsieurBarti/tff-mono/commit/d27090534b3009253cffa8f89cba1a4d0743ff91))
+* **security:** replace execsync with execfilesync to prevent shell injection ([ef185d6](https://github.com/MonsieurBarti/tff-mono/commit/ef185d6df96f345f8f5215a2df66236ad17c179c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @tff/core bumped to 1.0.0
+
 ## [0.9.25](https://github.com/MonsieurBarti/The-Forge-Flow-CC/compare/tff-cc-v0.9.24...tff-cc-v0.9.25) (2026-05-03)
 
 ### Bug Fixes
