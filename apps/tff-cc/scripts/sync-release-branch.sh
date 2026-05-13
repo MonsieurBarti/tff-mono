@@ -90,8 +90,11 @@ for sub in agents bin commands hooks references skills workflows; do
     continue
   fi
   if [ -L "$plugin_entry" ]; then
-    # Resolve the top-level symlink.
-    src=$(cd "plugin" && readlink -f "$sub")
+    link_target=$(readlink "$plugin_entry")
+    case "$link_target" in
+      /*) src=$link_target ;;
+      *)  src=$(cd "$(dirname "$plugin_entry")" && cd "$link_target" && pwd) ;;
+    esac
   else
     src=$(cd "$(dirname "$plugin_entry")" && pwd)/$sub
   fi
