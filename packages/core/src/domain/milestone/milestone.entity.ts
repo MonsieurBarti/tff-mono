@@ -152,6 +152,21 @@ export class Milestone extends AggregateRoot {
 		return this._archivedAt !== null;
 	}
 
+	toJSON(): MilestoneState {
+		return {
+			id: this.id,
+			projectId: this._projectId,
+			number: this._number,
+			name: this._name,
+			status: this._status,
+			branch: this._branch,
+			closeReason: this._closeReason,
+			createdAt: this._createdAt,
+			updatedAt: this._updatedAt,
+			archivedAt: this._archivedAt,
+		};
+	}
+
 	rename(name: string): void {
 		if (this.isArchived) {
 			throw new MilestoneAlreadyArchivedError(`Cannot rename archived milestone`, this._id);

@@ -211,6 +211,23 @@ export class Slice extends AggregateRoot {
 		return [...this._reviews];
 	}
 
+	toJSON(): SliceState {
+		return {
+			id: this.id,
+			milestoneId: this._milestoneId,
+			kind: this._kind,
+			number: this._number,
+			title: this._title,
+			status: this._status,
+			tier: this._tier,
+			baseBranch: this._baseBranch,
+			branchName: this._branchName,
+			createdAt: this._createdAt,
+			updatedAt: this._updatedAt,
+			archivedAt: this._archivedAt,
+		};
+	}
+
 	rename(title: string): void {
 		if (this.isArchived) {
 			throw new SliceAlreadyArchivedError(`Cannot rename archived slice`, this._id);
