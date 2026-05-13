@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { load as yamlLoad, CORE_SCHEMA } from "js-yaml";
 
@@ -147,5 +148,35 @@ export const auditDeadLetter = (root: string): DeadLetterResult | ProbeFailure =
 		};
 	} catch (err) {
 		return { ok: false, reason: `auditDeadLetter failed: ${(err as Error).message}` };
+	}
+};
+
+export interface PlannotatorHealthResult {
+	readonly ok: true;
+	readonly available: boolean;
+	readonly path?: string;
+	readonly hint?: string;
+}
+
+export const checkPlannotator = (_root: string): PlannotatorHealthResult | ProbeFailure => {
+	try {
+		const pluginPath = path.join(
+			os.homedir(),
+			".claude",
+			"plugins",
+			"data",
+			"plannotator-plannotator",
+		);
+		const available = fs.existsSync(pluginPath);
+		if (available) {
+			return { ok: true, available: true, path: pluginPath };
+		}
+		return {
+			ok: true,
+			available: false,
+			hint: "Plannotator not installed. See README § Setup Guide for install instructions.",
+		};
+	} catch (err) {
+		return { ok: false, reason: `checkPlannotator failed: ${(err as Error).message}` };
 	}
 };
