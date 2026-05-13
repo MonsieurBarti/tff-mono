@@ -3,6 +3,8 @@ dist/
 coverage/
 .turbo/
 .tff/
+.mcp_data/
 pnpm-lock.yaml
 apps/
 tools/
+CHANGELOG.md

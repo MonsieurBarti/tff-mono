@@ -61,7 +61,7 @@ jobs:
             --exclude='.gitignore' \
             dist/ bin/ package.json README.md \
             skills/ commands/ workflows/ agents/ references/ \
-            plugin/ native/ hooks/ .tff-cc/ .claude-plugin/
+            plugin/ native/ hooks/ .claude-plugin/
       - name: Upload to release
         env:
           TAG_NAME: ${{ needs.release-please.outputs['apps/tff-cc--tag_name'] }}

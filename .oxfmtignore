@@ -5,6 +5,7 @@ coverage/
 .tff/
 pnpm-lock.yaml
 apps/*/CHANGELOG.md
+packages/*/CHANGELOG.md
 apps/tff-cc/native/
 apps/tff-cc/assets/
 apps/tff-pi/.pi/
