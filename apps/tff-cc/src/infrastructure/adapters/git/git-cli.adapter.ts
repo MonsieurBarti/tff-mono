@@ -219,7 +219,7 @@ export class GitCliAdapter implements GitOps {
 							),
 						);
 					} else {
-						resolve(Ok(stdout as unknown as Buffer));
+						resolve(Ok(stdout));
 					}
 				},
 			);

@@ -72,6 +72,16 @@ export class Project extends AggregateRoot {
 		return this._updatedAt;
 	}
 
+	toJSON(): ProjectState {
+		return {
+			id: this.id,
+			name: this._name,
+			vision: this._vision,
+			createdAt: this._createdAt,
+			updatedAt: this._updatedAt,
+		};
+	}
+
 	updateVision(vision: string): void {
 		const validated = updateVisionSchema.parse(vision);
 		const oldVision = this._vision;

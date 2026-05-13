@@ -4,7 +4,7 @@ import * as path from "node:path";
 import Database from "better-sqlite3";
 import * as fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { isErr, isOk } from "@tff/core";
+import { isErr, isOk, Milestone, Project, Slice, Task } from "@tff/core";
 import { SQLiteSalvage } from "../../src/infrastructure/adapters/sqlite/sqlite-salvage.js";
 
 const SCHEMA_DDL = `
@@ -231,6 +231,12 @@ describe("SQLiteSalvage - property-based", () => {
 					expect(Array.isArray(result.data.snapshot.tasks)).toBe(true);
 					expect(Array.isArray(result.data.snapshot.dependencies)).toBe(true);
 					expect(Array.isArray(result.data.snapshot.reviews)).toBe(true);
+					if (result.data.snapshot.project) {
+						expect(result.data.snapshot.project).toBeInstanceOf(Project);
+					}
+					for (const ms of result.data.snapshot.milestones) expect(ms).toBeInstanceOf(Milestone);
+					for (const sl of result.data.snapshot.slices) expect(sl).toBeInstanceOf(Slice);
+					for (const t of result.data.snapshot.tasks) expect(t).toBeInstanceOf(Task);
 				}
 			}),
 			{ numRuns: 200 },

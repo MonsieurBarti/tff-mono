@@ -20,6 +20,7 @@ import {
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { TFF_DIR } from "@tff/core";
+import { tffWarn } from "./adapters/logging/warn.js";
 
 /** UUID v4 format validation regex */
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -157,7 +158,7 @@ export function readProjectIdFile(repoRoot: string): string | null {
 	}
 	// Validate UUID v4 format to prevent path traversal
 	if (!isValidUuidV4(content)) {
-		console.warn(`Invalid project ID format in ${idPath}: expected UUID v4, got "${content}"`);
+		tffWarn(`Invalid project ID format in ${idPath}: expected UUID v4, got "${content}"`);
 		return null;
 	}
 	return content;

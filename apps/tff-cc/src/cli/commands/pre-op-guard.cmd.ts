@@ -179,6 +179,5 @@ export const preOpGuardCmd = async (args: string[]): Promise<string> => {
 		}
 	}
 
-	// The callback always returns a string
-	return result as unknown as string;
+	return result as string;
 };

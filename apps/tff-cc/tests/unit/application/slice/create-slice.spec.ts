@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createSliceUseCase } from "../../../../src/application/slice/create-slice.js";
-import { isOk } from "@tff/core";
+import { isOk, Slice } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
@@ -34,6 +34,18 @@ describe("createSliceUseCase", () => {
 			expect(slice.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 			expect(slice.status).toBe("discussing");
 		}
+	});
+
+	it("created slice is a proper instance", async () => {
+		const milestones = state.listMilestones();
+		const milestoneId = isOk(milestones) && milestones.data[0] ? milestones.data[0].id : "M01";
+
+		const result = await createSliceUseCase(
+			{ milestoneId, title: "Auth" },
+			{ milestoneStore: state, sliceStore: state, artifactStore },
+		);
+		expect(isOk(result)).toBe(true);
+		if (isOk(result)) expect(result.data.slice).toBeInstanceOf(Slice);
 	});
 
 	it("should create slice directory with label format", async () => {
