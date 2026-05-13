@@ -44,3 +44,4 @@ If `release-branch-validation.yml` fails after the sync:
 
 - Do **not** manually bump versions, tag, or push. Release-please owns the version bump; the workflow owns the tag and artifact.
 - Before trusting the sync script in production, smoke-test it against a throwaway fork — see the comment block at the top of `scripts/sync-release-branch.sh`.
+- **v1.0.0 release** cut via release-please with `Release-As: 1.0.0` footer.
