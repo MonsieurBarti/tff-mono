@@ -507,6 +507,8 @@ The `release` branch is a built-artifact channel. The intended flow after a PR m
 
 Before trusting the sync script in production, maintainers should smoke-test it against a throwaway fork — see the comment block at the top of `scripts/sync-release-branch.sh`.
 
+For the full operator guide (failure modes, verification checklist, prerequisites), see [`references/release-checklist.md`](references/release-checklist.md).
+
 ## License
 
 MIT
