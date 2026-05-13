@@ -60,7 +60,7 @@ Verify: Run `/plannotator-annotate README.md` in Claude Code -- it should open a
 
 ```bash
 # Add the marketplace
-claude /plugin marketplace add MonsieurBarti/The-Forge-Flow-CC
+claude /plugin marketplace add MonsieurBarti/tff-mono
 
 # Install the plugin
 claude /plugin install tff-cc@the-forge-flow
