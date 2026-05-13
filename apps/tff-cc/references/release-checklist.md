@@ -40,4 +40,5 @@ Complete ALL steps ∈ order before every release.
 - **tff NEVER merges.** Only creates PRs. User merges via GitHub.
 - **PR links ALWAYS shown** to user when created.
 - **CHANGELOG ALWAYS updated** ∀ release — ¬ exceptions.
+- **v1.0.0 release** cut via release-please with `Release-As: 1.0.0` footer.
 - **docs/ is NOT tracked** ∈ git — internal design docs stay local.
