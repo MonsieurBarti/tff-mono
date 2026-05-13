@@ -1,8 +1,13 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { observeHealthCmd } from "../../src/cli/commands/observe-health.cmd.js";
+import { tffWarn } from "../../src/infrastructure/adapters/logging/warn.js";
+
+vi.mock("../../src/infrastructure/adapters/logging/warn.js", () => ({
+	tffWarn: vi.fn(),
+}));
 
 describe("observe:health integration", () => {
 	let tmp: string;
@@ -41,5 +46,15 @@ describe("observe:health integration", () => {
 		const parsed = JSON.parse(out);
 		expect(parsed.data.deadLetter.entryCount).toBe(2);
 		expect(parsed.data.deadLetter.bytes).toBeGreaterThan(0);
+	});
+
+	it("logs warning for malformed journal entries", async () => {
+		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
+		fs.writeFileSync(path.join(tmp, ".tff/observations/sessions.jsonl"), "not-json\n");
+		const out = await observeHealthCmd([]);
+		const parsed = JSON.parse(out);
+		expect(parsed.ok).toBe(true);
+		expect(parsed.data.lastObservation.ok).toBe(false);
+		expect(tffWarn).toHaveBeenCalled();
 	});
 });

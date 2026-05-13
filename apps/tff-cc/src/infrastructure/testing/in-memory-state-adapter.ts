@@ -1,23 +1,30 @@
 import type {
-	Milestone,
 	MilestoneProps,
+	MilestoneStatus,
 	MilestoneStore,
 	MilestoneUpdateProps,
-	Project,
 	ProjectProps,
 	ProjectStore,
 	Result,
-	Slice,
 	SliceProps,
 	SliceStatus,
 	SliceStore,
 	SliceUpdateProps,
-	Task,
 	TaskProps,
 	TaskStore,
 	TaskUpdateProps,
 } from "@tff/core";
-import { DomainEvent, Err, Ok, milestoneBranchName, SLICE_TRANSITIONS } from "@tff/core";
+import {
+	DomainEvent,
+	Err,
+	Milestone,
+	Ok,
+	Project,
+	Slice,
+	Task,
+	milestoneBranchName,
+	SLICE_TRANSITIONS,
+} from "@tff/core";
 import type { DomainError } from "../errors/generic-domain-error.js";
 import { GenericDomainError } from "../errors/generic-domain-error.js";
 import type { DatabaseInit } from "../../domain/ports/database-init.port.js";
@@ -32,10 +39,6 @@ import type { TransactionRunner } from "../../domain/ports/transaction-runner.po
 import type { Dependency } from "../../shared/value-objects/dependency.js";
 import type { ReviewRecord, ReviewType } from "../../shared/value-objects/review-record.js";
 import type { WorkflowSession } from "../../shared/value-objects/workflow-session.js";
-
-function mut<T>(obj: T): Record<string, unknown> {
-	return obj as unknown as Record<string, unknown>;
-}
 
 /**
  * Test-only in-memory implementation of the state ports. NOT intended for
@@ -78,10 +81,19 @@ export class InMemoryStateAdapter
 	 */
 	transaction<T>(fn: () => T): T {
 		const snapshot = {
-			project: structuredClone(this.project),
-			milestones: structuredClone(this.milestones),
-			slices: structuredClone(this.slices),
-			tasks: structuredClone(this.tasks),
+			project: this.project ? Project.reconstruct(this.project.toJSON()) : null,
+			milestones: new Map(
+				Array.from(this.milestones.entries()).map(([k, v]) => [
+					k,
+					Milestone.reconstruct(v.toJSON()),
+				]),
+			),
+			slices: new Map(
+				Array.from(this.slices.entries()).map(([k, v]) => [k, Slice.reconstruct(v.toJSON())]),
+			),
+			tasks: new Map(
+				Array.from(this.tasks.entries()).map(([k, v]) => [k, Task.reconstruct(v.toJSON())]),
+			),
 			dependencies: structuredClone(this.dependencies),
 			sliceDependencies: structuredClone(this.sliceDependencies),
 			session: structuredClone(this.session),
@@ -108,13 +120,13 @@ export class InMemoryStateAdapter
 	}
 
 	saveProject(props: ProjectProps): Result<Project, DomainError> {
-		// TODO(S04): Replace with Project.reconstruct() once in-memory adapter aligns with core entities
-		const project: Project = {
+		const project = Project.reconstruct({
 			id: "singleton",
 			name: props.name,
 			vision: props.vision ?? "",
 			createdAt: this.project?.createdAt ?? new Date(),
-		} as unknown as Project;
+			updatedAt: new Date(),
+		});
 		this.project = project;
 		return Ok(project);
 	}
@@ -125,16 +137,18 @@ export class InMemoryStateAdapter
 		const id = props.id ?? crypto.randomUUID();
 		// Use provided branch or compute from UUID
 		const branch = props.branch ?? milestoneBranchName(id);
-		// TODO(S04): Replace with Milestone.reconstruct() once in-memory adapter aligns with core entities
-		const milestone: Milestone = {
+		const milestone = Milestone.reconstruct({
 			id,
 			projectId: "singleton",
 			number: props.number,
 			name: props.name,
-			status: "open" as Milestone["status"],
+			status: "open" as MilestoneStatus,
 			branch,
+			closeReason: null,
 			createdAt: new Date(),
-		} as unknown as Milestone;
+			updatedAt: new Date(),
+			archivedAt: null,
+		});
 		this.milestones.set(id, milestone);
 		return Ok(milestone);
 	}
@@ -145,7 +159,7 @@ export class InMemoryStateAdapter
 
 	getMilestoneByNumber(number: number): Result<Milestone | null, DomainError> {
 		const matches = [...this.milestones.values()].filter(
-			(m) => m.number === number && m.archivedAt === undefined,
+			(m) => m.number === number && m.archivedAt == null,
 		);
 		if (matches.length === 0) return Ok(null);
 		const found = matches.reduce((latest, m) =>
@@ -157,15 +171,27 @@ export class InMemoryStateAdapter
 	listMilestones(options?: { includeArchived?: boolean }): Result<Milestone[], DomainError> {
 		const all = [...this.milestones.values()];
 		if (options?.includeArchived === true) return Ok(all);
-		return Ok(all.filter((m) => m.archivedAt === undefined));
+		return Ok(all.filter((m) => m.archivedAt == null));
 	}
 
 	updateMilestone(id: string, updates: MilestoneUpdateProps): Result<void, DomainError> {
 		const ms = this.milestones.get(id);
 		if (!ms) return Ok(undefined);
-		if (updates.name !== undefined) mut(ms).name = updates.name;
-		if (updates.status !== undefined) mut(ms).status = updates.status;
-		this.milestones.set(id, ms);
+		this.milestones.set(
+			id,
+			Milestone.reconstruct({
+				id: ms.id,
+				projectId: ms.projectId,
+				number: ms.number,
+				name: updates.name ?? ms.name,
+				status: updates.status ?? ms.status,
+				branch: ms.branch,
+				closeReason: ms.closeReason,
+				createdAt: ms.createdAt,
+				updatedAt: new Date(),
+				archivedAt: ms.archivedAt,
+			}),
+		);
 		return Ok(undefined);
 	}
 
@@ -176,15 +202,43 @@ export class InMemoryStateAdapter
 			const now = new Date();
 			let slicesArchived = 0;
 			for (const slice of this.slices.values()) {
-				if (slice.milestoneId === id && slice.archivedAt === undefined) {
-					mut(slice).archivedAt = now;
-					this.slices.set(slice.id, slice);
+				if (slice.milestoneId === id && slice.archivedAt == null) {
+					this.slices.set(
+						slice.id,
+						Slice.reconstruct({
+							id: slice.id,
+							milestoneId: slice.milestoneId,
+							kind: slice.kind,
+							number: slice.number,
+							title: slice.title,
+							status: slice.status,
+							tier: slice.tier,
+							baseBranch: slice.baseBranch,
+							branchName: slice.branchName,
+							createdAt: slice.createdAt,
+							updatedAt: new Date(),
+							archivedAt: now,
+						}),
+					);
 					slicesArchived += 1;
 				}
 			}
-			if (ms.archivedAt === undefined) {
-				mut(ms).archivedAt = now;
-				this.milestones.set(id, ms);
+			if (ms.archivedAt == null) {
+				this.milestones.set(
+					id,
+					Milestone.reconstruct({
+						id: ms.id,
+						projectId: ms.projectId,
+						number: ms.number,
+						name: ms.name,
+						status: ms.status,
+						branch: ms.branch,
+						closeReason: ms.closeReason,
+						createdAt: ms.createdAt,
+						updatedAt: new Date(),
+						archivedAt: now,
+					}),
+				);
 			}
 			return Ok({ slicesArchived });
 		});
@@ -223,9 +277,21 @@ export class InMemoryStateAdapter
 					),
 				);
 			}
-			mut(ms).status = "closed";
-			mut(ms).closeReason = reason;
-			this.milestones.set(id, ms);
+			this.milestones.set(
+				id,
+				Milestone.reconstruct({
+					id: ms.id,
+					projectId: ms.projectId,
+					number: ms.number,
+					name: ms.name,
+					status: "closed",
+					branch: ms.branch,
+					closeReason: reason ?? null,
+					createdAt: ms.createdAt,
+					updatedAt: new Date(),
+					archivedAt: ms.archivedAt,
+				}),
+			);
 			return Ok(undefined);
 		} catch (e) {
 			return Err(new GenericDomainError("WRITE_FAILURE", `Failed to close milestone: ${e}`));
@@ -253,8 +319,7 @@ export class InMemoryStateAdapter
 		}
 		// Use provided id or generate a new UUID
 		const id = props.id ?? crypto.randomUUID();
-		// TODO(S04): Replace with Slice.reconstruct() once in-memory adapter aligns with core entities
-		const slice: Slice = {
+		const slice = Slice.reconstruct({
 			id,
 			milestoneId: props.milestoneId ?? null,
 			kind,
@@ -265,7 +330,9 @@ export class InMemoryStateAdapter
 			baseBranch: props.baseBranch ?? "",
 			branchName: props.branchName ?? "",
 			createdAt: new Date(),
-		} as unknown as Slice;
+			updatedAt: new Date(),
+			archivedAt: null,
+		});
 		this.slices.set(id, slice);
 		return Ok(slice);
 	}
@@ -279,12 +346,11 @@ export class InMemoryStateAdapter
 		sliceNumber: number,
 	): Result<Slice | null, DomainError> {
 		const milestone = [...this.milestones.values()].find(
-			(m) => m.number === milestoneNumber && m.archivedAt === undefined,
+			(m) => m.number === milestoneNumber && m.archivedAt == null,
 		);
 		if (!milestone) return Ok(null);
 		const matches = [...this.slices.values()].filter(
-			(s) =>
-				s.milestoneId === milestone.id && s.number === sliceNumber && s.archivedAt === undefined,
+			(s) => s.milestoneId === milestone.id && s.number === sliceNumber && s.archivedAt == null,
 		);
 		if (matches.length === 0) return Ok(null);
 		const slice = matches.reduce((latest, s) =>
@@ -302,7 +368,7 @@ export class InMemoryStateAdapter
 				: (milestoneIdOrOptions ?? {});
 		const includeArchived = opts.includeArchived === true;
 		let all = [...this.slices.values()];
-		if (!includeArchived) all = all.filter((s) => s.archivedAt === undefined);
+		if (!includeArchived) all = all.filter((s) => s.archivedAt == null);
 		if (opts.milestoneId) {
 			return Ok(all.filter((s) => s.milestoneId === opts.milestoneId));
 		}
@@ -315,16 +381,30 @@ export class InMemoryStateAdapter
 	): Result<Slice[], DomainError> {
 		const includeArchived = options?.includeArchived === true;
 		let all = [...this.slices.values()];
-		if (!includeArchived) all = all.filter((s) => s.archivedAt === undefined);
+		if (!includeArchived) all = all.filter((s) => s.archivedAt == null);
 		return Ok(all.filter((s) => s.kind === kind));
 	}
 
 	updateSlice(id: string, updates: SliceUpdateProps): Result<void, DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
-		if (updates.title !== undefined) mut(slice).title = updates.title;
-		if (updates.tier !== undefined) mut(slice).tier = updates.tier;
-		this.slices.set(id, slice);
+		this.slices.set(
+			id,
+			Slice.reconstruct({
+				id: slice.id,
+				milestoneId: slice.milestoneId,
+				kind: slice.kind,
+				number: slice.number,
+				title: updates.title ?? slice.title,
+				status: slice.status,
+				tier: updates.tier ?? slice.tier,
+				baseBranch: slice.baseBranch,
+				branchName: slice.branchName,
+				createdAt: slice.createdAt,
+				updatedAt: new Date(),
+				archivedAt: slice.archivedAt,
+			}),
+		);
 		return Ok(undefined);
 	}
 
@@ -361,8 +441,23 @@ export class InMemoryStateAdapter
 			);
 		}
 		const from = slice.status;
-		mut(slice).status = target;
-		this.slices.set(id, slice);
+		this.slices.set(
+			id,
+			Slice.reconstruct({
+				id: slice.id,
+				milestoneId: slice.milestoneId,
+				kind: slice.kind,
+				number: slice.number,
+				title: slice.title,
+				status: target,
+				tier: slice.tier,
+				baseBranch: slice.baseBranch,
+				branchName: slice.branchName,
+				createdAt: slice.createdAt,
+				updatedAt: new Date(),
+				archivedAt: slice.archivedAt,
+			}),
+		);
 		const event = DomainEvent.create("slice.transitioned", { sliceId: id, from, to: target });
 		return Ok([event]);
 	}
@@ -370,17 +465,31 @@ export class InMemoryStateAdapter
 	archiveSlice(id: string): Result<void, DomainError> {
 		const slice = this.slices.get(id);
 		if (!slice) return Ok(undefined);
-		if (slice.archivedAt !== undefined) return Ok(undefined);
-		mut(slice).archivedAt = new Date();
-		this.slices.set(id, slice);
+		if (slice.archivedAt != null) return Ok(undefined);
+		this.slices.set(
+			id,
+			Slice.reconstruct({
+				id: slice.id,
+				milestoneId: slice.milestoneId,
+				kind: slice.kind,
+				number: slice.number,
+				title: slice.title,
+				status: slice.status,
+				tier: slice.tier,
+				baseBranch: slice.baseBranch,
+				branchName: slice.branchName,
+				createdAt: slice.createdAt,
+				updatedAt: new Date(),
+				archivedAt: new Date(),
+			}),
+		);
 		return Ok(undefined);
 	}
 
 	// TaskStore
 	createTask(props: TaskProps): Result<Task, DomainError> {
 		const id = `${props.sliceId}-T${props.number.toString().padStart(2, "0")}`;
-		// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
-		const task: Task = {
+		const task = Task.reconstruct({
 			id,
 			sliceId: props.sliceId,
 			number: props.number,
@@ -388,8 +497,13 @@ export class InMemoryStateAdapter
 			description: props.description ?? "",
 			status: "open",
 			wave: props.wave ?? null,
+			difficulty: null,
+			claimedAt: null,
+			claimedBy: null,
+			closedReason: null,
 			createdAt: new Date(),
-		} as unknown as Task;
+			updatedAt: new Date(),
+		});
 		this.tasks.set(id, task);
 		return Ok(task);
 	}
@@ -405,10 +519,24 @@ export class InMemoryStateAdapter
 	updateTask(id: string, updates: TaskUpdateProps): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		if (updates.title !== undefined) mut(task).title = updates.title;
-		if (updates.description !== undefined) mut(task).description = updates.description;
-		if (updates.wave !== undefined) mut(task).wave = updates.wave;
-		this.tasks.set(id, task);
+		this.tasks.set(
+			id,
+			Task.reconstruct({
+				id: task.id,
+				sliceId: task.sliceId,
+				number: task.number,
+				title: updates.title ?? task.title,
+				description: updates.description ?? task.description,
+				status: task.status,
+				wave: updates.wave ?? task.wave,
+				difficulty: task.difficulty,
+				claimedAt: task.claimedAt,
+				claimedBy: task.claimedBy,
+				closedReason: task.closedReason,
+				createdAt: task.createdAt,
+				updatedAt: new Date(),
+			}),
+		);
 		return Ok(undefined);
 	}
 
@@ -417,12 +545,24 @@ export class InMemoryStateAdapter
 		if (!task || task.status !== "open") {
 			return Err(new GenericDomainError("ALREADY_CLAIMED", `Task "${id}" is already claimed`));
 		}
-		mut(task).status = "in_progress";
-		mut(task).claimedAt = new Date();
-		if (claimedBy !== undefined) {
-			mut(task).claimedBy = claimedBy;
-		}
-		this.tasks.set(id, task);
+		this.tasks.set(
+			id,
+			Task.reconstruct({
+				id: task.id,
+				sliceId: task.sliceId,
+				number: task.number,
+				title: task.title,
+				description: task.description,
+				status: "in_progress",
+				wave: task.wave,
+				difficulty: task.difficulty,
+				claimedAt: new Date(),
+				claimedBy: claimedBy ?? null,
+				closedReason: task.closedReason,
+				createdAt: task.createdAt,
+				updatedAt: new Date(),
+			}),
+		);
 		return Ok(undefined);
 	}
 
@@ -440,9 +580,24 @@ export class InMemoryStateAdapter
 	closeTask(id: string, reason?: string): Result<void, DomainError> {
 		const task = this.tasks.get(id);
 		if (!task) return Ok(undefined);
-		mut(task).status = "closed";
-		mut(task).closedReason = reason;
-		this.tasks.set(id, task);
+		this.tasks.set(
+			id,
+			Task.reconstruct({
+				id: task.id,
+				sliceId: task.sliceId,
+				number: task.number,
+				title: task.title,
+				description: task.description,
+				status: "closed",
+				wave: task.wave,
+				difficulty: task.difficulty,
+				claimedAt: task.claimedAt,
+				claimedBy: task.claimedBy,
+				closedReason: reason ?? null,
+				createdAt: task.createdAt,
+				updatedAt: new Date(),
+			}),
+		);
 		return Ok(undefined);
 	}
 
@@ -559,21 +714,43 @@ export class InMemoryStateAdapter
 			const id = `${sliceId}-executor-seed-${idx}`;
 			const existing = this.tasks.get(id);
 			if (existing) {
-				mut(existing).claimedBy = agent;
-				this.tasks.set(id, existing);
-			} else {
-				// TODO(S04): Replace with Task.reconstruct() once in-memory adapter aligns with core entities
-				const task: Task = {
+				this.tasks.set(
 					id,
-					sliceId,
-					number: 9000 + idx,
-					title: `__seed_executor_${agent}`,
-					status: "in_progress",
-					claimedBy: agent,
-					claimedAt: new Date(),
-					createdAt: new Date(),
-				} as unknown as Task;
-				this.tasks.set(id, task);
+					Task.reconstruct({
+						id: existing.id,
+						sliceId: existing.sliceId,
+						number: existing.number,
+						title: existing.title,
+						description: existing.description,
+						status: existing.status,
+						wave: existing.wave,
+						difficulty: existing.difficulty,
+						claimedAt: existing.claimedAt,
+						claimedBy: agent,
+						closedReason: existing.closedReason,
+						createdAt: existing.createdAt,
+						updatedAt: new Date(),
+					}),
+				);
+			} else {
+				this.tasks.set(
+					id,
+					Task.reconstruct({
+						id,
+						sliceId,
+						number: 9000 + idx,
+						title: `__seed_executor_${agent}`,
+						description: "",
+						status: "in_progress",
+						wave: null,
+						difficulty: null,
+						claimedBy: agent,
+						claimedAt: new Date(),
+						closedReason: null,
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					}),
+				);
 			}
 		});
 	}

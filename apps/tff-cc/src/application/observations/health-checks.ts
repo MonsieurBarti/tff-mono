@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { load as yamlLoad, CORE_SCHEMA } from "js-yaml";
+import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 
 const OBS_DIR = ".tff/observations";
 const SESSIONS = `${OBS_DIR}/sessions.jsonl`;
@@ -71,7 +72,9 @@ export const checkLastObservation = (
 					lastSeenAt: parsed.ts,
 					stale: ageDays > staleAfterDays,
 				};
-			} catch {}
+			} catch {
+				tffWarn(`Malformed observation entry: ${recent[i]}`);
+			}
 		}
 		return { ok: false, reason: "no parseable observation in last 5 entries" };
 	} catch (err) {
