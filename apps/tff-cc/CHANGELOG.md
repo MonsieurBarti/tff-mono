@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v1.0.0...tff-cc-v1.0.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* **ci:** remove .tff-cc from release artifact ([a186382](https://github.com/MonsieurBarti/tff-mono/commit/a1863827d9f4f886e302d130c2fdb20ad968747f))
+* **ci:** remove .tff-cc from release artifact — local dev symlink only ([cd94717](https://github.com/MonsieurBarti/tff-mono/commit/cd94717920987aa55ed433fe4a3f2204646ec196))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @tff/core bumped to 1.0.1
+
 ## [1.0.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v0.9.25...tff-cc-v1.0.0) (2026-05-13)
 
 
