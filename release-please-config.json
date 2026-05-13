@@ -2,7 +2,8 @@
 	"packages": {
 		"apps/tff-cc": {
 			"package-name": "@the-forge-flow/tff-cc",
-			"component": "tff-cc"
+			"component": "tff-cc",
+			"extra-files": ["plugin/.claude-plugin/plugin.json"]
 		},
 		"packages/core": {
 			"package-name": "@tff/core",
