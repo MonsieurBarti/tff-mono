@@ -85,16 +85,18 @@ Issues → revise plan
 DISPATCH anonymous reviewer via {{spawn-agent}} (prompt: @skills/brainstorming/SKILL.md § Plan Document Reviewer)
 Issues → fix, re-dispatch (max 3)
 
-### 8. {{artifact-review}} Review (REQUIRED gate)
+LOAD @skills/plannotator-usage/SKILL.md
+
+### 8. plannotator-annotate Review (REQUIRED gate)
 
 **REQUIRED — do NOT proceed past this step until annotations are resolved.**
 This is a hard dependency per `the artifact review skill` (no terminal fallback).
 
-invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/milestones/<milestone>/slices/<id>/PLAN.md`
+invoke Skill `plannotator-annotate` with arg `{{project-dir}}/milestones/<milestone>/slices/<id>/PLAN.md`
 
 - feedback → revise the artifact, re-invoke
 - approved (no annotations ∨ all resolved) → continue
-- skipping this step is ¬ allowed; if {{artifact-review}} is unavailable, surface to user ∧ pause
+- skipping this step is ¬ allowed; if plannotator-annotate is unavailable, surface to user ∧ pause
 
 ### 9. Worktree + Transition
 
@@ -112,6 +114,6 @@ After completing all steps above:
 1. READ `{{settings-path}}` → check `autonomy.mode`
 2. IF `plan-to-pr`:
    - Non-gate steps: IMMEDIATELY invoke the next workflow — do NOT ask user
-   - Human gates (plan approval, spec approval, completion, **{{artifact-review}} review**): pause ∧ ask
+   - Human gates (plan approval, spec approval, completion, **plannotator-annotate review**): pause ∧ ask
 3. IF `guided`: suggest next step with `{{command-prefix}}<command>`, wait for user
 4. Log: `[tff] <slice-id>: planning → executing`

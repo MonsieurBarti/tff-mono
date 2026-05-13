@@ -12,9 +12,11 @@ Draft new skill from pattern candidate ∨ user description.
    - draft → `{{project-dir}}/drafts/<skill-name>.md`
 3. VALIDATE: `tff-tools skills:validate --skill '<json>'`
    - fail → drafter fixes ∧ re-validates
-4. REVIEW: invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/drafts/<skill-name>.md`
+     LOAD @skills/plannotator-usage/SKILL.md
+
+4. REVIEW: invoke Skill `plannotator-annotate` with arg `{{project-dir}}/drafts/<skill-name>.md`
 5. HANDLE:
    - approved → move `{{project-dir}}/drafts/<name>.md` → `skills/<name>.md`
-   - feedback → revise ∧ re-invoke `{{artifact-review}}`
+   - feedback → revise ∧ re-invoke `plannotator-annotate`
    - rejected → delete draft
 6. NEXT: @references/next-steps.md

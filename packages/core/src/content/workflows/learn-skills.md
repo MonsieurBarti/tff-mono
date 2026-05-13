@@ -23,7 +23,10 @@ Pass maxDrift: `tff-tools skills:drift --max-drift 0.2`
    - draft → `{{project-dir}}/drafts/<skill-name>.md`
 4. CONSTRAINTS: max 20% per refinement, max 60% cumulative drift, 7-day cooldown
    - violated → warn user, suggest new skill instead
-5. REVIEW: invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/drafts/<skill-name>.md`
+
+LOAD @skills/plannotator-usage/SKILL.md
+
+5. REVIEW: invoke Skill `plannotator-annotate` with arg `{{project-dir}}/drafts/<skill-name>.md`
 6. HANDLE:
    - approved →
      - archive to `{{project-dir}}/observations/skill-history/<name>.v<N>.md`

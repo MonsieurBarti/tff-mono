@@ -57,16 +57,18 @@ LOAD @skills/acceptance-criteria-validation/SKILL.md → SPAWN subagent: {spec_c
 DISPATCH anonymous reviewer via {{spawn-agent}} (prompt: @skills/brainstorming/SKILL.md)
 Issues → fix, re-dispatch (max 3)
 
-### 7. {{artifact-review}} Review (REQUIRED gate)
+LOAD @skills/plannotator-usage/SKILL.md
+
+### 7. plannotator-annotate Review (REQUIRED gate)
 
 **REQUIRED — do NOT proceed past this step until annotations are resolved.**
 This is a hard dependency per `the artifact review skill` (no terminal fallback).
 
-invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md`
+invoke Skill `plannotator-annotate` with arg `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md`
 
 - feedback → revise the artifact, re-invoke
 - approved (no annotations ∨ all resolved) → continue
-- skipping this step is ¬ allowed; if {{artifact-review}} is unavailable, surface to user ∧ pause
+- skipping this step is ¬ allowed; if plannotator-annotate is unavailable, surface to user ∧ pause
 
 ### 8. User Gate
 
