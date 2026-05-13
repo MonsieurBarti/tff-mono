@@ -18,6 +18,7 @@ jobs:
         with:
           ref: release
           path: release-tree
+          persist-credentials: false
 
       - name: Read source sha from manifest
         id: manifest
@@ -37,6 +38,7 @@ jobs:
         with:
           ref: ${{ steps.manifest.outputs.source_sha }}
           path: main-tree
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
 
