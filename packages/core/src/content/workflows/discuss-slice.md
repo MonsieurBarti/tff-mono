@@ -39,6 +39,8 @@ LOAD @skills/brainstorming/SKILL.md
 
 ### 3. Write Spec
 
+<!-- Skill references: @skills/to-prd/SKILL.md synthesizes conversation into PRD; @skills/grill-with-docs/SKILL.md stress-tests spec against domain vocabulary -->
+
 WRITE `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md` w/ validated design
 
 ### 4. Challenge Spec (SSS only — determined ∈ step 9)

@@ -17,6 +17,8 @@ READ `{{project-dir}}/milestones/<milestone>/slices/<id>/SPEC.md`
 READ `{{project-dir}}/milestones/<milestone>/slices/<id>/RESEARCH.md` (if ∃)
 LOAD @skills/writing-plans/SKILL.md
 
+<!-- Skill reference: @skills/grill-with-docs/SKILL.md stress-tests plan against domain vocabulary before approval -->
+
 ### 2. File Structure
 
 Map files to create/modify BEFORE tasks.
