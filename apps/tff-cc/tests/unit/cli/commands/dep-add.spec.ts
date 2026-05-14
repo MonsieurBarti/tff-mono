@@ -47,9 +47,9 @@ describe("dep:add", () => {
 	});
 
 	it("adds a task dependency", async () => {
-		const { taskId } = seedAdapter();
-		const tasks = getAdapter()!.listTasks(seedAdapter().sliceId);
+		const tasks = getAdapter()!.listTasks("M01-S01");
 		if (!tasks.ok || tasks.data.length < 2) throw new Error("need 2 tasks");
+		const taskId = tasks.data[0].id;
 		const t2 = tasks.data[1].id;
 		const result = JSON.parse(await depAddCmd(["--from-id", t2, "--to-id", taskId]));
 		expect(result.ok).toBe(true);

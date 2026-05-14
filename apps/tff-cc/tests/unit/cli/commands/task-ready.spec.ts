@@ -42,15 +42,13 @@ describe("task:ready", () => {
 	});
 
 	it("lists ready tasks for a valid slice-id", async () => {
-		const { sliceId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
-		const result = JSON.parse(await taskReadyCmd(["--slice-id", sliceId]));
+		const result = JSON.parse(await taskReadyCmd(["--slice-id", "M01-S01"]));
 		expect(result.ok).toBe(true);
 		expect(Array.isArray(result.data)).toBe(true);
 	});
 
 	it("returns empty array when no ready tasks", async () => {
-		const { adapter } = seedAdapter();
+		const adapter = getAdapter()!;
 		adapter.createMilestone({ number: 2, name: "Milestone Two" });
 		const msR = adapter.listMilestones();
 		if (!msR.ok) throw new Error("failed");
@@ -58,7 +56,6 @@ describe("task:ready", () => {
 		if (!m2) throw new Error("no m2");
 		adapter.createSlice({ milestoneId: m2.id, number: 1, title: "Empty Slice" });
 		const emptySliceId = "M02-S01";
-		setAdapter(adapter);
 		const result = JSON.parse(await taskReadyCmd(["--slice-id", emptySliceId]));
 		expect(result.ok).toBe(true);
 		expect(result.data).toEqual([]);

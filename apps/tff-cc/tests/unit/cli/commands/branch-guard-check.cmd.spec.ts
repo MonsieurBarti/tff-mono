@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockClosableStateStores } from "../helpers/mock-stores.js";
+import {
+	closeAllSlicesForMilestone,
+	createMockClosableStateStores,
+} from "../helpers/mock-stores.js";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
 import { Ok } from "@tff/core";
 import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
@@ -63,12 +66,7 @@ function seedAdapter(): { adapter: SQLiteStateAdapter; milestoneId: string } {
 
 function seedAdapterAllClosed(): { adapter: SQLiteStateAdapter; milestoneId: string } {
 	const result = seedAdapter();
-	type RawDb = { prepare(sql: string): { run(...args: unknown[]): void } };
-	(result.adapter as unknown as { db: RawDb }).db
-		.prepare(
-			"UPDATE slice SET status = 'closed', updated_at = datetime('now') WHERE milestone_id = ?",
-		)
-		.run(result.milestoneId);
+	closeAllSlicesForMilestone(result.adapter, result.milestoneId);
 	return result;
 }
 

@@ -43,19 +43,15 @@ describe("review:check-fresh", () => {
 	});
 
 	it("passes for fresh reviewer", async () => {
-		const { sliceId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
 		const result = JSON.parse(
-			await reviewCheckFreshCmd(["--slice-id", sliceId, "--agent", "fresh-reviewer"]),
+			await reviewCheckFreshCmd(["--slice-id", "M01-S01", "--agent", "fresh-reviewer"]),
 		);
 		expect(result.ok).toBe(true);
 	});
 
 	it("fails for stale reviewer (same as executor)", async () => {
-		const { sliceId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
 		const result = JSON.parse(
-			await reviewCheckFreshCmd(["--slice-id", sliceId, "--agent", "executor-agent"]),
+			await reviewCheckFreshCmd(["--slice-id", "M01-S01", "--agent", "executor-agent"]),
 		);
 		expect(result.ok).toBe(false);
 		expect(result.error.code).toBe("FRESH_REVIEWER_VIOLATION");

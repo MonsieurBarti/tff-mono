@@ -41,18 +41,14 @@ describe("task:claim", () => {
 	});
 
 	it("claims a task successfully", async () => {
-		const { taskId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
-		const result = JSON.parse(await taskClaimCmd(["--task-id", taskId]));
+		const result = JSON.parse(await taskClaimCmd(["--task-id", "M01-S01-T01"]));
 		expect(result.ok).toBe(true);
 		expect(result.data).toBeNull();
 	});
 
 	it("claims a task with claimed-by", async () => {
-		const { taskId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
 		const result = JSON.parse(
-			await taskClaimCmd(["--task-id", taskId, "--claimed-by", "executor"]),
+			await taskClaimCmd(["--task-id", "M01-S01-T01", "--claimed-by", "executor"]),
 		);
 		expect(result.ok).toBe(true);
 		expect(result.data).toBeNull();

@@ -54,21 +54,18 @@ describe("checkpoint:load", () => {
 	});
 
 	it("loads checkpoint for valid slice-id", async () => {
-		const { sliceId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
-		const result = JSON.parse(await checkpointLoadCmd(["--slice-id", sliceId]));
+		const result = JSON.parse(await checkpointLoadCmd(["--slice-id", "M01-S01"]));
 		expect(result.ok).toBe(true);
 		expect(result.data.baseCommit).toBe("abc123");
 	});
 
 	it("fails when checkpoint is missing", async () => {
-		const { adapter } = seedAdapter();
+		const adapter = getAdapter()!;
 		adapter.createSlice({
 			milestoneId: adapter.listMilestones().data![0].id,
 			number: 2,
 			title: "Slice Two",
 		});
-		setAdapter(adapter);
 		const result = JSON.parse(await checkpointLoadCmd(["--slice-id", "M01-S02"]));
 		expect(result.ok).toBe(false);
 		expect(result.error.code).toBe("NOT_FOUND");

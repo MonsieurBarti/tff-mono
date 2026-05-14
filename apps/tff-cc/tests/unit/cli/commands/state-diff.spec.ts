@@ -96,6 +96,7 @@ describe("state:diff", () => {
 	});
 
 	it("reports in-sync when no milestones and no disk state", async () => {
+		getAdapter()?.close();
 		const adapter = SQLiteStateAdapter.createInMemory();
 		adapter.init();
 		setAdapter(adapter);
@@ -105,6 +106,7 @@ describe("state:diff", () => {
 	});
 
 	it("reports out-of-sync when no milestones but disk state exists", async () => {
+		getAdapter()?.close();
 		const adapter = SQLiteStateAdapter.createInMemory();
 		adapter.init();
 		setAdapter(adapter);

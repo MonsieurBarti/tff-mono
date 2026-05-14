@@ -41,17 +41,15 @@ describe("task:close", () => {
 	});
 
 	it("closes a task successfully", async () => {
-		const { taskId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
-		const result = JSON.parse(await taskCloseCmd(["--task-id", taskId]));
+		const result = JSON.parse(await taskCloseCmd(["--task-id", "M01-S01-T01"]));
 		expect(result.ok).toBe(true);
 		expect(result.data).toBeNull();
 	});
 
 	it("closes a task with reason", async () => {
-		const { taskId } = seedAdapter();
-		setAdapter(seedAdapter().adapter);
-		const result = JSON.parse(await taskCloseCmd(["--task-id", taskId, "--reason", "Completed"]));
+		const result = JSON.parse(
+			await taskCloseCmd(["--task-id", "M01-S01-T01", "--reason", "Completed"]),
+		);
 		expect(result.ok).toBe(true);
 		expect(result.data).toBeNull();
 	});

@@ -89,3 +89,17 @@ export function setSliceStatus(
 		.prepare("UPDATE slice SET status = ?, updated_at = datetime('now') WHERE id = ?")
 		.run(status, sliceId);
 }
+
+/**
+ * Close all slices for a given milestone by setting their status to 'closed'.
+ * This bypasses domain transition guards and is intended ONLY for test setup.
+ */
+export function closeAllSlicesForMilestone(adapter: SQLiteStateAdapter, milestoneId: string): void {
+	type RawDb = { prepare(sql: string): { run(...args: unknown[]): void } };
+	const raw = adapter as unknown as { db: RawDb };
+	raw.db
+		.prepare(
+			"UPDATE slice SET status = 'closed', updated_at = datetime('now') WHERE milestone_id = ?",
+		)
+		.run(milestoneId);
+}
