@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { handleStartupRecovery } from "../application/recovery/handle-startup-recovery.js";
 import { GenericDomainError } from "../infrastructure/errors/generic-domain-error.js";
 import { NativeBindingError } from "../infrastructure/adapters/sqlite/native-binding-error.js";
+import { tffLog } from "../infrastructure/adapters/logging/warn.js";
 import {
 	getProjectHome,
 	getProjectId,
@@ -470,7 +471,7 @@ export const main = async () => {
 	await handleStartupRecovery({ homeDir: resolveStartupHomeDir() });
 
 	if (!command || command === "--help" || command === "-h") {
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: true,
 				data: {
@@ -484,7 +485,7 @@ export const main = async () => {
 	}
 
 	if (command === "--version" || command === "-v") {
-		console.log(await versionCmd(args));
+		tffLog(await versionCmd(args));
 		return;
 	}
 
@@ -494,7 +495,7 @@ export const main = async () => {
 		if (schema) {
 			// Check for --json flag - output schema format instead of help format
 			if (args.includes("--json")) {
-				console.log(
+				tffLog(
 					JSON.stringify({
 						ok: true,
 						data: {
@@ -505,10 +506,10 @@ export const main = async () => {
 				);
 				return;
 			}
-			console.log(generateHelp(schema));
+			tffLog(generateHelp(schema));
 			return;
 		}
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: false,
 				error: new GenericDomainError(
@@ -523,7 +524,7 @@ export const main = async () => {
 
 	const entry = COMMAND_REGISTRY[command];
 	if (!entry) {
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: false,
 				error: new GenericDomainError(
@@ -537,7 +538,7 @@ export const main = async () => {
 	}
 
 	const output = await entry.dispatcher(args);
-	console.log(output);
+	tffLog(output);
 };
 
 // Compare via realpath to handle platforms where argv[1] and the canonical
@@ -553,7 +554,7 @@ const isEntryPoint = (): boolean => {
 
 if (isEntryPoint()) {
 	main().catch((err) => {
-		console.log(handleEntryPointError(err));
+		tffLog(handleEntryPointError(err));
 		process.exit(1);
 	});
 }
