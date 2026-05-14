@@ -4,7 +4,10 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 
 ## Steps
 
-1. CHECK {{artifact-review}} installed
+1. CHECK plannotator installed: `tff-tools plannotator:check`
+   - Parse result:
+     - `data.available === true` → row: `| Plannotator | OK |`
+     - `data.available === false` → row: `| Plannotator | MISSING |` and surface `data.hint` under the table
 2. CHECK state consistency: `tff-tools slice:list` ∧ `tff-tools milestone:list`
    - verify markdown ↔ SQLite mismatches, orphans, worktree integrity
 3. CHECK STATE.md sync: `tff-tools state:diff`
@@ -51,7 +54,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
    ```
    | Check | Status |
    |---|---|
-   | {{artifact-review}} | OK/MISSING |
+   | Plannotator | OK/MISSING |
    | State consistency | OK/X mismatches |
    | STATE.md sync | OK/DRIFT |
    | Slice-PR sync | OK/X stale slices |

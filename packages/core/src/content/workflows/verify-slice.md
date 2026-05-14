@@ -11,14 +11,16 @@ LOAD @skills/verification-before-completion/SKILL.md
 
 1. LOAD @skills/acceptance-criteria-validation/SKILL.md → SPAWN subagent: {acceptance_criteria from PLAN.md}
    - Verify each criterion against implementation
-2. {{artifact-review}} Review (REQUIRED gate)
+     LOAD @skills/plannotator-usage/SKILL.md
+
+2. plannotator-annotate Review (REQUIRED gate)
    **REQUIRED — do NOT proceed past this step until annotations are resolved.**
    This is a hard dependency per `the artifact review skill` (no terminal fallback).
 
-   FINDINGS → invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/milestones/<milestone>/slices/<slice-id>/VERIFICATION.md`
+   FINDINGS → invoke Skill `plannotator-annotate` with arg `{{project-dir}}/milestones/<milestone>/slices/<slice-id>/VERIFICATION.md`
    - feedback → revise the artifact, re-invoke
    - approved (no annotations ∨ all resolved) → continue
-   - skipping this step is ¬ allowed; if {{artifact-review}} is unavailable, surface to user ∧ pause
+   - skipping this step is ¬ allowed; if plannotator-annotate is unavailable, surface to user ∧ pause
 
 3. VERDICT:
    - PASS → `tff-tools slice:transition --slice-id <id> --status reviewing`

@@ -28,7 +28,8 @@ describe("checkLastObservation", () => {
 		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
 			path.join(tmp, ".tff/observations/sessions.jsonl"),
-			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}\n`,
+			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}
+`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
 		expect(r).toMatchObject({
@@ -43,7 +44,8 @@ describe("checkLastObservation", () => {
 		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
 			path.join(tmp, ".tff/observations/sessions.jsonl"),
-			`${JSON.stringify({ ts: "2026-03-01T00:00:00Z", tool: "Read" })}\n`,
+			`${JSON.stringify({ ts: "2026-03-01T00:00:00Z", tool: "Read" })}
+`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
 		expect(r).toMatchObject({ ok: true, present: true, stale: true });
@@ -63,7 +65,8 @@ describe("checkLastObservation", () => {
 		fs.mkdirSync(path.join(tmp, ".tff/observations"), { recursive: true });
 		fs.writeFileSync(
 			path.join(tmp, ".tff/observations/sessions.jsonl"),
-			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}\n{"ts":"broken`,
+			`${JSON.stringify({ ts: "2026-04-14T00:00:00Z", tool: "Read" })}
+{"ts":"broken`,
 		);
 		const r = checkLastObservation(tmp, new Date("2026-04-21T00:00:00Z"), 14);
 		expect(r).toMatchObject({

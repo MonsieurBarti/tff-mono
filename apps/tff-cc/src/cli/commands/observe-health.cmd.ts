@@ -2,6 +2,7 @@ import {
 	auditDeadLetter,
 	checkFirstObservationSentinel,
 	checkLastObservation,
+	checkPlannotator,
 } from "../../application/observations/health-checks.js";
 import { type CommandSchema, parseFlags } from "../utils/flag-parser.js";
 
@@ -9,7 +10,7 @@ const STALE_AFTER_DAYS = 14;
 
 export const observeHealthSchema: CommandSchema = {
 	name: "observe:health",
-	purpose: "Check observation liveness (last-obs, first-obs sentinel, dead-letter)",
+	purpose: "Check observation liveness (last-obs, first-obs sentinel, dead-letter, plannotator)",
 	mutates: false,
 	requiredFlags: [],
 	optionalFlags: [],
@@ -27,6 +28,7 @@ export const observeHealthCmd = async (args: string[]): Promise<string> => {
 		lastObservation: checkLastObservation(root, now, STALE_AFTER_DAYS),
 		firstObservationSentinel: checkFirstObservationSentinel(root),
 		deadLetter: auditDeadLetter(root),
+		plannotator: checkPlannotator(root),
 	};
 
 	return JSON.stringify({ ok: true, data });
