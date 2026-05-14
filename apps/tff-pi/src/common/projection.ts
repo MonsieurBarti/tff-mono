@@ -15,9 +15,8 @@ import {
 	updateSliceTier,
 } from "./db.js";
 import { overrideSliceStatus, reconcileSliceStatus } from "./derived-state.js";
-import { canTransitionSlice } from "./state-machine.js";
-import { SLICE_STATUSES } from "./types.js";
-import type { Phase, SliceStatus, Tier } from "./types.js";
+import { canTransitionSlice } from "./transition-helpers.js";
+import { SLICE_STATUSES, type Phase, type SliceStatus, type Tier } from "./dto.js";
 
 // oxlint-disable-next-line no-explicit-any -- dispatch table needs a base type; each handler has a concrete params type
 type ProjectionHandler = (db: Database.Database, root: string, params: any) => void;

@@ -10,7 +10,7 @@ import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
 import { computeNextHint } from "../common/phase-completion.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

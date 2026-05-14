@@ -8,7 +8,7 @@ import { getDefaultBranch } from "../common/git.js";
 import { readProjectIdFile } from "../common/project-home.js";
 import type { Settings } from "../common/settings.js";
 import { finalizeStateBranchForMilestone } from "../common/state-ship.js";
-import { milestoneLabel } from "../common/types.js";
+import { milestoneLabel } from "@tff/core";
 
 export interface CompleteMilestoneMergedResult {
 	success: boolean;

@@ -1,12 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { HUMAN_GATES, SLICE_TRANSITIONS } from "@tff/core";
 import {
-	HUMAN_GATES,
-	SLICE_TRANSITIONS,
 	canTransitionMilestone,
 	canTransitionSlice,
 	isHumanGate,
 	nextSliceStatus,
-} from "../../../src/common/state-machine.js";
+} from "../../../src/common/transition-helpers.js";
 
 describe("state-machine", () => {
 	describe("SLICE_TRANSITIONS", () => {

@@ -12,7 +12,7 @@ import { makeBaseEvent } from "../common/events.js";
 import { computeNextHint } from "../common/phase-completion.js";
 import { requestReview } from "../common/plannotator-review.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import { computeWaves } from "../common/waves.js";
 
 export interface ToolResult {

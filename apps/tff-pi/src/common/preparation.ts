@@ -3,8 +3,8 @@ import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { readArtifact } from "./artifacts.js";
 import { getSlices } from "./db.js";
-import type { Slice } from "./types.js";
-import { milestoneLabel, sliceLabel } from "./types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Slice } from "./dto.js";
 
 export interface PreparationBrief {
 	codebaseBrief: string;

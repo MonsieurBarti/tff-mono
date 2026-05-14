@@ -10,7 +10,7 @@ import { getMilestone, getSlice } from "../common/db.js";
 import { buildDiscussCompletionSuffix } from "../common/phase-completion.js";
 import { requestReview } from "../common/plannotator-review.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

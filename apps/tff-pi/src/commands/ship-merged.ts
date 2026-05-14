@@ -8,7 +8,7 @@ import { makeBaseEvent } from "../common/events.js";
 import { getPrTools } from "../common/gh-client.js";
 import { parsePrUrl } from "../common/gh-helpers.js";
 import { gitEnv } from "../common/git.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 import { findActiveSlice } from "../orchestrator.js";
 import { finalizeMergedSlice, suggestNextAction } from "../phases/ship.js";
 

@@ -26,7 +26,7 @@ import {
 } from "../../src/common/db.js";
 import type { PhaseContext } from "../../src/common/phase.js";
 import { DEFAULT_SETTINGS } from "../../src/common/settings.js";
-import { milestoneLabel, sliceLabel } from "../../src/common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import { handleCreateSlice } from "../../src/tools/create-slice.js";
 import { must } from "../helpers.js";
 

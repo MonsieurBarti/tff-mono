@@ -1,21 +1,20 @@
 import { describe, expect, it } from "vitest";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import {
-	type Dependency,
 	MILESTONE_STATUSES,
-	type Milestone,
 	PHASE_RUN_STATUSES,
-	type PhaseRunStatus,
-	type Project,
 	SLICE_STATUSES,
-	type Slice,
 	TASK_STATUSES,
 	TIERS,
-	type Task,
-	milestoneLabel,
 	sanitizeForPrompt,
-	sliceLabel,
 	taskLabel,
-} from "../../../src/common/types.js";
+	type Dependency,
+	type Milestone,
+	type PhaseRunStatus,
+	type Project,
+	type Slice,
+	type Task,
+} from "../../../src/common/dto.js";
 
 describe("types", () => {
 	describe("SliceStatus", () => {

@@ -23,7 +23,8 @@ function makeCmdCtx(
 function makePhaseCtx(root: string, sendMessage = vi.fn()): PhaseContext {
 	return {
 		root,
-		slice: { id: "s1" },
+		slice: { id: "s1", number: 1 },
+		milestoneNumber: 1,
 		pi: { sendMessage },
 	} as unknown as PhaseContext;
 }

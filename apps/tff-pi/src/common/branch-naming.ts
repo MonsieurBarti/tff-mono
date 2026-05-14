@@ -5,7 +5,8 @@
 
 import type Database from "better-sqlite3";
 import { logWarning } from "./logger.js";
-import { type Milestone, type Slice, milestoneLabel, sliceLabel } from "./types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Milestone, Slice } from "./dto.js";
 
 const SLUG_LEN = 8;
 const SLUG_RE = /^[0-9a-f]{8}$/;

@@ -6,7 +6,7 @@ import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { prepareDispatch } from "../common/subagent-dispatcher.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import { getWorktreePath } from "../common/worktree.js";
 import { loadAgentResource, predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 

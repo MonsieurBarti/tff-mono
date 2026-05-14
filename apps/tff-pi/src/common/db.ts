@@ -2,21 +2,19 @@ import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import { reconcileSliceStatus } from "./derived-state.js";
 import { logException } from "./logger.js";
+import type { MilestoneStatus, SliceStatus, TaskStatus } from "@tff/core";
 import {
 	type Dependency,
 	MILESTONE_STATUSES,
 	type Milestone,
-	type MilestoneStatus,
 	type Project,
 	SLICE_STATUSES,
 	type Slice,
-	type SliceStatus,
 	TASK_STATUSES,
 	TIERS,
 	type Task,
-	type TaskStatus,
 	type Tier,
-} from "./types.js";
+} from "./dto.js";
 
 // ---------------------------------------------------------------------------
 // Connection

@@ -11,7 +11,8 @@ import { readProjectIdFile } from "./project-home.js";
 import { acquireLock, releaseLock } from "./session-lock.js";
 import type { Settings } from "./settings.js";
 import { commitStateAtPhaseEnd } from "./state-branch.js";
-import { type Phase, type Slice, sliceLabel } from "./types.js";
+import { sliceLabel } from "@tff/core";
+import type { Phase, Slice } from "./dto.js";
 
 /**
  * Phase messages are stashed on disk because module-level state is not

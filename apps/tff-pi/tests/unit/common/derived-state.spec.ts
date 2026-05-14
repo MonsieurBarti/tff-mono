@@ -18,7 +18,7 @@ import {
 	overrideSliceStatus,
 	reconcileSliceStatus,
 } from "../../../src/common/derived-state.js";
-import type { SliceStatus } from "../../../src/common/types.js";
+import type { SliceStatus } from "@tff/core";
 
 let db: Database.Database;
 let root: string;

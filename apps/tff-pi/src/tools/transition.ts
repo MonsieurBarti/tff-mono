@@ -8,8 +8,9 @@ import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { expectedInProgressStatusFor } from "../common/derived-state.js";
 import { makeBaseEvent } from "../common/events.js";
-import { SLICE_TRANSITIONS, canTransitionSlice, nextSliceStatus } from "../common/state-machine.js";
-import { type Phase, SLICE_STATUSES, type SliceStatus, sliceLabel } from "../common/types.js";
+import { SLICE_TRANSITIONS, sliceLabel } from "@tff/core";
+import { canTransitionSlice, nextSliceStatus } from "../common/transition-helpers.js";
+import { SLICE_STATUSES, type Phase, type SliceStatus } from "../common/dto.js";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

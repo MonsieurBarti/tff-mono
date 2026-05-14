@@ -4,7 +4,8 @@ import { determineNextPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 import { getLatestPhaseRun, getMilestone, getNextOpenSliceInMilestone, getSlice } from "./db.js";
 import { makeBaseEvent } from "./events.js";
 import { logWarning } from "./logger.js";
-import { type Phase, type Slice, sliceLabel } from "./types.js";
+import { sliceLabel } from "@tff/core";
+import type { Phase, Slice } from "./dto.js";
 
 /**
  * After a writer tool (tff_write_plan, tff_write_spec, ...) succeeds,

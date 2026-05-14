@@ -8,8 +8,8 @@ import {
 	type WaveEvent,
 } from "./events.js";
 import { formatDuration } from "./format.js";
-import type { Phase } from "./types.js";
-import { ALL_PHASES } from "./types.js";
+import type { Phase } from "./dto.js";
+import { ALL_PHASES } from "./dto.js";
 
 // ---------------------------------------------------------------------------
 // Interfaces (no PI imports)

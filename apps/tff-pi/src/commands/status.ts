@@ -3,11 +3,11 @@ import type Database from "better-sqlite3";
 import { type TffContext, getDb } from "../common/context.js";
 import { getMilestones, getPhaseRuns, getProject, getSlices } from "../common/db.js";
 import { formatDuration } from "../common/format.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 const NO_PROJECT_MSG = "No project found. Run `/tff new` to create one.";
 
-import type { SliceStatus } from "../common/types.js";
+import type { SliceStatus } from "@tff/core";
 
 const NEXT_ACTION_COMMAND: Partial<Record<SliceStatus, string>> = {
 	created: "discuss",

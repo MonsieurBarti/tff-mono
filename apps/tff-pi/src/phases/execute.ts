@@ -9,13 +9,8 @@ import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { type DispatchConfig, prepareDispatch } from "../common/subagent-dispatcher.js";
-import {
-	type Task,
-	milestoneLabel,
-	sanitizeForPrompt,
-	sliceLabel,
-	taskLabel,
-} from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import { sanitizeForPrompt, taskLabel, type Task } from "../common/dto.js";
 import { getWorktreePath } from "../common/worktree.js";
 import { enrichContextWithFff, predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 import { writeExecuteRelatedFiles } from "./finalizers.js";
@@ -114,7 +109,10 @@ function buildExecutorDispatchConfig(task: Task, ctxBundle: ExecutorCtxBundle): 
 		{ label: "Worktree gate", content: buildWorktreeGate(ctxBundle.wtPath) },
 	];
 	if (ctxBundle.reviewFeedback.length > 0) {
-		artifacts.push({ label: "Previous review feedback", content: ctxBundle.reviewFeedback });
+		artifacts.push({
+			label: "Previous review feedback",
+			content: ctxBundle.reviewFeedback,
+		});
 	}
 	const related = ctxBundle.extrasContextByTaskId.get(task.id);
 	if (related && related.length > 0) {
@@ -148,11 +146,19 @@ export const executePhase: PhaseModule = {
 
 		const milestoneRow = getMilestone(db, slice.milestoneId);
 		if (!milestoneRow) {
-			return { success: false, retry: false, error: `Milestone not found: ${slice.milestoneId}` };
+			return {
+				success: false,
+				retry: false,
+				error: `Milestone not found: ${slice.milestoneId}`,
+			};
 		}
 		const milestoneBranch = milestoneBranchName(milestoneRow);
 		const wtPath = getWorktreePath(root, sLabel);
-		writePendingWorktreeMarker(root, { sliceLabel: sLabel, sliceId: slice.id, milestoneBranch });
+		writePendingWorktreeMarker(root, {
+			sliceLabel: sLabel,
+			sliceId: slice.id,
+			milestoneBranch,
+		});
 
 		const specMd = readArtifact(root, `milestones/${mLabel}/slices/${sLabel}/SPEC.md`) ?? "";
 		const planMd = readArtifact(root, `milestones/${mLabel}/slices/${sLabel}/PLAN.md`) ?? "";

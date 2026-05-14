@@ -10,8 +10,9 @@ import {
 	getSlice,
 	getTasksByWave,
 } from "./common/db.js";
-import type { Phase, Slice, SliceStatus, Task, Tier } from "./common/types.js";
-import { milestoneLabel, sliceLabel } from "./common/types.js";
+import type { SliceStatus } from "@tff/core";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Phase, Slice, Task, Tier } from "./common/dto.js";
 
 export type { Phase };
 

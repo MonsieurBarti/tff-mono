@@ -4,7 +4,7 @@ import { writeArtifact } from "../common/artifacts.js";
 import { type TffContext, requireProject } from "../common/context.js";
 import { resolveMilestone } from "../common/db-resolvers.js";
 import { getMilestone } from "../common/db.js";
-import { milestoneLabel } from "../common/types.js";
+import { milestoneLabel } from "@tff/core";
 
 export interface CompleteMilestoneChangesResult {
 	success: boolean;

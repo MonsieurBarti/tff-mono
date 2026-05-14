@@ -14,7 +14,7 @@ import {
 	updateSliceTier,
 } from "../../../src/common/db.js";
 import { closePredecessorIfReady } from "../../../src/common/phase-completion.js";
-import type { Phase, Slice } from "../../../src/common/types.js";
+import type { Phase, Slice } from "../../../src/common/dto.js";
 import { must } from "../../helpers.js";
 
 function makePi() {

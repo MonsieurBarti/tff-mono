@@ -6,7 +6,7 @@ import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
 import { fetchReviewFeedback } from "../common/review-feedback.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import { findActiveSlice } from "../orchestrator.js";
 
 export interface ShipChangesResult {

@@ -18,7 +18,7 @@ import {
 } from "../../../src/common/db.js";
 import type { PhaseContext } from "../../../src/common/phase.js";
 import { DEFAULT_SETTINGS } from "../../../src/common/settings.js";
-import type { SliceStatus } from "../../../src/common/types.js";
+import type { SliceStatus } from "@tff/core";
 import { must } from "../../helpers.js";
 
 import { discussPhase } from "../../../src/phases/discuss.js";

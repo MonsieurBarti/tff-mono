@@ -1,8 +1,9 @@
 import { readArtifact } from "./artifacts.js";
 import { compressIfEnabled } from "./compress.js";
 import type { Settings } from "./settings.js";
-import type { Milestone, Project, Slice } from "./types.js";
-import { milestoneLabel, sanitizeForPrompt, sliceLabel } from "./types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Milestone, Project, Slice } from "./dto.js";
+import { sanitizeForPrompt } from "./dto.js";
 import { getWorktreePath, worktreeExists } from "./worktree.js";
 
 interface ContextInput {

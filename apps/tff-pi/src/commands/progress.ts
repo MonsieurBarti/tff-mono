@@ -3,7 +3,7 @@ import type Database from "better-sqlite3";
 import { type TffContext, getDb } from "../common/context.js";
 import { getMilestones, getPhaseRuns, getProject, getSlices, getTasks } from "../common/db.js";
 import { formatDuration } from "../common/format.js";
-import { PIPELINE_PHASE_ORDER, milestoneLabel, sliceLabel } from "../common/types.js";
+import { PIPELINE_PHASE_ORDER, milestoneLabel, sliceLabel } from "@tff/core";
 
 const NO_PROJECT_MSG = "No project found. Run `/tff new` to create one.";
 

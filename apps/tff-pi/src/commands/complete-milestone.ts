@@ -11,7 +11,7 @@ import { getPrTools } from "../common/gh-client.js";
 import { parsePrUrl } from "../common/gh-helpers.js";
 import { getDefaultBranch, gitEnv } from "../common/git.js";
 import type { Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface CompleteMilestoneResult {
 	success: boolean;

@@ -13,7 +13,7 @@ import {
 	getSlices,
 	getTasks,
 } from "../common/db.js";
-import type { Dependency, Milestone, Project, Slice, Task } from "../common/types.js";
+import type { Dependency, Milestone, Project, Slice, Task } from "../common/dto.js";
 
 // ---------------------------------------------------------------------------
 // Result types
