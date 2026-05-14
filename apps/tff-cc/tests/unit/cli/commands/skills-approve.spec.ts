@@ -42,19 +42,19 @@ vi.mock("node:fs", () => {
 			if (p.includes("test-skill")) return true;
 			return false;
 		}),
-		readFileSync: vi.fn((_p: string, ..._args: any[]) => {
+		readFileSync: vi.fn((p: string, ..._args: any[]) => {
 			for (const [key, value] of Object.entries(getFsState())) {
 				if (p === key || p.endsWith(key)) return value;
 			}
 			return "";
 		}),
-		writeFileSync: vi.fn((_p: string, content: string, ..._args: any[]) => {
+		writeFileSync: vi.fn((p: string, content: string, ..._args: any[]) => {
 			getFsState()[p] = content;
 		}),
 		mkdirSync: vi.fn((_p: string, _opts?: any) => {
 			// no-op for tests
 		}),
-		appendFileSync: vi.fn((_p: string, content: string, ..._args: any[]) => {
+		appendFileSync: vi.fn((p: string, content: string, ..._args: any[]) => {
 			getFsState()[p] = (getFsState()[p] ?? "") + content;
 		}),
 	};

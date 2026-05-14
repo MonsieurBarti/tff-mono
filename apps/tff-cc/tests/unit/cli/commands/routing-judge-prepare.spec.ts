@@ -52,8 +52,8 @@ vi.mock("../../../../src/infrastructure/adapters/jsonl/jsonl-routing-decision-re
 
 vi.mock("../../../../src/infrastructure/adapters/jsonl/routing-outcome-jsonl-reader.js", () => ({
 	JsonlRoutingOutcomeReader: class {
-		async readOutcomes() {
-			return [];
+		async *readOutcomes() {
+			yield* [];
 		}
 	},
 }));
