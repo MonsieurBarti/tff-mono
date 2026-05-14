@@ -13,6 +13,7 @@ LOAD @skills/architecture-review/SKILL.md
 
 1. ROUTE: SSS → spawn researcher | SS → ask user | S → skip
 2. RESEARCH (if needed):
+   <!-- Skill references: @skills/prototype/SKILL.md for disposable experiments; @skills/zoom-out/SKILL.md for mapping unfamiliar code regions -->
    - Read relevant codebase areas
    - Check dependencies + integration points
    - Output → `{{project-dir}}/milestones/<milestone>/slices/<slice-id>/RESEARCH.md`

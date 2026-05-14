@@ -41,3 +41,28 @@ tags: [architecture, review]
 - ∀ finding: cite specific file + line
 - Severity: Critical (blocks) | Important (should fix) | Suggestion (optional)
 - ∀ deviation from patterns: justification required
+
+## Domain-Vocabulary Heuristics
+
+Apply these structural tests during every architecture review:
+
+### Deletion Test
+
+Ask: "If I remove this module, does complexity scatter across the system or consolidate elsewhere?"
+
+- **Scatter** → the module was hiding distributed complexity. Refactor to make dependencies explicit.
+- **Consolidate** → the module was a genuine abstraction. Keep it.
+
+### Thin Implementations
+
+Identify modules with large surface area and low behavioral leverage. These are candidates for deepening — merging, hiding behind a narrower interface, or replacing with a library.
+
+### Entangled Units
+
+Locate seams where two modules cannot change independently. One adapter = hypothetical seam. Two adapters = real seam. Entangled units without a seam violate the boundary rule.
+
+### Difficult-to-Test Areas
+
+Flag modules that require heavy mocking or complex setup. "The interface is the test surface." Difficult testing often signals a shallow module or a missing port.
+
+Document findings using domain terminology from `CONTEXT.md` or `DOMAIN.md`, not generic handler or service names.

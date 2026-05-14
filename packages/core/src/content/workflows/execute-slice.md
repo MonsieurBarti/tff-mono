@@ -56,6 +56,8 @@ status = executing ∧ worktree ∃ at `{{project-dir}}/worktrees/<slice-id>/`
   sync:state
 ```
 
+<!-- Skill reference: @skills/zoom-out/SKILL.md for unfamiliar code regions during execution -->
+
 ## Domain Routing
 
 Read task file paths from PLAN.md to decide which domain skills to load:
