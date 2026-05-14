@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createMockClosableStateStores } from "../helpers/mock-stores.js";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
-import type { JournalRepository } from "../../../../src/domain/ports/journal-repository.port.js";
 import { Ok } from "@tff/core";
-import type { ClosableStateStores } from "../../../../src/infrastructure/adapters/sqlite/create-state-stores.js";
 import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
 // vi.hoisted ensures the captured adapter reference is available when vi.mock is hoisted
@@ -16,32 +15,8 @@ const { getAdapter, setAdapter } = vi.hoisted(() => {
 	};
 });
 
-const nullJournal: JournalRepository = {
-	append: () => Ok(0),
-	readAll: () => Ok([]),
-	readSince: () => Ok([]),
-	count: () => Ok(0),
-};
-
 vi.mock("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js", () => ({
-	createClosableStateStoresUnchecked: vi.fn((): ClosableStateStores => {
-		const adapter = getAdapter()!;
-		return {
-			db: adapter,
-			projectStore: adapter,
-			milestoneStore: adapter,
-			sliceStore: adapter,
-			taskStore: adapter,
-			dependencyStore: adapter,
-			sliceDependencyStore: adapter,
-			sessionStore: adapter,
-			reviewStore: adapter,
-			milestoneAuditStore: adapter,
-			journalRepository: nullJournal,
-			close: vi.fn(),
-			checkpoint: vi.fn(),
-		};
-	}),
+	createClosableStateStoresUnchecked: vi.fn(() => createMockClosableStateStores(getAdapter()!)),
 }));
 
 function unreachable(): never {
@@ -104,6 +79,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	delete process.env.TFF_ALLOW_MILESTONE_COMMIT;
+	getAdapter()?.close();
 });
 
 describe("branchGuardCheckCmd", () => {

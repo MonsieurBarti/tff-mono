@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Ok } from "@tff/core";
-import type { ClosableStateStores } from "../../../../src/infrastructure/adapters/sqlite/create-state-stores.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createMockClosableStateStores } from "../helpers/mock-stores.js";
 import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 import { taskReadyCmd } from "../../../../src/cli/commands/task-ready.cmd.js";
 
@@ -14,33 +13,8 @@ const { getAdapter, setAdapter } = vi.hoisted(() => {
 	};
 });
 
-const nullJournal = {
-	append: () => Ok(0 as number),
-	readAll: () => Ok([] as never[]),
-	readSince: () => Ok([] as never[]),
-	count: () => Ok(0 as number),
-};
-
 vi.mock("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js", () => ({
-	createClosableStateStoresUnchecked: vi.fn((): ClosableStateStores => {
-		const adapter = getAdapter()!;
-		return {
-			db: adapter,
-			projectStore: adapter,
-			milestoneStore: adapter,
-			sliceStore: adapter,
-			taskStore: adapter,
-			dependencyStore: adapter,
-			sliceDependencyStore: adapter,
-			sessionStore: adapter,
-			reviewStore: adapter,
-			milestoneAuditStore: adapter,
-			pendingJudgmentStore: adapter,
-			journalRepository: nullJournal,
-			close: () => {},
-			checkpoint: () => {},
-		};
-	}),
+	createClosableStateStoresUnchecked: vi.fn(() => createMockClosableStateStores(getAdapter()!)),
 }));
 
 function seedAdapter(): { adapter: SQLiteStateAdapter; sliceId: string } {
@@ -61,6 +35,10 @@ describe("task:ready", () => {
 	beforeEach(() => {
 		const { adapter } = seedAdapter();
 		setAdapter(adapter);
+	});
+
+	afterEach(() => {
+		getAdapter()?.close();
 	});
 
 	it("lists ready tasks for a valid slice-id", async () => {

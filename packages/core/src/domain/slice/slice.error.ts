@@ -9,6 +9,7 @@ export class InvalidTransitionError extends BaseDomainError<{
 	expected: readonly SliceStatus[];
 }> {
 	readonly errorLabel = "INVALID_TRANSITION";
+	readonly code = this.errorLabel;
 	readonly status = 409;
 	readonly context: { from: SliceStatus; to: SliceStatus; expected: readonly SliceStatus[] };
 	readonly message: string;
@@ -28,6 +29,7 @@ export class InvalidTransitionError extends BaseDomainError<{
 
 export class TierClassificationError extends BaseDomainError<{ tier: string; reason: string }> {
 	readonly errorLabel = "TIER_CLASSIFICATION_INVALID";
+	readonly code = this.errorLabel;
 	readonly status = 400;
 	readonly context: { tier: string; reason: string };
 	readonly message: string;
@@ -41,6 +43,7 @@ export class TierClassificationError extends BaseDomainError<{ tier: string; rea
 
 export class SliceNotFoundError extends BaseDomainError<{ sliceId: string }> {
 	readonly errorLabel = "SLICE_NOT_FOUND";
+	readonly code = this.errorLabel;
 	readonly status = 404;
 	readonly context: { sliceId: string };
 	readonly message: string;
@@ -54,6 +57,7 @@ export class SliceNotFoundError extends BaseDomainError<{ sliceId: string }> {
 
 export class SliceAlreadyArchivedError extends BaseDomainError<{ sliceId: string }> {
 	readonly errorLabel = "SLICE_ALREADY_ARCHIVED";
+	readonly code = this.errorLabel;
 	readonly status = 409;
 	readonly context: { sliceId: string };
 	readonly message: string;
@@ -67,6 +71,7 @@ export class SliceAlreadyArchivedError extends BaseDomainError<{ sliceId: string
 
 export class PreconditionViolationError extends BaseDomainError<{ preconditions: string[] }> {
 	readonly errorLabel = "PRECONDITION_VIOLATION";
+	readonly code = this.errorLabel;
 	readonly status = 422;
 	readonly context: { preconditions: string[] };
 	readonly message: string;
@@ -80,6 +85,7 @@ export class PreconditionViolationError extends BaseDomainError<{ preconditions:
 
 export class HumanGateRequiredError extends BaseDomainError<{ status: string; message: string }> {
 	readonly errorLabel = "HUMAN_GATE_REQUIRED";
+	readonly code = this.errorLabel;
 	readonly status = 403;
 	readonly context: { status: string; message: string };
 	readonly message: string;
@@ -93,6 +99,7 @@ export class HumanGateRequiredError extends BaseDomainError<{ status: string; me
 
 export class ReviewNotFoundError extends BaseDomainError<{ reviewId: number; sliceId: string }> {
 	readonly errorLabel = "REVIEW_NOT_FOUND";
+	readonly code = this.errorLabel;
 	readonly status = 404;
 	readonly context: { reviewId: number; sliceId: string };
 	readonly message: string;

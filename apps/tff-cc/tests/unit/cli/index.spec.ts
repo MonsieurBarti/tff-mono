@@ -58,6 +58,10 @@ describe("CLI index.ts", () => {
 			mockLog.mockClear();
 		});
 
+		afterAll(() => {
+			mockLog.mockRestore();
+		});
+
 		it("--help outputs command list including version", async () => {
 			const originalArgv = process.argv;
 			process.argv = ["node", "cli.js", "--help"];
