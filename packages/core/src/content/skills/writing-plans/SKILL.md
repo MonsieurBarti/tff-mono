@@ -78,3 +78,40 @@ Each task = 1 action (2-5 minutes):
 - ∀ standard/complex task: TDD steps (write test -> fail -> implement -> pass -> commit)
 - Simple tasks: simpler (may combine steps, skip TDD)
 - ¬proceed to execute until plan approved
+
+## Tracer-Bullet Ticket Decomposition
+
+When breaking a spec into tasks, prefer vertical slices that traverse every architectural layer over horizontal tiers.
+
+### Vertical Slice Pattern
+
+Each slice is an independently demonstrable end-to-end segment:
+
+```
+Schema change → API endpoint → UI component → Integration test
+```
+
+Label each slice:
+
+- **HITL** (human-in-the-loop): requires user sign-off before execution
+- **AFK** (away-from-keyboard): safe for autonomous execution
+
+### Rules
+
+- Each segment must be independently demonstrable
+- A slice that cannot be shown working end-to-end is too large — split it
+- Label HITL slices at boundaries where user judgment is required (UI copy, business rules, public API contracts)
+- AFK slices may proceed without blocking on human review
+- Reference predecessor slices by real task identifiers so blockers are explicit
+
+### Template
+
+```
+## Wave N
+
+### T<NN>: <slice-name> [HITL | AFK]
+- **Scope**: <one-sentence description>
+- **Layers**: schema, API, UI, tests (list affected)
+- **Blocked by**: T<NN>, T<NN>
+- **Verify**: <exact check that proves the slice works>
+```
