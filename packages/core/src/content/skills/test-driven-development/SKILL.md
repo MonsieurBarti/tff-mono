@@ -77,3 +77,29 @@ Deleting hours of work to start test-first is correct. Time gone regardless. Sta
 ## Framework
 
 Vitest: `describe`/`it`/`expect`/`beforeEach`/`afterEach` | ¬`test()` | colocated `.spec.ts` | `globals: true`
+
+## Vertical Slices / Tracer Bullets
+
+Avoid horizontal slicing — drafting every test before writing implementation code yields tests that verify imagined shapes rather than real behavior.
+
+Use vertical slices via tracer bullets:
+
+1. Write **one** test that confirms **one** observable expectation
+2. Run the test and observe FAIL
+3. Write **minimal** implementation to pass that test only
+4. Run the test and observe PASS
+5. Repeat — each cycle responds to lessons from the last
+
+Rules:
+
+- One test at a time
+- Only enough code to pass the current test
+- Do not anticipate future cases
+- Never refactor while RED
+
+Per-cycle checklist:
+
+- Does the test describe behavior, not implementation?
+- Does it exercise only public interfaces?
+- Would it survive an internal refactor?
+- Is it free of speculative features?
