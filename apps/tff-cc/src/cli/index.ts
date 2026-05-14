@@ -341,7 +341,7 @@ export const COMMAND_REGISTRY: Record<string, CommandEntry> = (() => {
 /**
  * Generate help output for a command
  */
-function generateHelp(schema: CommandSchema): string {
+export function generateHelp(schema: CommandSchema): string {
 	return JSON.stringify({
 		ok: true,
 		data: {
@@ -379,7 +379,7 @@ function generateSyntax(schema: CommandSchema): string {
 /**
  * Convert a CommandSchema to JSON Schema format
  */
-function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
+export function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
 	const properties: Record<string, Record<string, unknown>> = {};
 	const required: string[] = [];
 
@@ -402,7 +402,7 @@ function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
 /**
  * Convert a FlagDefinition to JSON Schema format
  */
-function flagToJsonSchema(flag: {
+export function flagToJsonSchema(flag: {
 	name: string;
 	type: string;
 	description: string;
@@ -454,7 +454,17 @@ function resolveStartupHomeDir(): string {
 	}
 }
 
-const main = async () => {
+export function handleEntryPointError(err: unknown): string {
+	if (err instanceof NativeBindingError) {
+		return JSON.stringify({ ok: false, error: err.toJSON() });
+	}
+	return JSON.stringify({
+		ok: false,
+		error: { code: "INTERNAL_ERROR", message: String(err) },
+	});
+}
+
+export const main = async () => {
 	const [command, ...args] = process.argv.slice(2);
 
 	await handleStartupRecovery({ homeDir: resolveStartupHomeDir() });
@@ -465,7 +475,7 @@ const main = async () => {
 				ok: true,
 				data: {
 					name: "tff-tools",
-					version: __TFF_VERSION__,
+					version: typeof __TFF_VERSION__ !== "undefined" ? __TFF_VERSION__ : "0.0.0-dev",
 					commands: Object.keys(COMMAND_REGISTRY),
 				},
 			}),
@@ -543,16 +553,7 @@ const isEntryPoint = (): boolean => {
 
 if (isEntryPoint()) {
 	main().catch((err) => {
-		if (err instanceof NativeBindingError) {
-			console.log(JSON.stringify({ ok: false, error: err.toJSON() }));
-		} else {
-			console.log(
-				JSON.stringify({
-					ok: false,
-					error: { code: "INTERNAL_ERROR", message: String(err) },
-				}),
-			);
-		}
+		console.log(handleEntryPointError(err));
 		process.exit(1);
 	});
 }

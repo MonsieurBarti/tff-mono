@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GitOps } from "../../../../src/domain/ports/git-ops.port.js";
-import type { JournalRepository } from "../../../../src/domain/ports/journal-repository.port.js";
 import { Ok } from "@tff/core";
+import { closeAllSlicesForMilestone, nullJournal } from "../helpers/mock-stores.js";
 import type { ClosableStateStores } from "../../../../src/infrastructure/adapters/sqlite/create-state-stores.js";
 import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
@@ -17,13 +17,6 @@ const { getAdapter, setAdapter } = vi.hoisted(() => {
 });
 
 const closeStub = vi.fn();
-
-const nullJournal: JournalRepository = {
-	append: () => Ok(0),
-	readAll: () => Ok([]),
-	readSince: () => Ok([]),
-	count: () => Ok(0),
-};
 
 vi.mock("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js", () => ({
 	createClosableStateStoresUnchecked: vi.fn((): ClosableStateStores => {
@@ -90,18 +83,17 @@ function seedAdapter(): { adapter: SQLiteStateAdapter; milestoneId: string } {
 
 function seedAdapterAllClosed(): { adapter: SQLiteStateAdapter; milestoneId: string } {
 	const result = seedAdapter();
-	type RawDb = { prepare(sql: string): { run(...args: unknown[]): void } };
-	(result.adapter as unknown as { db: RawDb }).db
-		.prepare(
-			"UPDATE slice SET status = 'closed', updated_at = datetime('now') WHERE milestone_id = ?",
-		)
-		.run(result.milestoneId);
+	closeAllSlicesForMilestone(result.adapter, result.milestoneId);
 	return result;
 }
 
 beforeEach(() => {
 	vi.resetModules();
 	closeStub.mockClear();
+});
+
+afterEach(() => {
+	getAdapter()?.close();
 });
 
 describe("withBranchGuards", () => {

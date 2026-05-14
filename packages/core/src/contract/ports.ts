@@ -14,6 +14,7 @@ export class ContractError extends BaseDomainError<{
 	cause?: string | undefined;
 }> {
 	readonly errorLabel = "CONTRACT_ERROR";
+	readonly code = this.errorLabel;
 	readonly status = 500;
 	readonly context: { port: string; operation: string; cause?: string | undefined };
 	readonly message: string;
