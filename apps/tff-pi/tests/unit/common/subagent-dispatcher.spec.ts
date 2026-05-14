@@ -40,7 +40,7 @@ function fireHook(pi: ReturnType<typeof makePi>, event: unknown, ctx: unknown): 
 }
 
 function resultPathFor(r: string): string {
-	return join(r, ".pi", ".tff", "dispatch-result.json");
+	return join(r, ".tff", "dispatch-result.json");
 }
 
 function readResult(r: string): DispatchResult {
@@ -67,7 +67,7 @@ describe("prepareDispatch", () => {
 			tasks: [{ agent: "tff-executor", task: "T", cwd: root, taskId: "T01" }],
 		};
 		const { message } = prepareDispatch(root, batch);
-		const configPath = join(root, ".pi", ".tff", "dispatch-config.json");
+		const configPath = join(root, ".tff", "dispatch-config.json");
 		expect(existsSync(configPath)).toBe(true);
 		const persisted = JSON.parse(readFileSync(configPath, "utf-8"));
 		expect(persisted.mode).toBe("single");
@@ -101,15 +101,13 @@ describe("prepareDispatch", () => {
 			],
 		};
 		prepareDispatch(root, batch);
-		const persisted = JSON.parse(
-			readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
-		);
+		const persisted = JSON.parse(readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"));
 		expect(persisted.tasks[0].task).toBe("## L1\nC1\n\n## L2\nC2\n\n## Task\nT");
 	});
 
 	it("deletes stale dispatch-result.json before writing new config", () => {
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
-		const stalePath = join(root, ".pi", ".tff", "dispatch-result.json");
+		mkdirSync(join(root, ".tff"), { recursive: true });
+		const stalePath = join(root, ".tff", "dispatch-result.json");
 		writeFileSync(stalePath, '{"stale":true}', "utf-8");
 		prepareDispatch(root, {
 			mode: "single",
@@ -351,9 +349,7 @@ describe("phase + sliceId persistence", () => {
 			sliceId: "slice-abc",
 			tasks: [{ agent: "tff-verifier", task: "x", cwd: "/tmp" }],
 		});
-		const cfg = JSON.parse(
-			readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
-		);
+		const cfg = JSON.parse(readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"));
 		expect(cfg.phase).toBe("verify");
 		expect(cfg.sliceId).toBe("slice-abc");
 	});
@@ -364,9 +360,7 @@ describe("phase + sliceId persistence", () => {
 			phase: "execute",
 			tasks: [{ agent: "tff-executor", task: "x", cwd: "/tmp" }],
 		});
-		const cfg = JSON.parse(
-			readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
-		);
+		const cfg = JSON.parse(readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"));
 		expect(cfg.phase).toBe("execute");
 		expect(cfg.sliceId).toBeUndefined();
 	});
@@ -544,7 +538,7 @@ describe("tool_result hook — capture + finalizer", () => {
 		);
 		// No finalizer → hook falls through to S02-style behavior: result file
 		// remains for readDispatchResult consume-once, no phase event emitted.
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(true);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(true);
 		expect(emitted).toHaveLength(0);
 	});
 
@@ -637,8 +631,8 @@ describe("tool_result hook — capture + finalizer", () => {
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 	});
 
 	it("deletes dispatch files even when finalizer throws", async () => {
@@ -664,8 +658,8 @@ describe("tool_result hook — capture + finalizer", () => {
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 	});
 
 	it("pairs calls with nearest-by-id toolResult and concatenates multiple text parts", async () => {
@@ -859,8 +853,8 @@ describe("tool_result hook — cleanup signalling (AC-13, AC-14, AC-15)", () => 
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(true);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(true);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 	});
 
 	it("AC-14: when finalizer returns undefined (void), both files are deleted", async () => {
@@ -883,8 +877,8 @@ describe("tool_result hook — cleanup signalling (AC-13, AC-14, AC-15)", () => 
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 	});
 
 	it("AC-14: when finalizer returns {continue:false}, both files are deleted", async () => {
@@ -907,8 +901,8 @@ describe("tool_result hook — cleanup signalling (AC-13, AC-14, AC-15)", () => 
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 	});
 
 	it("AC-15: when finalizer throws, both files are deleted and phase_failed is emitted", async () => {
@@ -933,8 +927,8 @@ describe("tool_result hook — cleanup signalling (AC-13, AC-14, AC-15)", () => 
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(false);
 		const failed = pi.emittedPhase.find((e) => e.type === "phase_failed");
 		expect(failed?.error).toBe("boom");
 	});
@@ -994,7 +988,7 @@ describe("tool_result hook — config cleanup when no finalizer is registered", 
 			},
 			{ projectRoot: root },
 		);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-result.json"))).toBe(true);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-result.json"))).toBe(true);
 	});
 });

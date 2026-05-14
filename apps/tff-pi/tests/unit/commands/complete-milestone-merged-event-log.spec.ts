@@ -53,7 +53,7 @@ describe("handleCompleteMilestoneMerged — event log (complete-milestone-merged
 		db = new Database(":memory:");
 		applyMigrations(db);
 		root = mkdtempSync(join(tmpdir(), "tff-cmm-el-"));
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+		mkdirSync(join(root, ".tff"), { recursive: true });
 
 		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
 		milestoneId = insertMilestone(db, {
@@ -85,7 +85,7 @@ describe("handleCompleteMilestoneMerged — event log (complete-milestone-merged
 		expect(events[0]?.cmd).toBe("complete-milestone-merged");
 		expect(events[0]?.params).toMatchObject({ milestoneId });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});

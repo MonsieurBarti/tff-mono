@@ -27,18 +27,18 @@ function buildVerifyTaskBody(p: {
 	const lines = [
 		`Slice: ${p.sLabel}`,
 		"",
-		`Work inside ${p.wtPath}. Read-only except for writes to ${p.wtPath}/.pi/.tff/artifacts/.`,
+		`Work inside ${p.wtPath}. Read-only except for writes to ${p.wtPath}/.tff/artifacts/.`,
 		"",
 		"1. For every AC in SPEC.md, inspect the diff + worktree code and decide PASS / FAIL with one-line evidence (test name or file:line).",
 		`2. If the mechanical verification report above shows all passed, cite it; otherwise run the project tests (${p.testInstruction}) and record the exact command + outcome.`,
-		"3. Write <cwd>/.pi/.tff/artifacts/VERIFICATION.md containing:",
+		"3. Write <cwd>/.tff/artifacts/VERIFICATION.md containing:",
 		"   - AC checklist with `- [x]` / `- [ ]` per AC-N",
 		"   - Test command run + pass/fail counts",
 		"   - On any FAIL: which PLAN.md task(s) need rework",
 	];
 	if (p.compressLine.length > 0) lines.push(p.compressLine);
 	lines.push(
-		"4. Write <cwd>/.pi/.tff/artifacts/PR.md — concise reviewer-facing description (≤20 lines), uncompressed regardless of artifact compression. Use PR body template above if present.",
+		"4. Write <cwd>/.tff/artifacts/PR.md — concise reviewer-facing description (≤20 lines), uncompressed regardless of artifact compression. Use PR body template above if present.",
 		"5. End with:",
 		"   STATUS: <DONE|DONE_WITH_CONCERNS|BLOCKED>",
 		"   EVIDENCE: <one-line summary>",

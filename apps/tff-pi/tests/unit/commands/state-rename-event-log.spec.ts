@@ -74,7 +74,7 @@ describe("runStateRename — event log (state-rename)", () => {
 		db = new Database(":memory:");
 		applyMigrations(db);
 		root = mkdtempSync(join(tmpdir(), "tff-sr-el-"));
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+		mkdirSync(join(root, ".tff"), { recursive: true });
 		// Need a project row for updateLogCursor to work
 		insertProject(db, { id: "p1", name: "P", vision: "V" });
 	});
@@ -118,7 +118,7 @@ describe("runStateRename — event log (state-rename)", () => {
 			newStateBranch: "tff-state/feature/new-branch",
 		});
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});

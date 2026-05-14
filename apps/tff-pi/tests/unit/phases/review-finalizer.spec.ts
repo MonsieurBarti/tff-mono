@@ -89,7 +89,7 @@ function seedCtx(): TestCtx {
 	const root = mkdtempSync(join(tmpdir(), "tff-review-fin-root-"));
 	worktreePath = mkdtempSync(join(tmpdir(), "tff-review-fin-wt-"));
 	initTffDirectory(root);
-	mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+	mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 
 	insertProject(db, { name: "TFF", vision: "V" });
 	const projectId = must(getProject(db)).id;
@@ -172,7 +172,7 @@ function needsContextResult(evidence: string): DispatchResult {
 }
 
 function writeReviewArtifact(t: TestCtx, content: string): void {
-	writeFileSync(join(t.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"), content, "utf-8");
+	writeFileSync(join(t.worktreePath, ".tff", "artifacts", "REVIEW.md"), content, "utf-8");
 }
 
 function getFinalizer(): Finalizer {
@@ -257,7 +257,7 @@ describe("review finalizer", () => {
 		writeFileSync(join(targetDir, "REVIEW.md"), "should not be read\n\nVERDICT: approved", "utf-8");
 		symlinkSync(
 			join(targetDir, "REVIEW.md"),
-			join(t.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(t.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 		);
 		await invokeFinalizer(t, { result: doneResult(), calls: [] });
 		const failed = t.emitted.find((e) => e.type === "phase_failed");

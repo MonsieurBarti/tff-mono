@@ -116,7 +116,7 @@ function mixedResult(
 
 function readDispatchConfig(root: string): DispatchBatch {
 	return JSON.parse(
-		readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
+		readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"),
 	) as DispatchBatch;
 }
 

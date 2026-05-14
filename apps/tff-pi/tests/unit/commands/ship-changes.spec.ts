@@ -80,7 +80,6 @@ describe("handleShipChanges", () => {
 
 		const feedbackPath = join(
 			root,
-			".pi",
 			".tff",
 			"milestones",
 			"M01",
@@ -115,7 +114,6 @@ describe("handleShipChanges", () => {
 
 		const feedbackPath = join(
 			root,
-			".pi",
 			".tff",
 			"milestones",
 			"M01",

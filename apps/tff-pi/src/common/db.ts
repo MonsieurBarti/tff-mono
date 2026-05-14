@@ -182,15 +182,6 @@ export function applyMigrations(db: Database.Database, opts?: { root?: string })
 		});
 		runMigration();
 	}
-
-	if (currentVersion < 5) {
-		db.exec(`
-            ALTER TABLE project ADD COLUMN log_cursor_hash TEXT;
-            ALTER TABLE project ADD COLUMN log_cursor_row  INTEGER NOT NULL DEFAULT 0;
-            DROP TABLE IF EXISTS event_log;
-        `);
-		db.prepare("INSERT INTO schema_version (version) VALUES (5)").run();
-	}
 }
 
 // ---------------------------------------------------------------------------

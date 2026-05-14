@@ -4,11 +4,11 @@ import { DEFAULT_SETTINGS, serializeSettings } from "./settings.js";
 import { milestoneLabel, sliceLabel } from "./types.js";
 
 export function tffPath(root: string, ...segments: string[]): string {
-	return join(root, ".pi", ".tff", ...segments);
+	return join(root, ".tff", ...segments);
 }
 
 /**
- * Test helper — seeds .tff/ subdirs and settings.yaml. Creates .pi/.tff/ if
+ * Test helper — seeds .tff/ subdirs and settings.yaml. Creates .tff/ if
  * absent so phase prepare() paths that commitCommand() can append to
  * event-log.jsonl. Not called from production code; use ensureProjectHomeDir
  * (project-home.ts) for that.
@@ -25,7 +25,7 @@ export function initTffDirectory(root: string): void {
 }
 
 function safeTffPath(root: string, relativePath: string): string {
-	const tffRoot = resolve(root, ".pi", ".tff");
+	const tffRoot = resolve(root, ".tff");
 	const fullPath = resolve(tffRoot, relativePath);
 	if (fullPath !== tffRoot && !fullPath.startsWith(`${tffRoot}/`)) {
 		throw new Error(`Path traversal detected: ${relativePath}`);

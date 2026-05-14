@@ -22,7 +22,7 @@ describe("handleCreateSlice — event log", () => {
 		db = new Database(":memory:");
 		applyMigrations(db);
 		root = mkdtempSync(join(tmpdir(), "tff-cs-el-"));
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+		mkdirSync(join(root, ".tff"), { recursive: true });
 		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
 		milestoneId = insertMilestone(db, {
 			id: "m1",
@@ -60,7 +60,7 @@ describe("handleCreateSlice — event log", () => {
 			title: "Auth",
 		});
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});
@@ -77,7 +77,7 @@ describe("handleCreateSlice — event log", () => {
 		expect(events[1]?.cmd).toBe("create-slice");
 		expect(events[1]?.params.title).toBe("DB");
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(2);
 	});
 

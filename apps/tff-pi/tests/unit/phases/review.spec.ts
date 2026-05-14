@@ -71,7 +71,7 @@ describe("reviewPhase — dispatch shape (M01-S04)", () => {
 		root = mkdtempSync(join(tmpdir(), "tff-review-test-"));
 		worktreePath = mkdtempSync(join(tmpdir(), "tff-review-wt-"));
 		initTffDirectory(root);
-		mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+		mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -130,9 +130,7 @@ describe("reviewPhase — dispatch shape (M01-S04)", () => {
 		// and misses the repo-root .pi/agents/. Parallel uses per-task cwd only.
 		const { ctx } = makeCtx();
 		await reviewPhase.prepare(ctx);
-		const cfg = JSON.parse(
-			readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
-		);
+		const cfg = JSON.parse(readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"));
 		expect(cfg.phase).toBe("review");
 		expect(cfg.mode).toBe("parallel");
 		expect(cfg.sliceId).toBe(sliceId);
@@ -144,9 +142,7 @@ describe("reviewPhase — dispatch shape (M01-S04)", () => {
 	it("AC-3: task body includes SPEC, PLAN, VERIFICATION, Security-lens reference in order (front-matter stripped)", async () => {
 		const { ctx } = makeCtx();
 		await reviewPhase.prepare(ctx);
-		const cfg = JSON.parse(
-			readFileSync(join(root, ".pi", ".tff", "dispatch-config.json"), "utf-8"),
-		);
+		const cfg = JSON.parse(readFileSync(join(root, ".tff", "dispatch-config.json"), "utf-8"));
 		const taskBody: string = cfg.tasks[0].task;
 		const specIdx = taskBody.indexOf("## SPEC.md");
 		const planIdx = taskBody.indexOf("## PLAN.md");

@@ -94,7 +94,7 @@ function seedCtx(): TestCtx {
 	const root = mkdtempSync(join(tmpdir(), "tff-ship-pre-root-"));
 	worktreePath = mkdtempSync(join(tmpdir(), "tff-ship-pre-wt-"));
 	initTffDirectory(root);
-	mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+	mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 
 	insertProject(db, { name: "TFF", vision: "V" });
 	const projectId = must(getProject(db)).id;
@@ -151,7 +151,7 @@ function doneResult(): DispatchResult {
 }
 
 function writeWorktreeArtifact(t: TestCtx, name: string, content: string): void {
-	writeFileSync(join(t.worktreePath, ".pi", ".tff", "artifacts", name), content, "utf-8");
+	writeFileSync(join(t.worktreePath, ".tff", "artifacts", name), content, "utf-8");
 }
 
 function getFinalizer(): Finalizer {

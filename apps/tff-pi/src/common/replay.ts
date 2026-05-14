@@ -11,7 +11,7 @@ import { validateCommandPreconditions } from "./preconditions.js";
 import { UnknownCommandError, projectCommand } from "./projection.js";
 
 export function tailReplay(db: Database.Database, root: string): void {
-	const { lastHash, lastRow } = loadCursor(db);
+	const { lastHash, lastRow } = loadCursor(root);
 
 	// Cursor integrity check
 	if (lastRow > 0) {
@@ -48,14 +48,14 @@ export function tailReplay(db: Database.Database, root: string): void {
 				row: String(currentRow),
 				...(inv.reason !== undefined && { error: inv.reason }),
 			});
-			updateLogCursor(db, event.hash, currentRow);
+			updateLogCursor(root, event.hash, currentRow);
 			continue;
 		}
 
 		try {
 			db.transaction(() => {
 				projectCommand(db, root, event.cmd, event.params);
-				updateLogCursor(db, event.hash, currentRow);
+				updateLogCursor(root, event.hash, currentRow);
 			})();
 		} catch (err) {
 			if (err instanceof UnknownCommandError) {
@@ -67,7 +67,7 @@ export function tailReplay(db: Database.Database, root: string): void {
 					error: err instanceof Error ? err.message : String(err),
 				});
 			}
-			updateLogCursor(db, event.hash, currentRow);
+			updateLogCursor(root, event.hash, currentRow);
 		}
 	}
 }

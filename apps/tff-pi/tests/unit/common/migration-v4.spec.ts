@@ -161,8 +161,8 @@ describe("schema v4 migration — reconcile all non-closed slices", () => {
 		applyMigrationsUpToV3(db);
 		applyMigrations(db);
 		const v = db.prepare("SELECT MAX(version) as v FROM schema_version").get() as { v: number };
-		// Schema v5 is the current maximum.
-		expect(v.v).toBe(5);
+		// Schema v4 is the current maximum.
+		expect(v.v).toBe(4);
 	});
 
 	it("migration is atomic — v4 reconcile runs and v4 version row is recorded", () => {
@@ -222,8 +222,8 @@ describe("schema v4 migration — reconcile all non-closed slices", () => {
 		}
 
 		expect(getSlice(db, goodSliceId)?.status).toBe("executing");
-		// All migrations ran up to v5
+		// All migrations ran up to v4
 		const v = db.prepare("SELECT MAX(version) as v FROM schema_version").get() as { v: number };
-		expect(v.v).toBe(5);
+		expect(v.v).toBe(4);
 	});
 });

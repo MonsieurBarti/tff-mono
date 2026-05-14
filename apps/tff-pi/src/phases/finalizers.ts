@@ -105,7 +105,7 @@ async function reviewFinalizer({
 		return { continue: false };
 	}
 
-	const reviewSrc = join(wtPath, ".pi", ".tff", "artifacts", "REVIEW.md");
+	const reviewSrc = join(wtPath, ".tff", "artifacts", "REVIEW.md");
 
 	if (!existsSync(reviewSrc)) {
 		pi.events.emit("tff:phase", {
@@ -230,7 +230,7 @@ async function verifyFinalizer({
 		return { continue: false };
 	}
 
-	const artifactsDir = join(wtPath, ".pi", ".tff", "artifacts");
+	const artifactsDir = join(wtPath, ".tff", "artifacts");
 	const vSrc = join(artifactsDir, "VERIFICATION.md");
 	const prSrc = join(artifactsDir, "PR.md");
 	if (!existsSync(vSrc) || !existsSync(prSrc)) {

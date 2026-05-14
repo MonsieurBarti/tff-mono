@@ -17,7 +17,7 @@ import { tailReplay } from "../../../src/common/replay.js";
 
 function tempRoot(): string {
 	const root = mkdtempSync(join(tmpdir(), "tff-replay-"));
-	mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+	mkdirSync(join(root, ".tff"), { recursive: true });
 	return root;
 }
 
@@ -42,7 +42,7 @@ function writeRawEvent(root: string, cmd: string, params: Record<string, unknown
 		actor: "agent",
 		session_id: "test-session",
 	};
-	appendFileSync(join(root, ".pi", ".tff", "event-log.jsonl"), `${JSON.stringify(event)}\n`);
+	appendFileSync(join(root, ".tff", "event-log.jsonl"), `${JSON.stringify(event)}\n`);
 }
 
 describe("tailReplay — basic catch-up", () => {
@@ -63,7 +63,7 @@ describe("tailReplay — basic catch-up", () => {
 
 		tailReplay(db, root);
 
-		expect(loadCursor(db).lastRow).toBe(5);
+		expect(loadCursor(root).lastRow).toBe(5);
 		expect(getSlice(db, sId)?.status).toBe("verifying");
 	});
 });
@@ -77,11 +77,11 @@ describe("tailReplay — no-op paths", () => {
 
 		writeRawEvent(root, "override-status", { sliceId: sId, status: "discussing", reason: "r" });
 		const hash = hashEvent("override-status", { sliceId: sId, status: "discussing", reason: "r" });
-		updateLogCursor(db, hash, 1);
+		updateLogCursor(root, hash, 1);
 
 		tailReplay(db, root);
 
-		expect(loadCursor(db).lastRow).toBe(1);
+		expect(loadCursor(root).lastRow).toBe(1);
 	});
 
 	test("second run is a no-op after first run catches up", () => {
@@ -93,9 +93,9 @@ describe("tailReplay — no-op paths", () => {
 		writeRawEvent(root, "override-status", { sliceId: sId, status: "discussing", reason: "r" });
 
 		tailReplay(db, root);
-		const after1 = loadCursor(db).lastRow;
+		const after1 = loadCursor(root).lastRow;
 		tailReplay(db, root);
-		const after2 = loadCursor(db).lastRow;
+		const after2 = loadCursor(root).lastRow;
 
 		expect(after1).toBe(1);
 		expect(after2).toBe(1);
@@ -115,7 +115,7 @@ describe("tailReplay — invariant violation", () => {
 		const warnSpy = vi.spyOn(logger, "logWarning");
 		try {
 			tailReplay(db, root);
-			expect(loadCursor(db).lastRow).toBe(1);
+			expect(loadCursor(root).lastRow).toBe(1);
 			expect(
 				warnSpy.mock.calls.some(([c, m]) => c === "replay" && m === "invariant-violation"),
 			).toBe(true);
@@ -134,7 +134,7 @@ describe("tailReplay — cursor integrity check", () => {
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "S" });
 
 		writeRawEvent(root, "override-status", { sliceId: sId, status: "discussing", reason: "r" });
-		updateLogCursor(db, "aaaa1111aaaa1111", 1); // wrong hash
+		updateLogCursor(root, "aaaa1111aaaa1111", 1); // wrong hash
 
 		const errorSpy = vi.spyOn(logger, "logError");
 		try {
@@ -142,7 +142,7 @@ describe("tailReplay — cursor integrity check", () => {
 			expect(
 				errorSpy.mock.calls.some(([c, m]) => c === "replay" && m === "cursor-hash-mismatch"),
 			).toBe(true);
-			expect(loadCursor(db).lastRow).toBe(1);
+			expect(loadCursor(root).lastRow).toBe(1);
 		} finally {
 			errorSpy.mockRestore();
 		}
@@ -156,7 +156,7 @@ describe("tailReplay — cursor integrity check", () => {
 
 		writeRawEvent(root, "override-status", { sliceId: sId, status: "discussing", reason: "r" });
 		// Set cursor to row=1 with wrong hash (simulates hash mismatch after a previous event)
-		updateLogCursor(db, "aaaa1111aaaa1111", 1);
+		updateLogCursor(root, "aaaa1111aaaa1111", 1);
 		// Write a second event that should still be replayed
 		writeRawEvent(root, "override-status", { sliceId: sId, status: "researching", reason: "r2" });
 
@@ -168,7 +168,7 @@ describe("tailReplay — cursor integrity check", () => {
 				errorSpy.mock.calls.some(([c, m]) => c === "replay" && m === "cursor-hash-mismatch"),
 			).toBe(true);
 			// Tail (from row=1) has 1 event (the second one), and it was projected
-			expect(loadCursor(db).lastRow).toBe(2);
+			expect(loadCursor(root).lastRow).toBe(2);
 			expect(getSlice(db, sId)?.status).toBe("researching");
 		} finally {
 			errorSpy.mockRestore();
@@ -185,7 +185,7 @@ describe("tailReplay — unknown command", () => {
 		const warnSpy = vi.spyOn(logger, "logWarning");
 		try {
 			tailReplay(db, root);
-			expect(loadCursor(db).lastRow).toBe(1);
+			expect(loadCursor(root).lastRow).toBe(1);
 			expect(warnSpy.mock.calls.some(([c, m]) => c === "replay" && m === "unknown-command")).toBe(
 				true,
 			);
@@ -220,7 +220,7 @@ describe("tailReplay — projection error", () => {
 
 		tailReplay(db, root);
 
-		expect(loadCursor(db).lastRow).toBe(3);
+		expect(loadCursor(root).lastRow).toBe(3);
 		expect(errorSpy.mock.calls.some(([c, m]) => c === "replay" && m === "projection-failed")).toBe(
 			true,
 		);
@@ -238,7 +238,7 @@ describe("tailReplay — malformed log line", () => {
 		const mId = insertMilestone(db, { projectId: pId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "S" });
 
-		const logPath = join(root, ".pi", ".tff", "event-log.jsonl");
+		const logPath = join(root, ".tff", "event-log.jsonl");
 		const e1 = {
 			v: 2,
 			cmd: "override-status",
@@ -264,7 +264,7 @@ describe("tailReplay — malformed log line", () => {
 		tailReplay(db, root);
 
 		// physical cursor: 3 lines total (e1, malformed, e3) → lastRow = 3
-		expect(loadCursor(db).lastRow).toBe(3);
+		expect(loadCursor(root).lastRow).toBe(3);
 		expect(getSlice(db, sId)?.status).toBe("researching");
 	});
 
@@ -274,7 +274,7 @@ describe("tailReplay — malformed log line", () => {
 		const mId = insertMilestone(db, { projectId: pId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "S" });
 
-		const logPath = join(root, ".pi", ".tff", "event-log.jsonl");
+		const logPath = join(root, ".tff", "event-log.jsonl");
 		const eA = {
 			v: 2,
 			cmd: "override-status",
@@ -302,12 +302,12 @@ describe("tailReplay — malformed log line", () => {
 		expect(getSlice(db, sId)?.status).toBe("researching");
 
 		// Simulate physical cursor: 3 physical lines; set cursor to 3 (as appendCommand would)
-		updateLogCursor(db, eB.hash, 3);
+		updateLogCursor(root, eB.hash, 3);
 
 		// Second run: readEvents(root, 3) should return nothing — no over-replay
 		tailReplay(db, root);
 
-		expect(loadCursor(db).lastRow).toBe(3);
+		expect(loadCursor(root).lastRow).toBe(3);
 		expect(getSlice(db, sId)?.status).toBe("researching");
 	});
 });

@@ -129,7 +129,7 @@ describe("verifyPhase", () => {
 		expect(result.success).toBe(true);
 		expect(result.retry).toBe(false);
 		expect(result.message).toContain("<DISPATCH-ONLY>");
-		const cfg = JSON.parse(readFileSync(join(root, ".pi/.tff/dispatch-config.json"), "utf-8")) as {
+		const cfg = JSON.parse(readFileSync(join(root, ".tff/dispatch-config.json"), "utf-8")) as {
 			phase: string;
 			mode: string;
 			sliceId: string;
@@ -189,7 +189,7 @@ describe("verifyPhase", () => {
 		expect(result.retry).toBe(true);
 		expect(__getFinalizerForTest("verify")).toBeUndefined();
 		// dispatch-config.json must not exist — dispatch was never prepared
-		expect(() => readFileSync(join(root, ".pi/.tff/dispatch-config.json"), "utf-8")).toThrow();
+		expect(() => readFileSync(join(root, ".tff/dispatch-config.json"), "utf-8")).toThrow();
 	});
 
 	it("AC-5: post-verify checkpoint is created during prepare()", async () => {
@@ -263,7 +263,7 @@ describe("verifyPhase", () => {
 		const ctx = makeCtx(db, root, sliceId);
 		await verifyPhase.prepare(ctx);
 
-		const cfg = JSON.parse(readFileSync(join(root, ".pi/.tff/dispatch-config.json"), "utf-8")) as {
+		const cfg = JSON.parse(readFileSync(join(root, ".tff/dispatch-config.json"), "utf-8")) as {
 			tasks: Array<{ task: string }>;
 		};
 

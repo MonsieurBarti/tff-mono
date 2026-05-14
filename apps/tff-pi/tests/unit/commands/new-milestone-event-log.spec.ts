@@ -36,7 +36,7 @@ describe("createMilestone — event log", () => {
 		db = new Database(":memory:");
 		applyMigrations(db);
 		root = mkdtempSync(join(tmpdir(), "tff-nm-el-"));
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+		mkdirSync(join(root, ".tff"), { recursive: true });
 		projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
 	});
 
@@ -65,7 +65,7 @@ describe("createMilestone — event log", () => {
 			name: "Auth Feature",
 		});
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});
@@ -81,7 +81,7 @@ describe("createMilestone — event log", () => {
 		expect(events[1]?.cmd).toBe("create-milestone");
 		expect(events[1]?.params.name).toBe("Second");
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(2);
 	});
 });

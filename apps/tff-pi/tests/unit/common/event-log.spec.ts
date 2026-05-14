@@ -1,9 +1,7 @@
 import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import Database from "better-sqlite3";
 import { describe, expect, test } from "vitest";
-import { applyMigrations } from "../../../src/common/db.js";
 import {
 	appendCommand,
 	hashEvent,
@@ -14,7 +12,7 @@ import {
 
 function tempRoot(): string {
 	const root = mkdtempSync(join(tmpdir(), "tff-event-log-"));
-	mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+	mkdirSync(join(root, ".tff"), { recursive: true });
 	return root;
 }
 
@@ -61,7 +59,7 @@ describe("readEvents", () => {
 				session_id: "sess1",
 			}),
 		];
-		writeFileSync(join(root, ".pi/.tff/event-log.jsonl"), `${lines.join("\n")}\n`);
+		writeFileSync(join(root, ".tff/event-log.jsonl"), `${lines.join("\n")}\n`);
 		const events = readEvents(root);
 		expect(events).toHaveLength(2);
 		expect(events[0]?.cmd).toBe("write-spec");
@@ -81,7 +79,7 @@ describe("readEvents", () => {
 				session_id: "s",
 			}),
 		);
-		writeFileSync(join(root, ".pi/.tff/event-log.jsonl"), `${lines.join("\n")}\n`);
+		writeFileSync(join(root, ".tff/event-log.jsonl"), `${lines.join("\n")}\n`);
 		const events = readEvents(root, 1);
 		expect(events).toHaveLength(2);
 		expect(events[0]?.cmd).toBe("cmd2");
@@ -99,7 +97,7 @@ describe("readEvents", () => {
 			session_id: "s",
 		});
 		const lines = [good, "not json", good];
-		writeFileSync(join(root, ".pi/.tff/event-log.jsonl"), `${lines.join("\n")}\n`);
+		writeFileSync(join(root, ".tff/event-log.jsonl"), `${lines.join("\n")}\n`);
 		const events = readEvents(root);
 		expect(events).toHaveLength(2);
 		expect(events[0]?.cmd).toBe("write-spec");
@@ -114,7 +112,7 @@ describe("appendCommand", () => {
 		expect(result.hash).toHaveLength(16);
 		expect(result.row).toBe(1);
 
-		const file = readFileSync(join(root, ".pi/.tff/event-log.jsonl"), "utf-8");
+		const file = readFileSync(join(root, ".tff/event-log.jsonl"), "utf-8");
 		const parsed = JSON.parse(file.trim());
 		expect(parsed.v).toBe(2);
 		expect(parsed.cmd).toBe("write-spec");
@@ -136,7 +134,7 @@ describe("appendCommand", () => {
 	test("respects meta.actor override", () => {
 		const root = tempRoot();
 		appendCommand(root, "state-rename", { from: "x", to: "y" }, { actor: "user" });
-		const raw = readFileSync(join(root, ".pi/.tff/event-log.jsonl"), "utf-8");
+		const raw = readFileSync(join(root, ".tff/event-log.jsonl"), "utf-8");
 		expect(JSON.parse(raw.trim()).actor).toBe("user");
 	});
 
@@ -146,7 +144,7 @@ describe("appendCommand", () => {
 		expect(r1.row).toBe(1);
 
 		// Inject a malformed line directly (bypassing appendCommand)
-		const logPath = join(root, ".pi/.tff/event-log.jsonl");
+		const logPath = join(root, ".tff/event-log.jsonl");
 		appendFileSync(logPath, "not valid json\n");
 
 		// After malformed line, physical count becomes 3 for the next append
@@ -158,7 +156,7 @@ describe("appendCommand", () => {
 describe("readEvents — physical line offset", () => {
 	test("fromPhysicalLine skips exactly N physical lines including malformed", () => {
 		const root = tempRoot();
-		const logPath = join(root, ".pi/.tff/event-log.jsonl");
+		const logPath = join(root, ".tff/event-log.jsonl");
 
 		const eventA = JSON.stringify({
 			v: 2,
@@ -188,7 +186,7 @@ describe("readEvents — physical line offset", () => {
 
 	test("fromPhysicalLine=2 starts at the third physical line", () => {
 		const root = tempRoot();
-		const logPath = join(root, ".pi/.tff/event-log.jsonl");
+		const logPath = join(root, ".tff/event-log.jsonl");
 
 		const eventA = JSON.stringify({
 			v: 2,
@@ -219,19 +217,15 @@ describe("readEvents — physical line offset", () => {
 });
 
 describe("cursor operations", () => {
-	test("loadCursor returns default on fresh db", () => {
-		const db = new Database(":memory:");
-		applyMigrations(db);
-		db.prepare("INSERT INTO project (id, name, vision) VALUES ('p1', 'n', 'v')").run();
-		const cursor = loadCursor(db);
+	test("loadCursor returns default when file missing", () => {
+		const root = tempRoot();
+		const cursor = loadCursor(root);
 		expect(cursor).toEqual({ lastHash: null, lastRow: 0 });
 	});
 
 	test("updateLogCursor persists and loadCursor reads it", () => {
-		const db = new Database(":memory:");
-		applyMigrations(db);
-		db.prepare("INSERT INTO project (id, name, vision) VALUES ('p1', 'n', 'v')").run();
-		updateLogCursor(db, "abc1234567890def", 5);
-		expect(loadCursor(db)).toEqual({ lastHash: "abc1234567890def", lastRow: 5 });
+		const root = tempRoot();
+		updateLogCursor(root, "abc1234567890def", 5);
+		expect(loadCursor(root)).toEqual({ lastHash: "abc1234567890def", lastRow: 5 });
 	});
 });

@@ -129,6 +129,7 @@ export function getDefaultBranch(cwd?: string): string | null {
 }
 
 const DEFAULT_GITIGNORE_ENTRIES = [
+	".tff",
 	".pi/",
 	"node_modules/",
 	"dist/",

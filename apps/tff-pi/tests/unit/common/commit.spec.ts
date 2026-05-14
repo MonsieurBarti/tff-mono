@@ -16,7 +16,7 @@ import * as projModule from "../../../src/common/projection.js";
 
 function tempRoot(): string {
 	const root = mkdtempSync(join(tmpdir(), "tff-commit-"));
-	mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+	mkdirSync(join(root, ".tff"), { recursive: true });
 	return root;
 }
 
@@ -49,7 +49,7 @@ describe("commitCommand — happy path (no fsOps)", () => {
 		const events = readEvents(root);
 		expect(events).toHaveLength(1);
 		expect(events[0]?.cmd).toBe("override-status");
-		expect(loadCursor(db).lastRow).toBe(1);
+		expect(loadCursor(root).lastRow).toBe(1);
 	});
 });
 
@@ -158,7 +158,7 @@ describe("commitCommand — projectCommand failure", () => {
 
 		expect(existsSync(tmpPath)).toBe(false);
 		expect(readEvents(root)).toHaveLength(0);
-		expect(loadCursor(db).lastRow).toBe(0);
+		expect(loadCursor(root).lastRow).toBe(0);
 
 		vi.restoreAllMocks();
 	});

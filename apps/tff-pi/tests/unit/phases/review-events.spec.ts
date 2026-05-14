@@ -99,7 +99,7 @@ describe("reviewPhase event emission (finalizer-driven)", () => {
 		const root = mkdtempSync(join(tmpdir(), "tff-review-events-root-"));
 		worktreePath = mkdtempSync(join(tmpdir(), "tff-review-events-wt-"));
 		initTffDirectory(root);
-		mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+		mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -164,7 +164,7 @@ describe("reviewPhase event emission (finalizer-driven)", () => {
 
 	it("finalizer emits phase_complete on approved VERDICT", async () => {
 		writeFileSync(
-			join(worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nOK.\n\nVERDICT: approved",
 			"utf-8",
 		);
@@ -183,7 +183,7 @@ describe("reviewPhase event emission (finalizer-driven)", () => {
 
 	it("finalizer emits phase_failed('Review verdict: denied') on denied VERDICT", async () => {
 		writeFileSync(
-			join(worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nFail.\n\nVERDICT: denied",
 			"utf-8",
 		);

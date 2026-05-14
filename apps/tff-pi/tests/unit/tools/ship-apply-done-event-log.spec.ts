@@ -29,7 +29,7 @@ describe("handleShipApplyDone — event log", () => {
 		const db = new Database(":memory:");
 		applyMigrations(db);
 		const root = mkdtempSync(join(tmpdir(), "tff-ship-apply-done-el-"));
-		mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+		mkdirSync(join(root, ".tff"), { recursive: true });
 
 		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
 		const mId = insertMilestone(db, { id: "m1", projectId, number: 1, name: "M", branch: "b" });
@@ -51,7 +51,7 @@ describe("handleShipApplyDone — event log", () => {
 		expect(events[0]?.cmd).toBe("ship-apply-done");
 		expect(events[0]?.params).toMatchObject({ sliceId: sId });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 
