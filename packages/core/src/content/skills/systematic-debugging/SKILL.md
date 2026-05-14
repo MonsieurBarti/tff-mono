@@ -59,3 +59,42 @@ tags: [debugging, process]
 - Document root cause ∈ commit message (¬just "fix bug")
 - ∀ investigation step: show user what you found ∧ why it matters
 - 3+ fixes attempted -> architectural problem, question the design
+
+## 6-Phase Diagnose Protocol
+
+For hard bugs and performance regressions, apply this disciplined diagnosis loop:
+
+### Phase 1: Reproducible Signal
+
+Construct a fast, deterministic feedback loop. Preferred forms (fastest to slowest):
+
+- Unit test that reproduces the failure
+- Minimal script against the suspect module
+- Differential harness comparing passing and failing cases
+- Integration test with focused scope
+
+Aggressively refine the loop for speed and clarity. The quality of the loop determines the quality of the diagnosis.
+
+### Phase 2: Verify Symptom
+
+Reproduce the failure and validate that it matches the user's reported symptom. If the reproduction diverges, the symptom description is incomplete or incorrect.
+
+### Phase 3: Generate Hypotheses
+
+Produce 3–5 ranked, falsifiable hypotheses following the template:
+
+> If **X** is the cause, then changing **Y** will make the bug disappear / changing **Z** will make it worse.
+
+Show the ranked list to the user before testing.
+
+### Phase 4: Instrument Predictions
+
+Map each probe to a specific prediction. Prefer debuggers over broad logging. Any temporary logs must carry a unique tag such as `[DEBUG-a4f2]`.
+
+### Phase 5: Regression Test
+
+When a correct seam exists, write the regression test first, then apply the fix. If no adequate seam is available, document that architectural shortcoming.
+
+### Phase 6: Post-Mortem
+
+Remove all instrumentation. Rerun the original reproduction. Ask: "What would have prevented this bug?" Escalate architectural gaps to architecture review.
