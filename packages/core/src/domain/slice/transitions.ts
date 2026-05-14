@@ -13,13 +13,13 @@ export type ComplexityTier = "S" | "SS" | "SSS";
 
 export const SLICE_TRANSITIONS: Record<SliceStatus, readonly SliceStatus[]> = {
 	created: ["discussing"],
-	discussing: ["researching"],
+	discussing: ["researching", "planning"],
 	researching: ["planning"],
 	planning: ["planning", "executing"],
 	executing: ["verifying"],
 	verifying: ["reviewing", "executing"],
 	reviewing: ["shipping", "executing"],
-	shipping: ["closed"],
+	shipping: ["closed", "executing"],
 	closed: [],
 };
 

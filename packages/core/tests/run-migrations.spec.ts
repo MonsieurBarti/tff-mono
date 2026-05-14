@@ -38,6 +38,55 @@ describe("runMigrations", () => {
 		expect(tableNames).toContain("phase_run");
 	});
 
+	it("creates slice table with pr_url column", () => {
+		runMigrations(db);
+		const cols = db.prepare("SELECT name FROM pragma_table_info('slice') ORDER BY cid").all() as {
+			name: string;
+		}[];
+		const colNames = cols.map((c) => c.name);
+		expect(colNames).toContain("pr_url");
+	});
+
+	it("defaults slice.status to created", () => {
+		runMigrations(db);
+		db.prepare("INSERT INTO project (id, name) VALUES (?, ?)").run("singleton", "Test");
+		db.prepare(
+			"INSERT INTO milestone (id, project_id, number, name, branch) VALUES (?, ?, ?, ?, ?)",
+		).run("ms-1", "singleton", 1, "M1", "main");
+		db.prepare(
+			"INSERT INTO slice (id, milestone_id, kind, number, title) VALUES (?, ?, ?, ?, ?)",
+		).run("sl-1", "ms-1", "milestone", 1, "Test");
+		const row = db.prepare("SELECT status FROM slice WHERE id = ?").get("sl-1") as {
+			status: string;
+		};
+		expect(row.status).toBe("created");
+	});
+
+	it("accepts created in slice.status CHECK constraint", () => {
+		runMigrations(db);
+		db.prepare("INSERT INTO project (id, name) VALUES (?, ?)").run("singleton", "Test");
+		db.prepare(
+			"INSERT INTO milestone (id, project_id, number, name, branch) VALUES (?, ?, ?, ?, ?)",
+		).run("ms-1", "singleton", 1, "M1", "main");
+		db.prepare(
+			"INSERT INTO slice (id, milestone_id, kind, number, title, status) VALUES (?, ?, ?, ?, ?, ?)",
+		).run("sl-1", "ms-1", "milestone", 1, "Test", "created");
+		const row = db.prepare("SELECT status FROM slice WHERE id = ?").get("sl-1") as {
+			status: string;
+		};
+		expect(row.status).toBe("created");
+	});
+
+	it("does not include log_cursor columns in project table", () => {
+		runMigrations(db);
+		const cols = db.prepare("SELECT name FROM pragma_table_info('project') ORDER BY cid").all() as {
+			name: string;
+		}[];
+		const colNames = cols.map((c) => c.name);
+		expect(colNames).not.toContain("log_cursor_hash");
+		expect(colNames).not.toContain("log_cursor_row");
+	});
+
 	it("is idempotent", () => {
 		runMigrations(db);
 		runMigrations(db);

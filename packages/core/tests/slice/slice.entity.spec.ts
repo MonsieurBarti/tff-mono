@@ -534,7 +534,7 @@ describe("Slice aggregate root", () => {
 			expect(slice.status).toBe("planning");
 		});
 
-		it("throws InvalidTransitionError for discussing→planning on non-S-tier slices", () => {
+		it("allows discussing→planning for non-S-tier slices", () => {
 			const slice = Slice.createNew({
 				milestoneId: "ms-1",
 				kind: "milestone",
@@ -544,7 +544,8 @@ describe("Slice aggregate root", () => {
 			});
 			slice.classifyTier("SS");
 			slice.transition("discussing");
-			expect(() => slice.transition("planning")).toThrow(InvalidTransitionError);
+			slice.transition("planning");
+			expect(slice.status).toBe("planning");
 		});
 	});
 
@@ -945,13 +946,13 @@ describe("Slice errors", () => {
 describe("SLICE_TRANSITIONS", () => {
 	it("defines the correct allowed transitions", () => {
 		expect(SLICE_TRANSITIONS.created).toEqual(["discussing"]);
-		expect(SLICE_TRANSITIONS.discussing).toEqual(["researching"]);
+		expect(SLICE_TRANSITIONS.discussing).toEqual(["researching", "planning"]);
 		expect(SLICE_TRANSITIONS.researching).toEqual(["planning"]);
 		expect(SLICE_TRANSITIONS.planning).toEqual(["planning", "executing"]);
 		expect(SLICE_TRANSITIONS.executing).toEqual(["verifying"]);
 		expect(SLICE_TRANSITIONS.verifying).toEqual(["reviewing", "executing"]);
 		expect(SLICE_TRANSITIONS.reviewing).toEqual(["shipping", "executing"]);
-		expect(SLICE_TRANSITIONS.shipping).toEqual(["closed"]);
+		expect(SLICE_TRANSITIONS.shipping).toEqual(["closed", "executing"]);
 		expect(SLICE_TRANSITIONS.closed).toEqual([]);
 	});
 });

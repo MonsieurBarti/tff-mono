@@ -44,11 +44,12 @@ CREATE TABLE IF NOT EXISTS slice (
   kind TEXT NOT NULL DEFAULT 'milestone' CHECK (kind IN ('milestone', 'quick', 'debug')),
   number INTEGER NOT NULL,
   title TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'discussing' CHECK (status IN ('discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'shipping', 'closed')),
+  status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'discussing', 'researching', 'planning', 'executing', 'verifying', 'reviewing', 'shipping', 'closed')),
   tier TEXT CHECK (tier IN ('S', 'SS', 'SSS')),
   base_branch TEXT,
   branch_name TEXT,
   archived_at INTEGER,
+  pr_url TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
   updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );

@@ -121,10 +121,10 @@ describe("operation-prerequisites", () => {
 				expect(hint).toContain("Next:");
 			});
 
-			it("should suggest /tff:research when blocked on plan from discussing", () => {
+			it("should suggest /tff:plan when blocked on plan from discussing", () => {
 				const hint = generateRecoveryHint("plan", "discussing", "planning");
-				expect(hint).toContain("/tff:research");
-				expect(hint).toContain("Next:");
+				expect(hint).toContain("/tff:plan");
+				expect(hint).toContain("Run /tff:plan first.");
 			});
 
 			it("should suggest valid options from planning for verify", () => {
