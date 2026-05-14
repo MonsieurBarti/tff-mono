@@ -10,7 +10,7 @@ const STALE_AFTER_DAYS = 14;
 
 export const observeHealthSchema: CommandSchema = {
 	name: "observe:health",
-	purpose: "Check observation liveness (last-obs, first-obs sentinel, dead-letter)",
+	purpose: "Check observation liveness (last-obs, first-obs sentinel, dead-letter, plannotator)",
 	mutates: false,
 	requiredFlags: [],
 	optionalFlags: [],
