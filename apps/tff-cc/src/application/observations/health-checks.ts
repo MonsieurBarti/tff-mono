@@ -74,12 +74,13 @@ export const checkLastObservation = (
 					stale: ageDays > staleAfterDays,
 				};
 			} catch {
-				tffWarn(`Malformed observation entry: ${recent[i]}`);
+				const truncated = recent[i].length > 80 ? `${recent[i].slice(0, 80)}…` : recent[i];
+				tffWarn(`Malformed observation entry: ${truncated}`);
 			}
 		}
 		return { ok: false, reason: "no parseable observation in last 5 entries" };
 	} catch (err) {
-		return { ok: false, reason: `checkLastObservation failed: ${(err as Error).message}` };
+		return { ok: false, reason: `checkLastObservation failed: ${String(err)}` };
 	}
 };
 
@@ -117,7 +118,7 @@ export const checkFirstObservationSentinel = (root: string): SentinelResult | Pr
 	} catch (err) {
 		return {
 			ok: false,
-			reason: `checkFirstObservationSentinel failed: ${(err as Error).message}`,
+			reason: `checkFirstObservationSentinel failed: ${String(err)}`,
 		};
 	}
 };
@@ -150,7 +151,7 @@ export const auditDeadLetter = (root: string): DeadLetterResult | ProbeFailure =
 			bytes: stat.size,
 		};
 	} catch (err) {
-		return { ok: false, reason: `auditDeadLetter failed: ${(err as Error).message}` };
+		return { ok: false, reason: `auditDeadLetter failed: ${String(err)}` };
 	}
 };
 
@@ -180,6 +181,6 @@ export const checkPlannotator = (_root: string): PlannotatorHealthResult | Probe
 			hint: "Plannotator not installed. See README § Setup Guide for install instructions.",
 		};
 	} catch (err) {
-		return { ok: false, reason: `checkPlannotator failed: ${(err as Error).message}` };
+		return { ok: false, reason: `checkPlannotator failed: ${String(err)}` };
 	}
 };

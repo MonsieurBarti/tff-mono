@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 import { assertNotOnDefaultBranch } from "../../application/guards/branch-guard.js";
 import { assertNotOnMilestoneBranch } from "../../application/guards/milestone-branch-guard.js";
 import type { GitOps } from "../../domain/ports/git-ops.port.js";
@@ -19,8 +20,10 @@ export const touchMutatingSentinel = (root: string): void => {
 		const abs = path.join(root, SENTINEL_REL);
 		fs.mkdirSync(path.dirname(abs), { recursive: true });
 		if (!fs.existsSync(abs)) fs.writeFileSync(abs, "", "utf8");
-	} catch {
-		// Silent — observability should never break a mutating command.
+	} catch (err) {
+		tffWarn("Failed to write mutating sentinel", {
+			error: err instanceof Error ? err.message : String(err),
+		});
 	}
 };
 
