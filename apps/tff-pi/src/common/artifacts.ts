@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { DEFAULT_SETTINGS, serializeSettings } from "./settings.js";
-import { milestoneLabel, sliceLabel } from "./types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export function tffPath(root: string, ...segments: string[]): string {
 	return join(root, ".tff", ...segments);

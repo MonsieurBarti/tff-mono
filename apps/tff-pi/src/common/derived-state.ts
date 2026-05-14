@@ -1,17 +1,15 @@
 import type Database from "better-sqlite3";
 import { readArtifact } from "./artifacts.js";
 import { getMilestone, getSlice } from "./db.js";
+import { PIPELINE_PHASE_ORDER, milestoneLabel, sliceLabel } from "@tff/core";
 import {
-	PIPELINE_PHASE_ORDER,
-	type Phase,
 	SIDE_CHANNEL_PHASES,
 	SLICE_STATUSES,
+	type Phase,
 	type Slice,
 	type SliceStatus,
 	type Tier,
-	milestoneLabel,
-	sliceLabel,
-} from "./types.js";
+} from "./dto.js";
 
 // Rollback targets reflect SLICE_TRANSITIONS (state-machine.ts:3): only verify,
 // review, and ship have backward transitions today (all to executing). For
@@ -21,7 +19,7 @@ import {
 function nextPhaseFor(current: Phase, tier: Tier | null): Phase | null {
 	if (SIDE_CHANNEL_PHASES.includes(current)) return null; // side channel, not on the pipeline
 	if (current === "discuss") return tier === "S" ? "plan" : "research";
-	const idx = PIPELINE_PHASE_ORDER.indexOf(current);
+	const idx = (PIPELINE_PHASE_ORDER as readonly string[]).indexOf(current);
 	if (idx < 0 || idx === PIPELINE_PHASE_ORDER.length - 1) return null;
 	return PIPELINE_PHASE_ORDER[idx + 1] ?? null;
 }

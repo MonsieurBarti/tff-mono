@@ -101,7 +101,7 @@ export function mergeSnapshots(base: Snapshot, ours: Snapshot, theirs: Snapshot)
 	return { ok: true, merged };
 }
 
-// Mirrors the canonical status arrays in src/common/types.ts. Any future
+// Mirrors the canonical status arrays in src/common/dto.ts. Any future
 // addition to those arrays requires a matching update here — the merge order
 // is a semantics decision, not a code-ordering accident.
 // slice.status is a derived-cache column (see src/common/derived-state.ts);

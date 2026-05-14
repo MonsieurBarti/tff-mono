@@ -20,7 +20,7 @@ import { projectHomeDir } from "./project-home.js";
 import { writeRepoState } from "./repo-state.js";
 import { isStateBranchEnabledForRoot } from "./state-branch-toggle.js";
 import { writeSnapshot } from "./state-exporter.js";
-import type { Phase } from "./types.js";
+import type { Phase } from "./dto.js";
 
 export class StateBranchError extends Error {
 	constructor(message: string) {

@@ -1,4 +1,4 @@
-import type { Phase, Tier } from "./types.js";
+import type { Phase, Tier } from "./dto.js";
 
 export const TFF_CHANNELS = [
 	"tff:phase",

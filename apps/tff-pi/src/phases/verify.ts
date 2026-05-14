@@ -13,7 +13,7 @@ import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { prepareDispatch } from "../common/subagent-dispatcher.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 import { detectVerifyCommands } from "../common/verify-commands.js";
 import { getWorktreePath } from "../common/worktree.js";
 import { predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";

@@ -7,7 +7,7 @@ import { type TffContext, getDb } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

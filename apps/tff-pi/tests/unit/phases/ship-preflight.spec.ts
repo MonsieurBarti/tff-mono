@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { initTffDirectory, writeArtifact } from "../../../src/common/artifacts.js";
-import type { Slice } from "../../../src/common/types.js";
+import type { Slice } from "../../../src/common/dto.js";
 import { preflightCheck } from "../../../src/phases/ship.js";
 
 describe("preflightCheck", () => {

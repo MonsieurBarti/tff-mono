@@ -7,7 +7,7 @@ import { commitCommand } from "../common/commit.js";
 import { type TffContext, getDb } from "../common/context.js";
 import { resolveMilestone } from "../common/db-resolvers.js";
 import { getMilestone, getNextSliceNumber } from "../common/db.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

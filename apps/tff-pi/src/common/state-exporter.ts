@@ -2,7 +2,7 @@ import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import type { PhaseRun } from "./db.js";
-import type { Dependency, Milestone, Project, Slice, Task } from "./types.js";
+import type { Dependency, Milestone, Project, Slice, Task } from "./dto.js";
 
 export const SNAPSHOT_SCHEMA_VERSION = 1;
 export const SNAPSHOT_FILENAME = "state-snapshot.json";

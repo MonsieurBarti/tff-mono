@@ -14,8 +14,8 @@ import { branchExists, gitEnv, remoteBranchExists } from "../common/git.js";
 import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
-import type { Slice } from "../common/types.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Slice } from "../common/dto.js";
 import { getWorktreePath, removeWorktree } from "../common/worktree.js";
 import { predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Task } from "../../src/common/types.js";
+import type { Task } from "../../src/common/dto.js";
 import { enrichContextWithFff, loadPhaseResources } from "../../src/orchestrator.js";
 
 const ALL_PHASES = [

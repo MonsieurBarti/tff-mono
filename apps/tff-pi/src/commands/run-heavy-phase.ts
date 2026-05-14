@@ -1,7 +1,7 @@
 import type { TffContext } from "../common/context.js";
 import type { PhaseContext, PhaseModule } from "../common/phase.js";
 import { runPhaseWithFreshContext } from "../common/phase.js";
-import type { Phase } from "../common/types.js";
+import type { Phase } from "../common/dto.js";
 
 /**
  * Shared wrapper around `runPhaseWithFreshContext` for slash commands that

@@ -3,8 +3,8 @@ import { readArtifact } from "./artifacts.js";
 import { getLastCheckpoint, listCheckpoints } from "./checkpoint.js";
 import { getMilestone, getMilestones, getProject, getSlice, getSlices } from "./db.js";
 import { readPerSliceLog } from "./per-slice-log.js";
-import type { Slice, SliceStatus } from "./types.js";
-import { milestoneLabel, sliceLabel } from "./types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Slice, SliceStatus } from "./dto.js";
 import { getWorktreePath, worktreeExists } from "./worktree.js";
 
 const FORENSICS_MAX_COUNT = 10;

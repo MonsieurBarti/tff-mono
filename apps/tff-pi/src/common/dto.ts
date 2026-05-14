@@ -1,43 +1,16 @@
-export const SLICE_STATUSES = [
-	"created",
-	"discussing",
-	"researching",
-	"planning",
-	"executing",
-	"verifying",
-	"reviewing",
-	"shipping",
-	"closed",
-] as const;
-export type SliceStatus = (typeof SLICE_STATUSES)[number];
+import {
+	PHASE_VALUES,
+	PIPELINE_PHASE_ORDER,
+	type SliceStatus,
+	type MilestoneStatus,
+	type TaskStatus,
+	type ComplexityTier as Tier,
+} from "@tff/core";
+export { PIPELINE_PHASE_ORDER, PHASE_VALUES };
+export type { SliceStatus, MilestoneStatus, TaskStatus, Tier };
 
-export const MILESTONE_STATUSES = ["created", "in_progress", "completing", "closed"] as const;
-export type MilestoneStatus = (typeof MILESTONE_STATUSES)[number];
+export type Phase = (typeof PHASE_VALUES)[number] | "ship-fix";
 
-export const TASK_STATUSES = ["open", "in_progress", "closed"] as const;
-export type TaskStatus = (typeof TASK_STATUSES)[number];
-
-export const PHASE_RUN_STATUSES = [
-	"started",
-	"completed",
-	"failed",
-	"abandoned",
-	"retried",
-] as const;
-export type PhaseRunStatus = (typeof PHASE_RUN_STATUSES)[number];
-
-export const TIERS = ["S", "SS", "SSS"] as const;
-export type Tier = (typeof TIERS)[number];
-
-export type Phase =
-	| "discuss"
-	| "research"
-	| "plan"
-	| "execute"
-	| "verify"
-	| "review"
-	| "ship"
-	| "ship-fix";
 export const ALL_PHASES: Phase[] = [
 	"discuss",
 	"research",
@@ -50,15 +23,31 @@ export const ALL_PHASES: Phase[] = [
 ];
 
 export const SIDE_CHANNEL_PHASES: readonly Phase[] = ["ship-fix"];
-export const PIPELINE_PHASE_ORDER: readonly Phase[] = [
-	"discuss",
-	"research",
-	"plan",
-	"execute",
-	"verify",
-	"review",
-	"ship",
-];
+
+export const SLICE_STATUSES = [
+	"created",
+	"discussing",
+	"researching",
+	"planning",
+	"executing",
+	"verifying",
+	"reviewing",
+	"shipping",
+	"closed",
+] as const;
+
+export const MILESTONE_STATUSES = ["created", "in_progress", "completing", "closed"] as const;
+export const TASK_STATUSES = ["open", "in_progress", "closed"] as const;
+export const TIERS = ["S", "SS", "SSS"] as const;
+
+export const PHASE_RUN_STATUSES = [
+	"started",
+	"completed",
+	"failed",
+	"abandoned",
+	"retried",
+] as const;
+export type PhaseRunStatus = (typeof PHASE_RUN_STATUSES)[number];
 
 export interface Project {
 	id: string;
@@ -104,14 +93,6 @@ export interface Dependency {
 	toTaskId: string;
 }
 
-export function milestoneLabel(number: number): string {
-	return `M${String(number).padStart(2, "0")}`;
-}
-
-export function sliceLabel(milestoneNumber: number, sliceNumber: number): string {
-	return `${milestoneLabel(milestoneNumber)}-S${String(sliceNumber).padStart(2, "0")}`;
-}
-
 export function taskLabel(taskNumber: number): string {
 	return `T${String(taskNumber).padStart(2, "0")}`;
 }
@@ -122,7 +103,5 @@ export interface ValidateResult {
 }
 
 export function sanitizeForPrompt(input: string): string {
-	// Strip markdown code fence boundaries that could escape prompt context
-	// Strip system/assistant/user role markers that could manipulate LLM behavior
 	return input.replace(/```/g, "'''").replace(/^(system|assistant|user):/gim, "$1 -");
 }

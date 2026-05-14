@@ -19,7 +19,7 @@ import {
 	UnknownCommandError,
 	projectCommand,
 } from "../../../src/common/projection.js";
-import type { SliceStatus } from "../../../src/common/types.js";
+import type { SliceStatus } from "@tff/core";
 
 function seeded() {
 	const db = new Database(":memory:");

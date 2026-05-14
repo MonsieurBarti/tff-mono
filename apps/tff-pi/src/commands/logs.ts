@@ -4,7 +4,7 @@ import { findSliceByLabel } from "../common/db-resolvers.js";
 import { getMilestone } from "../common/db.js";
 import { formatDuration } from "../common/format.js";
 import { readPerSliceLog } from "../common/per-slice-log.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 import { findActiveSlice } from "../orchestrator.js";
 
 export function handleLogs(root: string, label: string, options?: { json?: boolean }): string {

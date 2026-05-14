@@ -1,8 +1,8 @@
 import type Database from "better-sqlite3";
 import { commitCommand } from "./commit.js";
 import { getLatestPhaseRun } from "./db.js";
-import { canTransitionSlice } from "./state-machine.js";
-import type { Phase, Slice, SliceStatus } from "./types.js";
+import { canTransitionSlice } from "./transition-helpers.js";
+import type { Phase, Slice, SliceStatus } from "./dto.js";
 
 const PHASE_IN_PROGRESS_STATUS: Partial<Record<Phase, SliceStatus>> = {
 	discuss: "discussing",

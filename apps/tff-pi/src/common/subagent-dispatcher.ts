@@ -12,7 +12,7 @@ import type Database from "better-sqlite3";
 import type { TffContext } from "./context.js";
 import { logException } from "./logger.js";
 import { DEFAULT_SETTINGS, type Settings } from "./settings.js";
-import type { Phase } from "./types.js";
+import type { Phase } from "./dto.js";
 
 export type AgentStatus = "DONE" | "DONE_WITH_CONCERNS" | "NEEDS_CONTEXT" | "BLOCKED";
 

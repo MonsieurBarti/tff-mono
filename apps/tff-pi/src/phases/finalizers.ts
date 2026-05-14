@@ -23,13 +23,8 @@ import {
 	prepareDispatch,
 	registerPhaseFinalizer,
 } from "../common/subagent-dispatcher.js";
-import {
-	type Task,
-	milestoneLabel,
-	sanitizeForPrompt,
-	sliceLabel,
-	taskLabel,
-} from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import { sanitizeForPrompt, taskLabel, type Task } from "../common/dto.js";
 import { getWorktreePath } from "../common/worktree.js";
 
 const VERDICT_RE = /^VERDICT:\s*(approved|denied)\s*$/gm;
@@ -512,7 +507,10 @@ async function executeFinalizer({
 				{ label: "Worktree gate", content: buildWorktreeGate(wtPath) },
 			];
 			if (reviewFeedback.length > 0) {
-				artifacts.push({ label: "Previous review feedback", content: reviewFeedback });
+				artifacts.push({
+					label: "Previous review feedback",
+					content: reviewFeedback,
+				});
 			}
 			if (relatedFiles.length > 0) {
 				artifacts.push({ label: "Related files", content: relatedFiles });

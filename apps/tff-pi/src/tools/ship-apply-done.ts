@@ -8,7 +8,7 @@ import { type TffContext, getDb } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
-import { milestoneLabel, sliceLabel } from "../common/types.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface ShipApplyDoneInput {
 	sliceLabel: string;

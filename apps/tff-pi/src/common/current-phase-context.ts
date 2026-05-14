@@ -1,4 +1,4 @@
-import type { Phase } from "./types.js";
+import type { Phase } from "./dto.js";
 
 export interface CurrentPhase {
 	sliceId: string;

@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 import { getActiveMilestone, getProject, getSlice } from "../common/db.js";
-import type { Phase, ValidateResult } from "../common/types.js";
+import type { Phase, ValidateResult } from "../common/dto.js";
 import { predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 
 /**

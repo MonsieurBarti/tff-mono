@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 import { getMilestone, getMilestones, getProject, getSlice, getSlices } from "./db.js";
-import type { Milestone, Slice } from "./types.js";
+import type { Milestone, Slice } from "./dto.js";
 
 /**
  * Pure, ctx-free resolvers from user-supplied refs (either `M<nn>`/`M<nn>-S<nn>`

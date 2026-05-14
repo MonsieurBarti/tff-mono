@@ -11,7 +11,8 @@ import {
 	updateSliceTier,
 } from "../../../src/common/db.js";
 import { computeNextHint } from "../../../src/common/phase-completion.js";
-import type { Slice, SliceStatus } from "../../../src/common/types.js";
+import type { SliceStatus } from "@tff/core";
+import type { Slice } from "../../../src/common/dto.js";
 import { must } from "../../helpers.js";
 
 function setupOneSlice(status: SliceStatus, tier: "S" | "SS" | "SSS" = "SS") {

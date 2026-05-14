@@ -8,7 +8,7 @@ import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
 import { type PhaseContext, runPhaseWithFreshContext } from "../common/phase.js";
 import { DEFAULT_SETTINGS } from "../common/settings.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 import { shipFixPhase } from "../phases/ship-fix.js";
 
 export interface ToolResult {

@@ -8,7 +8,7 @@ import {
 	writeSync,
 } from "node:fs";
 import { join } from "node:path";
-import type { Phase } from "./types.js";
+import type { Phase } from "./dto.js";
 
 export interface SessionLock {
 	phase: Phase;

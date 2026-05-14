@@ -4,9 +4,9 @@ import type Database from "better-sqlite3";
 import { getLatestPhaseRun, getMilestone, getSlice } from "./db.js";
 import { expectedInProgressStatusFor } from "./derived-state.js";
 import { readEvents } from "./event-log.js";
-import { canTransitionSlice } from "./state-machine.js";
-import type { Phase, SliceStatus } from "./types.js";
-import { milestoneLabel, sliceLabel } from "./types.js";
+import { canTransitionSlice } from "./transition-helpers.js";
+import { milestoneLabel, sliceLabel } from "@tff/core";
+import type { Phase, SliceStatus } from "./dto.js";
 
 export interface PreconditionResult {
 	ok: boolean;

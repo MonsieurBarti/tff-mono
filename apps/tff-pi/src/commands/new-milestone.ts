@@ -9,7 +9,7 @@ import { type TffContext, requireProject } from "../common/context.js";
 import { getNextMilestoneNumber, getProject } from "../common/db.js";
 import { branchExists, createBranch, getCurrentBranch, pushBranch } from "../common/git.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel } from "../common/types.js";
+import { milestoneLabel } from "@tff/core";
 
 export interface MilestoneResult {
 	milestoneId: string;

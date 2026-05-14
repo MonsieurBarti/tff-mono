@@ -2,7 +2,7 @@ import { makeBaseEvent } from "../common/events.js";
 import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 import {
 	collectPhaseContext,
 	loadPhaseResources,

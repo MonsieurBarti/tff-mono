@@ -2,7 +2,7 @@ import { makeBaseEvent } from "../common/events.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { type PreparationBrief, buildPreparationBrief } from "../common/preparation.js";
-import { sliceLabel } from "../common/types.js";
+import { sliceLabel } from "@tff/core";
 import { loadPhaseResources } from "../orchestrator.js";
 
 export const discussPhase: PhaseModule = {
