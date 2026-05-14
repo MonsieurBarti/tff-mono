@@ -6,7 +6,7 @@ import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { handleInit } from "../../../src/commands/init.js";
 import { handleNew, runNew } from "../../../src/commands/new.js";
-import { artifactExists, readArtifact } from "../../../src/common/artifacts.js";
+import { artifactExists, readArtifact } from "@tff/core";
 import { createTffContext } from "../../../src/common/context.js";
 import { applyMigrations, getMilestones, getProject } from "../../../src/common/db.js";
 import { readProjectIdFile } from "../../../src/common/project-home.js";

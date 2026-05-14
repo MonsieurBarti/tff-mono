@@ -10,7 +10,7 @@ vi.mock("../../../src/common/review-feedback.js", () => ({
 }));
 
 import { handleShipChanges } from "../../../src/commands/ship-changes.js";
-import { initTffDirectory } from "../../../src/common/artifacts.js";
+import { initTffDirectory } from "@tff/core";
 import {
 	applyMigrations,
 	getSlice,

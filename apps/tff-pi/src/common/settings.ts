@@ -1,5 +1,5 @@
 import YAML from "yaml";
-import { readArtifact } from "./artifacts.js";
+import { readArtifact } from "@tff/core";
 import type { TffContext } from "./context.js";
 
 export interface Settings {

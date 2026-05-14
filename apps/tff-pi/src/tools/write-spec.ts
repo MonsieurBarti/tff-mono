@@ -1,7 +1,7 @@
 import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
-import { writeArtifact } from "../common/artifacts.js";
+import { writeArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { commitCommand } from "../common/commit.js";
 import { compressIfEnabled } from "../common/compress.js";
 import { type TffContext, getDb } from "../common/context.js";
@@ -10,7 +10,6 @@ import { getMilestone, getSlice } from "../common/db.js";
 import { buildDiscussCompletionSuffix } from "../common/phase-completion.js";
 import { requestReview } from "../common/plannotator-review.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

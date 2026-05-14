@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runMechanicalVerification } from "../../../src/common/mechanical-verifier.js";
-import type { VerifyCommand } from "../../../src/common/verify-commands.js";
+import type { VerifyCommand } from "@tff/core";
 
 describe("mechanical-verifier", () => {
 	let cwd: string;

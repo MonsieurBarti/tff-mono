@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { readArtifact, writeArtifact } from "../common/artifacts.js";
+import { readArtifact, writeArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { milestoneBranchName, sliceBranchName } from "../common/branch-naming.js";
 import { cleanupCheckpoints } from "../common/checkpoint.js";
 import { compressIfEnabled } from "../common/compress.js";
@@ -14,7 +14,6 @@ import { branchExists, gitEnv, remoteBranchExists } from "../common/git.js";
 import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import type { Slice } from "../common/dto.js";
 import { getWorktreePath, removeWorktree } from "../common/worktree.js";
 import { predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";

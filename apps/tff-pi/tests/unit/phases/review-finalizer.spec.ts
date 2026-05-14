@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { artifactExists, initTffDirectory, writeArtifact } from "../../../src/common/artifacts.js";
+import { artifactExists, initTffDirectory, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,

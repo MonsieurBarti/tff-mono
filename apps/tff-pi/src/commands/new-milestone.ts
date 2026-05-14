@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { initMilestoneDir, writeArtifact } from "../common/artifacts.js";
+import { initMilestoneDir, writeArtifact, milestoneLabel } from "@tff/core";
 import { milestoneBranchName } from "../common/branch-naming.js";
 import { commitCommand } from "../common/commit.js";
 import { compressIfEnabled } from "../common/compress.js";
@@ -9,7 +9,6 @@ import { type TffContext, requireProject } from "../common/context.js";
 import { getNextMilestoneNumber, getProject } from "../common/db.js";
 import { branchExists, createBranch, getCurrentBranch, pushBranch } from "../common/git.js";
 import { DEFAULT_SETTINGS, type Settings } from "../common/settings.js";
-import { milestoneLabel } from "@tff/core";
 
 export interface MilestoneResult {
 	milestoneId: string;

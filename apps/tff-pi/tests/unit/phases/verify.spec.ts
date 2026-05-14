@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { type Mock, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { initTffDirectory, readArtifact, writeArtifact } from "../../../src/common/artifacts.js";
+import { initTffDirectory, readArtifact, writeArtifact } from "@tff/core";
 import { compressIfEnabled } from "../../../src/common/compress.js";
 import {
 	applyMigrations,
@@ -49,9 +49,13 @@ vi.mock("../../../src/common/checkpoint.js", () => ({
 	createCheckpoint: vi.fn(),
 }));
 
-vi.mock("../../../src/common/verify-commands.js", () => ({
-	detectVerifyCommands: vi.fn().mockResolvedValue([]),
-}));
+vi.mock("@tff/core", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@tff/core")>();
+	return {
+		...actual,
+		detectVerifyCommands: vi.fn().mockResolvedValue([]),
+	};
+});
 
 vi.mock("../../../src/common/mechanical-verifier.js", () => ({
 	runMechanicalVerification: vi.fn(),
@@ -74,7 +78,7 @@ vi.mock("../../../src/orchestrator.js", () => ({
 }));
 
 import { getDiff } from "../../../src/common/git.js";
-import { detectVerifyCommands } from "../../../src/common/verify-commands.js";
+import { detectVerifyCommands } from "@tff/core";
 import { verifyPhase } from "../../../src/phases/verify.js";
 
 function makeCtx(db: Database.Database, root: string, sliceId: string): PhaseContext {

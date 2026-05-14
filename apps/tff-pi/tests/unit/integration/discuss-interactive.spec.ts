@@ -3,12 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-	initMilestoneDir,
-	initSliceDir,
-	initTffDirectory,
-	writeArtifact,
-} from "../../../src/common/artifacts.js";
+import { initMilestoneDir, initSliceDir, initTffDirectory, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,

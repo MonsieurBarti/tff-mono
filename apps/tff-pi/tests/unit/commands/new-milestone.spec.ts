@@ -5,12 +5,7 @@ import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMilestone } from "../../../src/commands/new-milestone.js";
-import {
-	artifactExists,
-	initTffDirectory,
-	milestoneDir,
-	readArtifact,
-} from "../../../src/common/artifacts.js";
+import { artifactExists, initTffDirectory, resolveTffPath, readArtifact } from "@tff/core";
 import { compressIfEnabled } from "../../../src/common/compress.js";
 import {
 	applyMigrations,
@@ -94,7 +89,7 @@ describe("createMilestone", () => {
 
 	it("creates milestone directory on disk", () => {
 		createMilestone(db, root, projectId, "Foundation");
-		const dir = milestoneDir(root, 1);
+		const dir = resolveTffPath(root, "milestones", "M01");
 		expect(existsSync(dir)).toBe(true);
 	});
 

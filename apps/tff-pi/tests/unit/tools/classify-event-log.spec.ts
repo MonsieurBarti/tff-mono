@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { describe, expect, test } from "vitest";
-import { writeArtifact } from "../../../src/common/artifacts.js";
+import { writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getSlice,

@@ -31,6 +31,21 @@ export {
 	type DimensionForPredicate,
 	type VerdictForPredicate,
 } from "./dimension-verdict.js";
+export {
+	resolveTffPath,
+	writeArtifact,
+	deleteArtifact,
+	readArtifact,
+	artifactExists,
+	initTffDirectory,
+	initMilestoneDir,
+	initSliceDir,
+} from "./artifact-io.js";
+export {
+	detectVerifyCommands,
+	type VerifyCommand,
+	type VerifySettings,
+} from "./verify-commands.js";
 export { signalsToTagSet, scoreAgents, type RankedAgent } from "./routing-rubric.js";
 export { sanitizeReason } from "./sanitize-reason.js";
 export { resolveBaseBranch, resolveBranchName } from "./slice-resolvers.js";

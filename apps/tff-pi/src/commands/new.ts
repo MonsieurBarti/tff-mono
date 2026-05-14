@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { tffPath, writeArtifact } from "../common/artifacts.js";
+import { resolveTffPath, writeArtifact } from "@tff/core";
 import { commitCommand } from "../common/commit.js";
 import { compressIfEnabled } from "../common/compress.js";
 import type { TffContext } from "../common/context.js";
@@ -35,7 +35,7 @@ export function handleNew(
 }
 
 function initDb(ctx: TffContext, root: string): void {
-	const dbPath = tffPath(root, "state.db");
+	const dbPath = resolveTffPath(root, "state.db");
 	ctx.db = openDatabase(dbPath);
 	applyMigrations(ctx.db, { root });
 }

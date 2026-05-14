@@ -1,6 +1,6 @@
 // Single chokepoint for the state_branch.enabled toggle. Every state-branch
 // entry point gates on this. Audit new call sites with: grep -r "isStateBranchEnabled"
-import { readArtifact } from "./artifacts.js";
+import { readArtifact } from "@tff/core";
 import type { TffContext } from "./context.js";
 import { DEFAULT_SETTINGS, parseSettings } from "./settings.js";
 

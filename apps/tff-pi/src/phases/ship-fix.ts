@@ -1,7 +1,6 @@
-import { readArtifact } from "../common/artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { makeBaseEvent } from "../common/events.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import { sanitizeForPrompt } from "../common/dto.js";
 import { getWorktreePath } from "../common/worktree.js";
 import { loadPhaseResources } from "../orchestrator.js";

@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { gitEnv } from "./git.js";
-import type { VerifyCommand } from "./verify-commands.js";
+import type { VerifyCommand } from "@tff/core";
 
 export interface CommandResult {
 	name: string;

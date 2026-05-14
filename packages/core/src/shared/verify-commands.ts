@@ -1,7 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
-import type { Settings } from "./settings.js";
 
 export interface VerifyCommand {
 	name: string;
@@ -9,9 +8,14 @@ export interface VerifyCommand {
 	source: "settings" | "ci" | "hooks" | "package.json";
 }
 
+export interface VerifySettings {
+	verify_commands?: { name: string; command: string }[];
+	verify_auto_detect?: boolean;
+}
+
 export async function detectVerifyCommands(
 	root: string,
-	settings: Settings,
+	settings: VerifySettings,
 ): Promise<VerifyCommand[]> {
 	// 1. Explicit settings take precedence
 	if (settings.verify_commands && settings.verify_commands.length > 0) {
