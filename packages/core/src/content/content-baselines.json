@@ -44,10 +44,10 @@
 			"sha256": "5fb1c57c541cc5a0d808338bd64bd434771065aa173322bab0b53e9f9c0163dd"
 		},
 		"architecture-review": {
-			"approvedAt": "2026-05-10T14:56:26.451Z",
+			"approvedAt": "2026-05-14T18:45:57.000Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "d7e1b62c50c48d13280d278975b471cbf707afdab34f6865f3a457c1cd2ec6e0"
+			"sha256": "5cb3381f48f7f35c8e12090ac60e367acc7daf4844ec7c83d36d91337156d4a3"
 		},
 		"brainstorming": {
 			"approvedAt": "2026-05-10T14:56:26.451Z",
@@ -91,6 +91,12 @@
 			"refinementId": null,
 			"sha256": "8ff79a7250923ad39f00defbe634b1d1686896a7921019f0973bcce2f20993e1"
 		},
+		"grill-with-docs": {
+			"approvedAt": "2026-05-14T18:45:57.002Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "3d691a0069fe3978f3e10f6b9925a06a2005252e4bdb56a65bac862a439ba1d1"
+		},
 		"hexagonal-architecture": {
 			"approvedAt": "2026-05-10T14:56:26.452Z",
 			"originalCommitSha": null,
@@ -98,10 +104,16 @@
 			"sha256": "c57c2515757d3c116f68a61220a655c78b2abd2b1fed16e2ab685ba4e9fbe2b6"
 		},
 		"plannotator-usage": {
-			"approvedAt": "2026-05-10T14:56:26.452Z",
+			"approvedAt": "2026-05-14T18:45:57.002Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "e493e7431caf2fbaff8b96eb4e54710d5c4d97d68e10cc92099966b41b840818"
+			"sha256": "46cb68fea8f47d10926cc8637b53449716dad18eff7b94d3424dec844129c80f"
+		},
+		"prototype": {
+			"approvedAt": "2026-05-14T18:45:57.002Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "cd665238894fb50f40edfcea91970a82ea9f18829e3d7a850b5757568b0a952f"
 		},
 		"receiving-code-review": {
 			"approvedAt": "2026-05-10T14:56:26.452Z",
@@ -121,6 +133,12 @@
 			"refinementId": null,
 			"sha256": "a355532a47b690f549ed7248900bd1270252b6f93cdcc8bc9922a53f85886caf"
 		},
+		"setup-project-skills": {
+			"approvedAt": "2026-05-14T18:45:57.003Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "1143acfb5b08029e162247ca05a2ba426274e4339dc946161b41cd8528a0c14d"
+		},
 		"skill-authoring": {
 			"approvedAt": "2026-05-10T14:56:26.452Z",
 			"originalCommitSha": null,
@@ -134,16 +152,28 @@
 			"sha256": "12aff271b45e48d00f40639c7007a83ddcfb495be5039c452d1c210dbcb8799c"
 		},
 		"systematic-debugging": {
-			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"approvedAt": "2026-05-14T18:45:57.003Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "013358fcdc140f10aed71d488a8266d349b954c5d15b0ea6044f3cbafa93dd1b"
+			"sha256": "8ed60da5117acbd4222e49eeb3ff747a9b3e2b964b915474ac1fd9a325111dd7"
 		},
 		"test-driven-development": {
-			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"approvedAt": "2026-05-14T18:45:57.003Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "214c93df5a59492e39fcc1c1940dab22c06959f127dff7ed074ba6ae1eb27c85"
+			"sha256": "1189a249c47dec9372a25c5e4da0bd0f41d8f96ed30dab083e5a91e6ab8761ae"
+		},
+		"to-prd": {
+			"approvedAt": "2026-05-14T18:45:57.003Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "5ca997d7236ab7b9e48fd57d5e36ca7a28f1a7ab80c0aa082fcc5d4b82943534"
+		},
+		"triage": {
+			"approvedAt": "2026-05-14T18:45:57.003Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "36697cb8469cca68ca5f7d44d2debf0b174b5df5b3a5c725d664c0766ebd7a89"
 		},
 		"verification-before-completion": {
 			"approvedAt": "2026-05-10T14:56:26.453Z",
@@ -152,10 +182,16 @@
 			"sha256": "d49eae1e40e6f6291ad0fbafa43372693e2e85c046f69b525a806e8dc9b3b5d7"
 		},
 		"writing-plans": {
-			"approvedAt": "2026-05-10T14:56:26.453Z",
+			"approvedAt": "2026-05-14T18:45:57.003Z",
 			"originalCommitSha": null,
 			"refinementId": null,
-			"sha256": "28ae3399ced8b30a67b71bb569af7118f64729bf5d7dab8338c4c0795ec39d50"
+			"sha256": "ef553a5a4badcab9967242ba3c21243da469f98b76177574226c950037b5a759"
+		},
+		"zoom-out": {
+			"approvedAt": "2026-05-14T18:45:57.004Z",
+			"originalCommitSha": null,
+			"refinementId": null,
+			"sha256": "51c6a8f6ceed62e598f564c62694a8e151b575c2f4933abba67a46a5efe64ba8"
 		}
 	},
 	"workflows": {
@@ -168,40 +204,40 @@
 			"sha256": "e83b58a83e24baac1e4d3a815a3fcb1bf04702ec608485157bf8fc87e2198b29"
 		},
 		"compose-skills": {
-			"approvedAt": "2026-05-10T00:36:05.730Z",
-			"sha256": "cc2df7fe1b4cc0439ff95a12a1783358f3e14577f539f996795148ce7ba6dad9"
+			"approvedAt": "2026-05-14T18:45:57.004Z",
+			"sha256": "686aa34908ee2c4423d09970bb89acf30955408d82dbf221f1ada00ee597081c"
 		},
 		"create-skill": {
-			"approvedAt": "2026-05-10T00:36:05.731Z",
-			"sha256": "d82108c76dd0115f8a5b60736ad6c33ce6fc7674513a1096995dc607e09e28cc"
+			"approvedAt": "2026-05-14T18:45:57.004Z",
+			"sha256": "6c540b403f2b6ff46bd8b46d00a80777c64727686130688289e09db8832639fe"
 		},
 		"debug": {
-			"approvedAt": "2026-05-10T08:40:31.855Z",
-			"sha256": "baa901bb71203bf22ef5bfb70d9ed800b46e0a06f63d53c5239313d3a40798f8"
+			"approvedAt": "2026-05-14T18:45:57.004Z",
+			"sha256": "268804d19222bf7ce9655a1fbefa8a2ddf113d3ea84f732a6e8df5f027a6fbfa"
 		},
 		"detect-patterns": {
 			"approvedAt": "2026-05-10T00:36:05.731Z",
 			"sha256": "12cc9ac69570ea2eb189d8d40aa59360ed7f64496618440620424e7704b4843f"
 		},
 		"discuss-slice": {
-			"approvedAt": "2026-05-10T08:40:31.856Z",
-			"sha256": "cbb1a81409dd17849143ed9533d810d45a228113723319daf1161f8c360a0545"
+			"approvedAt": "2026-05-14T18:45:57.004Z",
+			"sha256": "e4dc02202bc4444c631c21f7aefc2ed3c897950d1299b542ac1a0b6ab138195c"
 		},
 		"execute-slice": {
 			"approvedAt": "2026-05-10T08:40:31.856Z",
 			"sha256": "0fce019789be802ed90e0cd5b3eb15de876b34038d84d220d0ecec2832036606"
 		},
 		"health": {
-			"approvedAt": "2026-05-10T00:36:05.731Z",
-			"sha256": "c4c8ded7bda6d7223b01639e5a13f2714b242c6b9fc1d583393bef76b4eeea08"
+			"approvedAt": "2026-05-14T18:45:57.005Z",
+			"sha256": "95945dbf01c78d9ad3c60741cd54a5a52ee4e8137a45d12ef8623b2dae4e6533"
 		},
 		"help": {
 			"approvedAt": "2026-05-10T00:23:37.748Z",
 			"sha256": "829a8541ed0e948bfe9c7c4b5bc5c690f0c388787fc019cdd450fa0e93353703"
 		},
 		"learn-skills": {
-			"approvedAt": "2026-05-10T00:36:05.731Z",
-			"sha256": "d3d8569920dffacaffaf9697d6a7cf1cbdd6bfb72e5a30c4ec7dfb9af264c3bc"
+			"approvedAt": "2026-05-14T18:45:57.005Z",
+			"sha256": "fe16a5654408dfd75f2e78fa1c7c01270d18659d0de9a80d41a6e782d3b6c5d9"
 		},
 		"map-codebase": {
 			"approvedAt": "2026-05-10T00:36:05.731Z",
@@ -216,16 +252,16 @@
 			"sha256": "10033a641b6b3276bdb76a7d6038e1aba7d98d108a134b2de57a4d71a9a0e2ce"
 		},
 		"plan-slice": {
-			"approvedAt": "2026-05-10T08:40:31.857Z",
-			"sha256": "a9afcac6bb1651038688c2022667bb547861915be7aa2af8388849714bec8272"
+			"approvedAt": "2026-05-14T18:45:57.005Z",
+			"sha256": "c718a92698bc303b25dc34622c516d842b5d2d55f5573d0d8a1048a8863c5e3b"
 		},
 		"progress": {
 			"approvedAt": "2026-05-10T00:36:05.732Z",
 			"sha256": "b118d1b0a6bf86f38720f8260a009683db41d342086da867854e5c369a769b0f"
 		},
 		"quick": {
-			"approvedAt": "2026-05-10T08:40:31.857Z",
-			"sha256": "65a45647df96e5ab4f586fe6f7093e3e47b4a0f82092929e2848dace87889896"
+			"approvedAt": "2026-05-14T18:45:57.005Z",
+			"sha256": "b5ae691f3e26efd38a9dacaa3b7c95b2b0b1c16de3229514edf9e7bf3e1a3001"
 		},
 		"research-slice": {
 			"approvedAt": "2026-05-10T00:36:05.732Z",
@@ -248,8 +284,8 @@
 			"sha256": "cb11b422a3c71eb8a1bf0f9f8fa1b6d538cda9924a60da44c6fe394b50b5ca05"
 		},
 		"verify-slice": {
-			"approvedAt": "2026-05-10T08:40:31.857Z",
-			"sha256": "fbea742bc29b31f1e9498c0c9c86814562f46543dc55c68942dfa3c13a34c8e9"
+			"approvedAt": "2026-05-14T18:45:57.005Z",
+			"sha256": "717b8bdd71d29034aae8bc46e7c5f7701e0bc40fdc54ecec08367e988992745c"
 		}
 	},
 	"protocols": {
@@ -262,8 +298,8 @@
 			"sha256": "4165e1c02c9e752c7e4cf13ed735b11b2ab58631a00f66475db0c1702fd487da"
 		},
 		"conventions": {
-			"approvedAt": "2026-05-10T08:40:31.857Z",
-			"sha256": "6c0e39670a9096335fd0185e137d93dda44d8738b64ed5d2e56d35ff327f008f"
+			"approvedAt": "2026-05-14T18:45:57.006Z",
+			"sha256": "9320d3521490fe3a6aab88bd59bf84e452b2a1ba34b7fd75218a3214c9c196a1"
 		},
 		"flag-naming-conventions": {
 			"approvedAt": "2026-05-10T00:23:37.749Z",
