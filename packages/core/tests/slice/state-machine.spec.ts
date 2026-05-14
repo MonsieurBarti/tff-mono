@@ -74,6 +74,25 @@ describe("validateTransition", () => {
 		const result = validateTransition("planning", "planning", SLICE_TRANSITIONS);
 		expect(result).toEqual({ ok: true });
 	});
+
+	it("returns ok:true for discussing→planning", () => {
+		const result = validateTransition("discussing", "planning", SLICE_TRANSITIONS);
+		expect(result).toEqual({ ok: true });
+	});
+
+	it("returns ok:true for shipping→executing", () => {
+		const result = validateTransition("shipping", "executing", SLICE_TRANSITIONS);
+		expect(result).toEqual({ ok: true });
+	});
+
+	it("returns ok:true for every transition defined in SLICE_TRANSITIONS", () => {
+		for (const [from, targets] of Object.entries(SLICE_TRANSITIONS)) {
+			for (const to of targets) {
+				const result = validateTransition(from, to, SLICE_TRANSITIONS);
+				expect(result, `transition ${from} → ${to} should be valid`).toEqual({ ok: true });
+			}
+		}
+	});
 });
 
 describe("nextSliceStatus", () => {
