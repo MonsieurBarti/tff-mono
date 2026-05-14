@@ -1,0 +1,100 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Ok } from "@tff/core";
+import type { ClosableStateStores } from "../../../../src/infrastructure/adapters/sqlite/create-state-stores.js";
+import { SQLiteStateAdapter } from "../../../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
+import { taskReadyCmd } from "../../../../src/cli/commands/task-ready.cmd.js";
+
+const { getAdapter, setAdapter } = vi.hoisted(() => {
+	let _adapter: SQLiteStateAdapter | null = null;
+	return {
+		getAdapter: () => _adapter,
+		setAdapter: (a: SQLiteStateAdapter) => {
+			_adapter = a;
+		},
+	};
+});
+
+const nullJournal = {
+	append: () => Ok(0 as number),
+	readAll: () => Ok([] as never[]),
+	readSince: () => Ok([] as never[]),
+	count: () => Ok(0 as number),
+};
+
+vi.mock("../../../../src/infrastructure/adapters/sqlite/create-state-stores.js", () => ({
+	createClosableStateStoresUnchecked: vi.fn((): ClosableStateStores => {
+		const adapter = getAdapter()!;
+		return {
+			db: adapter,
+			projectStore: adapter,
+			milestoneStore: adapter,
+			sliceStore: adapter,
+			taskStore: adapter,
+			dependencyStore: adapter,
+			sliceDependencyStore: adapter,
+			sessionStore: adapter,
+			reviewStore: adapter,
+			milestoneAuditStore: adapter,
+			pendingJudgmentStore: adapter,
+			journalRepository: nullJournal,
+			close: () => {},
+			checkpoint: () => {},
+		};
+	}),
+}));
+
+function seedAdapter(): { adapter: SQLiteStateAdapter; sliceId: string } {
+	const adapter = SQLiteStateAdapter.createInMemory();
+	adapter.init();
+	adapter.saveProject({ name: "Test Project" });
+	adapter.createMilestone({ number: 1, name: "Milestone One" });
+	const msR = adapter.listMilestones();
+	if (!msR.ok || msR.data.length === 0) throw new Error("No milestones seeded");
+	const milestoneId = msR.data[0].id;
+	adapter.createSlice({ milestoneId, number: 1, title: "Slice One", id: "M01-S01" });
+	const sliceId = "M01-S01";
+	adapter.createTask({ sliceId, number: 1, title: "Task One" });
+	return { adapter, sliceId };
+}
+
+describe("task:ready", () => {
+	beforeEach(() => {
+		const { adapter } = seedAdapter();
+		setAdapter(adapter);
+	});
+
+	it("lists ready tasks for a valid slice-id", async () => {
+		const { sliceId } = seedAdapter();
+		setAdapter(seedAdapter().adapter);
+		const result = JSON.parse(await taskReadyCmd(["--slice-id", sliceId]));
+		expect(result.ok).toBe(true);
+		expect(Array.isArray(result.data)).toBe(true);
+	});
+
+	it("returns empty array when no ready tasks", async () => {
+		const { adapter } = seedAdapter();
+		adapter.createMilestone({ number: 2, name: "Milestone Two" });
+		const msR = adapter.listMilestones();
+		if (!msR.ok) throw new Error("failed");
+		const m2 = msR.data.find((m) => m.number === 2);
+		if (!m2) throw new Error("no m2");
+		adapter.createSlice({ milestoneId: m2.id, number: 1, title: "Empty Slice" });
+		const emptySliceId = "M02-S01";
+		setAdapter(adapter);
+		const result = JSON.parse(await taskReadyCmd(["--slice-id", emptySliceId]));
+		expect(result.ok).toBe(true);
+		expect(result.data).toEqual([]);
+	});
+
+	it("fails for invalid slice-id format", async () => {
+		const result = JSON.parse(await taskReadyCmd(["--slice-id", "invalid"]));
+		expect(result.ok).toBe(false);
+		expect(result.error.code).toBe("PATTERN_MISMATCH");
+	});
+
+	it("fails when missing required flag", async () => {
+		const result = JSON.parse(await taskReadyCmd([]));
+		expect(result.ok).toBe(false);
+		expect(result.error.code).toBe("MISSING_REQUIRED_FLAG");
+	});
+});
