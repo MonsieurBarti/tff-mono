@@ -1,6 +1,8 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { load as yamlLoad, CORE_SCHEMA } from "js-yaml";
+import { tffWarn } from "../../infrastructure/adapters/logging/warn.js";
 
 const OBS_DIR = ".tff/observations";
 const SESSIONS = `${OBS_DIR}/sessions.jsonl`;
@@ -71,11 +73,14 @@ export const checkLastObservation = (
 					lastSeenAt: parsed.ts,
 					stale: ageDays > staleAfterDays,
 				};
-			} catch {}
+			} catch {
+				const truncated = recent[i].length > 80 ? `${recent[i].slice(0, 80)}…` : recent[i];
+				tffWarn(`Malformed observation entry: ${truncated}`);
+			}
 		}
 		return { ok: false, reason: "no parseable observation in last 5 entries" };
 	} catch (err) {
-		return { ok: false, reason: `checkLastObservation failed: ${(err as Error).message}` };
+		return { ok: false, reason: `checkLastObservation failed: ${String(err)}` };
 	}
 };
 
@@ -113,7 +118,7 @@ export const checkFirstObservationSentinel = (root: string): SentinelResult | Pr
 	} catch (err) {
 		return {
 			ok: false,
-			reason: `checkFirstObservationSentinel failed: ${(err as Error).message}`,
+			reason: `checkFirstObservationSentinel failed: ${String(err)}`,
 		};
 	}
 };
@@ -146,6 +151,36 @@ export const auditDeadLetter = (root: string): DeadLetterResult | ProbeFailure =
 			bytes: stat.size,
 		};
 	} catch (err) {
-		return { ok: false, reason: `auditDeadLetter failed: ${(err as Error).message}` };
+		return { ok: false, reason: `auditDeadLetter failed: ${String(err)}` };
+	}
+};
+
+export interface PlannotatorHealthResult {
+	readonly ok: true;
+	readonly available: boolean;
+	readonly path?: string;
+	readonly hint?: string;
+}
+
+export const checkPlannotator = (_root: string): PlannotatorHealthResult | ProbeFailure => {
+	try {
+		const pluginPath = path.join(
+			os.homedir(),
+			".claude",
+			"plugins",
+			"data",
+			"plannotator-plannotator",
+		);
+		const available = fs.existsSync(pluginPath);
+		if (available) {
+			return { ok: true, available: true, path: pluginPath };
+		}
+		return {
+			ok: true,
+			available: false,
+			hint: "Plannotator not installed. See README § Setup Guide for install instructions.",
+		};
+	} catch (err) {
+		return { ok: false, reason: `checkPlannotator failed: ${String(err)}` };
 	}
 };

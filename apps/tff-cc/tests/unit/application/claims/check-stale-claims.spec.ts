@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkStaleClaims } from "../../../../src/application/claims/check-stale-claims.js";
-import { isOk } from "@tff/core";
+import { isOk, Task } from "@tff/core";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
 
 describe("InMemoryStateAdapter — claim + stale detection", () => {
@@ -35,7 +35,11 @@ describe("InMemoryStateAdapter — claim + stale detection", () => {
 		adapter.claimTask("M01-S01-T01");
 		const t1 = adapter.getTask("M01-S01-T01");
 		if (isOk(t1) && t1.data) {
-			t1.data.claimedAt = new Date(Date.now() - 31 * 60 * 1000);
+			const backdated = Task.reconstruct({
+				...t1.data.toJSON(),
+				claimedAt: new Date(Date.now() - 31 * 60 * 1000),
+			});
+			(adapter as unknown as { tasks: Map<string, Task> }).tasks.set("M01-S01-T01", backdated);
 		}
 
 		adapter.claimTask("M01-S01-T02");
@@ -73,7 +77,11 @@ describe("checkStaleClaims use case", () => {
 		adapter.claimTask("M01-S01-T01");
 		const t1 = adapter.getTask("M01-S01-T01");
 		if (isOk(t1) && t1.data) {
-			t1.data.claimedAt = new Date(Date.now() - 31 * 60 * 1000);
+			const backdated = Task.reconstruct({
+				...t1.data.toJSON(),
+				claimedAt: new Date(Date.now() - 31 * 60 * 1000),
+			});
+			(adapter as unknown as { tasks: Map<string, Task> }).tasks.set("M01-S01-T01", backdated);
 		}
 
 		const result = await checkStaleClaims({ ttlMinutes: 30 }, { taskStore: adapter });

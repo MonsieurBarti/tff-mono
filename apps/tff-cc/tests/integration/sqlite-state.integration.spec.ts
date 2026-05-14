@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { isErr, isOk } from "@tff/core";
+import { isErr, isOk, Milestone, Project, Slice, Task } from "@tff/core";
 import { SQLiteStateAdapter } from "../../src/infrastructure/adapters/sqlite/sqlite-state.adapter.js";
 
 // Integration tests access the private `db` field for direct SQL operations.
@@ -105,8 +105,11 @@ describe("SQLite integration", () => {
 			const result = fileAdapter.init();
 
 			expect(isOk(result)).toBe(true);
-			expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("schema version mismatch"));
-			expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining(tempDbPath));
+			expect(warnSpy).toHaveBeenCalledWith(
+				"[tff]",
+				expect.stringContaining("schema version mismatch"),
+			);
+			expect(warnSpy).toHaveBeenCalledWith("[tff]", expect.stringContaining(tempDbPath));
 			warnSpy.mockRestore();
 
 			// Verify database is functional after recovery
@@ -132,5 +135,32 @@ describe("SQLite integration", () => {
 		const result = adapter.closeMilestone(milestoneId);
 		expect(isErr(result)).toBe(true);
 		if (isErr(result)) expect(result.error.errorLabel).toBe("MILESTONE_COMPLETENESS_VIOLATION");
+	});
+
+	it("returns proper entity instances", () => {
+		adapter.saveProject({ name: "P" });
+		const p = adapter.getProject();
+		expect(isOk(p)).toBe(true);
+		if (isOk(p) && p.data) expect(p.data).toBeInstanceOf(Project);
+
+		const m = adapter.createMilestone({ number: 1, name: "M" });
+		expect(isOk(m)).toBe(true);
+		if (isOk(m) && m.data) expect(m.data).toBeInstanceOf(Milestone);
+
+		const sl = adapter.createSlice({
+			milestoneId: isOk(m) ? m.data.id : "M01",
+			number: 1,
+			title: "S",
+		});
+		expect(isOk(sl)).toBe(true);
+		if (isOk(sl) && sl.data) expect(sl.data).toBeInstanceOf(Slice);
+
+		const t = adapter.createTask({
+			sliceId: isOk(sl) ? sl.data.id : "M01-S01",
+			number: 1,
+			title: "T",
+		});
+		expect(isOk(t)).toBe(true);
+		if (isOk(t) && t.data) expect(t.data).toBeInstanceOf(Task);
 	});
 });

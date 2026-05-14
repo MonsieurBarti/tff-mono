@@ -8,7 +8,6 @@ export const WorkflowPoolSchema = z
 		default_agent: z.string().min(1),
 	})
 	.refine((pool) => pool.agents.some((a) => a.id === pool.default_agent), {
-		message: "default_agent must be the id of an agent in the pool",
-		path: ["default_agent"],
+		message: "default_agent must match an agent in the agents array",
 	});
 export type WorkflowPool = z.infer<typeof WorkflowPoolSchema>;

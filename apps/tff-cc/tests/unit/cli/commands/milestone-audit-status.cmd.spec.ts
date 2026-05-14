@@ -68,7 +68,7 @@ describe("milestone:audit-status", () => {
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M99"]));
 
 		expect(result.ok).toBe(false);
-		expect(result.error.errorLabel).toBe("NOT_FOUND");
+		expect(result.error.code).toBe("NOT_FOUND");
 	});
 
 	it("returns ok with verdict ready when latest audit is ready", async () => {
@@ -102,7 +102,7 @@ describe("milestone:audit-status", () => {
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M01"]));
 
 		expect(result.ok).toBe(false);
-		expect(result.error.errorLabel).toBe("AUDIT_NOT_READY");
+		expect(result.error.code).toBe("AUDIT_NOT_READY");
 	});
 
 	it("returns AUDIT_REQUIRED when no audit record exists", async () => {
@@ -114,7 +114,7 @@ describe("milestone:audit-status", () => {
 		const result = JSON.parse(await milestoneAuditStatusCmd(["--milestone-id", "M01"]));
 
 		expect(result.ok).toBe(false);
-		expect(result.error.errorLabel).toBe("AUDIT_REQUIRED");
+		expect(result.error.code).toBe("AUDIT_REQUIRED");
 	});
 
 	it("calls stores.close() after execution", async () => {

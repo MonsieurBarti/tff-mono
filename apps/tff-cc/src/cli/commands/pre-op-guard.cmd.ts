@@ -179,6 +179,14 @@ export const preOpGuardCmd = async (args: string[]): Promise<string> => {
 		}
 	}
 
-	// The callback always returns a string
-	return result as unknown as string;
+	if (typeof result !== "string") {
+		return JSON.stringify({
+			ok: false,
+			error: {
+				code: "GUARD_UNEXPECTED_RESULT",
+				message: `Unexpected result type: ${typeof result}`,
+			},
+		});
+	}
+	return result;
 };

@@ -9,10 +9,13 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 describe("build manifest", () => {
 	it("writes dist/.build-manifest.json with sourceSha, bundleSha256, builtAt", () => {
-		// Ensure a clean build so timestamps and hashes are fresh.
-		execSync("pnpm run build", { stdio: "inherit", cwd: repoRoot });
-
 		const manifestPath = resolve(repoRoot, "dist/.build-manifest.json");
+		if (!existsSync(manifestPath)) {
+			// Only build if manifest is missing (isolated test run). In CI turbo
+			// already runs build before test, so this is skipped — avoiding a
+			// race with the structural skill-baseline integrity test.
+			execSync("pnpm run build", { stdio: "inherit", cwd: repoRoot });
+		}
 		expect(existsSync(manifestPath)).toBe(true);
 
 		const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {

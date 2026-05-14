@@ -141,7 +141,7 @@ describe("syncStateCmd — behavior", () => {
 		const result = JSON.parse(await syncStateCmd(["--milestone-id", "M99"]));
 
 		expect(result.ok).toBe(false);
-		expect(result.error.errorLabel).toBe("NOT_FOUND");
+		expect(result.error.code).toBe("NOT_FOUND");
 	});
 
 	it("returns VALIDATION_ERROR when neither --milestone-id nor --kind is provided", async () => {

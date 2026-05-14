@@ -27,7 +27,8 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/MonsieurBarti/The-Forge-Flow-CC.git"
+		"url": "https://github.com/MonsieurBarti/tff-mono.git",
+		"directory": "apps/tff-cc"
 	},
 	"license": "MIT",
 	"author": "MonsieurBarti",

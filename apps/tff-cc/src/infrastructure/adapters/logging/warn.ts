@@ -6,6 +6,10 @@ export function tffWarn(message: string, context?: Record<string, unknown>): voi
 	}
 }
 
+export function tffLog(message: string): void {
+	console.log(message);
+}
+
 /**
  * Emit a debug-level trace line. Opt-in via `TFF_DEBUG=1`; silent otherwise.
  * Debug output must never mutate public JSON; used for best-effort, non-fatal

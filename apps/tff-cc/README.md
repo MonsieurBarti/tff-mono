@@ -56,6 +56,12 @@ claude /plugin install plannotator@plannotator
 
 Verify: Run `/plannotator-annotate README.md` in Claude Code -- it should open a browser window.
 
+You can also verify from the command line:
+
+```bash
+tff-tools plannotator:check
+```
+
 ### Step 2: Install The Forge Flow
 
 ```bash
@@ -72,7 +78,7 @@ The plugin is pulled from the repo's `release` branch, which ships a pre-built `
 
 ### Verification
 
-Run `/tff:health` to check state consistency and plannotator availability.
+Run `/tff:health` to check state consistency and plannotator availability (uses `tff-tools plannotator:check` internally).
 
 ---
 

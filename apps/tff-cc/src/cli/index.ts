@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { handleStartupRecovery } from "../application/recovery/handle-startup-recovery.js";
 import { GenericDomainError } from "../infrastructure/errors/generic-domain-error.js";
 import { NativeBindingError } from "../infrastructure/adapters/sqlite/native-binding-error.js";
+import { tffLog } from "../infrastructure/adapters/logging/warn.js";
 import {
 	getProjectHome,
 	getProjectId,
@@ -34,6 +35,7 @@ import {
 } from "./commands/milestone-record-audit.cmd.js";
 import { observeHealthCmd, observeHealthSchema } from "./commands/observe-health.cmd.js";
 import { observeRecordCmd, observeRecordSchema } from "./commands/observe-record.cmd.js";
+import { plannotatorCheckCmd, plannotatorCheckSchema } from "./commands/plannotator-check.cmd.js";
 import {
 	patternsAggregateCmd,
 	patternsAggregateSchema,
@@ -270,6 +272,10 @@ export const COMMAND_REGISTRY: Record<string, CommandEntry> = (() => {
 			schema: observeHealthSchema,
 			dispatcher: wrap(observeHealthCmd, observeHealthSchema),
 		},
+		"plannotator:check": {
+			schema: plannotatorCheckSchema,
+			dispatcher: wrap(plannotatorCheckCmd, plannotatorCheckSchema),
+		},
 		"observe:record": {
 			schema: observeRecordSchema,
 			dispatcher: wrap(observeRecordCmd, observeRecordSchema),
@@ -336,7 +342,7 @@ export const COMMAND_REGISTRY: Record<string, CommandEntry> = (() => {
 /**
  * Generate help output for a command
  */
-function generateHelp(schema: CommandSchema): string {
+export function generateHelp(schema: CommandSchema): string {
 	return JSON.stringify({
 		ok: true,
 		data: {
@@ -374,7 +380,7 @@ function generateSyntax(schema: CommandSchema): string {
 /**
  * Convert a CommandSchema to JSON Schema format
  */
-function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
+export function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
 	const properties: Record<string, Record<string, unknown>> = {};
 	const required: string[] = [];
 
@@ -397,7 +403,7 @@ function schemaToJsonSchema(schema: CommandSchema): Record<string, unknown> {
 /**
  * Convert a FlagDefinition to JSON Schema format
  */
-function flagToJsonSchema(flag: {
+export function flagToJsonSchema(flag: {
 	name: string;
 	type: string;
 	description: string;
@@ -449,18 +455,28 @@ function resolveStartupHomeDir(): string {
 	}
 }
 
-const main = async () => {
+export function handleEntryPointError(err: unknown): string {
+	if (err instanceof NativeBindingError) {
+		return JSON.stringify({ ok: false, error: err.toJSON() });
+	}
+	return JSON.stringify({
+		ok: false,
+		error: { code: "INTERNAL_ERROR", message: String(err) },
+	});
+}
+
+export const main = async () => {
 	const [command, ...args] = process.argv.slice(2);
 
 	await handleStartupRecovery({ homeDir: resolveStartupHomeDir() });
 
 	if (!command || command === "--help" || command === "-h") {
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: true,
 				data: {
 					name: "tff-tools",
-					version: __TFF_VERSION__,
+					version: typeof __TFF_VERSION__ !== "undefined" ? __TFF_VERSION__ : "0.0.0-dev",
 					commands: Object.keys(COMMAND_REGISTRY),
 				},
 			}),
@@ -469,7 +485,7 @@ const main = async () => {
 	}
 
 	if (command === "--version" || command === "-v") {
-		console.log(await versionCmd(args));
+		tffLog(await versionCmd(args));
 		return;
 	}
 
@@ -479,7 +495,7 @@ const main = async () => {
 		if (schema) {
 			// Check for --json flag - output schema format instead of help format
 			if (args.includes("--json")) {
-				console.log(
+				tffLog(
 					JSON.stringify({
 						ok: true,
 						data: {
@@ -490,10 +506,10 @@ const main = async () => {
 				);
 				return;
 			}
-			console.log(generateHelp(schema));
+			tffLog(generateHelp(schema));
 			return;
 		}
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: false,
 				error: new GenericDomainError(
@@ -508,7 +524,7 @@ const main = async () => {
 
 	const entry = COMMAND_REGISTRY[command];
 	if (!entry) {
-		console.log(
+		tffLog(
 			JSON.stringify({
 				ok: false,
 				error: new GenericDomainError(
@@ -522,7 +538,7 @@ const main = async () => {
 	}
 
 	const output = await entry.dispatcher(args);
-	console.log(output);
+	tffLog(output);
 };
 
 // Compare via realpath to handle platforms where argv[1] and the canonical
@@ -538,16 +554,7 @@ const isEntryPoint = (): boolean => {
 
 if (isEntryPoint()) {
 	main().catch((err) => {
-		if (err instanceof NativeBindingError) {
-			console.log(JSON.stringify({ ok: false, error: err.toJSON() }));
-		} else {
-			console.log(
-				JSON.stringify({
-					ok: false,
-					error: { code: "INTERNAL_ERROR", message: String(err) },
-				}),
-			);
-		}
+		tffLog(handleEntryPointError(err));
 		process.exit(1);
 	});
 }

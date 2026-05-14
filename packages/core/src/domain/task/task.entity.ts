@@ -201,6 +201,24 @@ export class Task extends AggregateRoot {
 		return this._status === "closed";
 	}
 
+	toJSON(): TaskState {
+		return {
+			id: this.id,
+			sliceId: this._sliceId,
+			number: this._number,
+			title: this._title,
+			description: this._description,
+			status: this._status,
+			wave: this._wave,
+			difficulty: this._difficulty,
+			claimedAt: this._claimedAt,
+			claimedBy: this._claimedBy,
+			closedReason: this._closedReason,
+			createdAt: this._createdAt,
+			updatedAt: this._updatedAt,
+		};
+	}
+
 	rename(title: string): void {
 		const validated = renameSchema.parse(title);
 		this._title = validated;

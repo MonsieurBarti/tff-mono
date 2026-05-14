@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMilestoneUseCase } from "../../../../src/application/milestone/create-milestone.js";
-import { isOk } from "@tff/core";
+import { isOk, Milestone } from "@tff/core";
 import { InMemoryArtifactStore } from "../../../../src/infrastructure/testing/in-memory-artifact-store.js";
 import { InMemoryGitOps } from "../../../../src/infrastructure/testing/in-memory-git-ops.js";
 import { InMemoryStateAdapter } from "../../../../src/infrastructure/testing/in-memory-state-adapter.js";
@@ -40,6 +40,15 @@ describe("createMilestoneUseCase", () => {
 			// Milestone should have branch stored
 			expect(milestone.branch).toBe(branchName);
 		}
+	});
+
+	it("created milestone is a proper instance", async () => {
+		const result = await createMilestoneUseCase(
+			{ name: "MVP", number: 1 },
+			{ milestoneStore: adapter, artifactStore, gitOps },
+		);
+		expect(isOk(result)).toBe(true);
+		if (isOk(result)) expect(result.data.milestone).toBeInstanceOf(Milestone);
 	});
 
 	it("should create REQUIREMENTS.md in label-based directory", async () => {

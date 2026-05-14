@@ -23,7 +23,7 @@ export class ClaudeCodeConfigAdapter implements ConfigReader {
 		try {
 			const settingsPath = resolve(this.repoRoot, SETTINGS_FILE);
 			const content = await readFile(settingsPath, "utf8");
-			const parsed = parseYaml(content) as unknown;
+			const parsed = parseYaml(content);
 
 			if (!keyPath) {
 				return Ok(parsed);

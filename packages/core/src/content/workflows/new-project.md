@@ -28,6 +28,7 @@ Context: @references/orchestrator-pattern.md ∧ @references/conventions.md
 3. ASK user: project name (required), vision statement
    - Pre-filled from step 2 if onboarding occurred
 4. INIT: `tff-tools project:init --name "<name>" --vision "<vision>"`
+   <!-- Skill reference: @skills/setup-project-skills/SKILL.md for repo-level agent config scaffolding -->
 5. SETTINGS: generate `{{settings-path}}` from @references/settings-template.md
 6. SUMMARY: show created files (PROJECT.md, settings.yaml)
    - suggest `{{command-prefix}}new-milestone` to create first milestone

@@ -5,21 +5,24 @@ import {
 	AlreadyClaimedError,
 	BaseDomainError,
 	Err,
+	Milestone,
 	Ok,
 	PreconditionViolationError,
+	Project,
 	Slice,
 	SliceNotFoundError,
+	Task,
 	milestoneBranchName,
 	runMigrations,
 } from "@tff/core";
+import { tffWarn } from "../logging/warn.js";
 import { GenericDomainError, type DomainError } from "../../errors/generic-domain-error.js";
 import type {
 	DomainEvent,
-	Milestone,
 	MilestoneProps,
+	MilestoneStatus,
 	MilestoneStore,
 	MilestoneUpdateProps,
-	Project,
 	ProjectProps,
 	ProjectStore,
 	Result,
@@ -28,7 +31,6 @@ import type {
 	SliceStatus,
 	SliceStore,
 	SliceUpdateProps,
-	Task,
 	TaskProps,
 	TaskStore,
 	TaskUpdateProps,
@@ -169,13 +171,11 @@ export class SQLiteStateAdapter
 						),
 					);
 				}
-				console.warn(
-					`[tff] Database schema version mismatch at ${this.dbPath}; backing up and recreating.`,
-				);
+				tffWarn(`Database schema version mismatch at ${this.dbPath}; backing up and recreating.`);
 				try {
 					const backupPath = `${this.dbPath}.backup.${Date.now()}`;
 					copyFileSync(this.dbPath, backupPath);
-					console.warn(`[tff] Backup saved to ${backupPath}`);
+					tffWarn(`Backup saved to ${backupPath}`);
 					this.db.close();
 					unlinkSync(this.dbPath);
 					for (const suffix of ["-wal", "-shm"]) {
@@ -224,14 +224,15 @@ export class SQLiteStateAdapter
 				  }
 				| undefined;
 			if (!row) return Ok(null);
-			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-			return Ok({
-				id: row.id,
-				name: row.name,
-				vision: row.vision ?? "",
-				createdAt: new Date(row.created_at),
-				updatedAt: new Date(row.updated_at),
-			} as unknown as Project);
+			return Ok(
+				Project.reconstruct({
+					id: row.id,
+					name: row.name,
+					vision: row.vision ?? "",
+					createdAt: new Date(row.created_at),
+					updatedAt: new Date(row.updated_at),
+				}),
+			);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to get project: ${e}`));
 		}
@@ -247,14 +248,15 @@ export class SQLiteStateAdapter
            ON CONFLICT(id) DO UPDATE SET name = excluded.name, vision = excluded.vision, updated_at = excluded.updated_at`,
 				)
 				.run(props.name, props.vision ?? null, now, now);
-			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-			return Ok({
-				id: "singleton",
-				name: props.name,
-				vision: props.vision ?? "",
-				createdAt: new Date(now),
-				updatedAt: new Date(now),
-			} as unknown as Project);
+			return Ok(
+				Project.reconstruct({
+					id: "singleton",
+					name: props.name,
+					vision: props.vision ?? "",
+					createdAt: new Date(now),
+					updatedAt: new Date(now),
+				}),
+			);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to save project: ${e}`));
 		}
@@ -272,19 +274,20 @@ export class SQLiteStateAdapter
            VALUES (?, 'singleton', ?, ?, 'open', ?, ?, ?)`,
 				)
 				.run(id, props.number, props.name, branch, now, now);
-			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-			return Ok({
-				id,
-				projectId: "singleton",
-				number: props.number,
-				name: props.name,
-				status: "open" as Milestone["status"],
-				branch,
-				closeReason: null,
-				createdAt: new Date(now),
-				updatedAt: new Date(now),
-				archivedAt: null,
-			} as unknown as Milestone);
+			return Ok(
+				Milestone.reconstruct({
+					id,
+					projectId: "singleton",
+					number: props.number,
+					name: props.name,
+					status: "open" as MilestoneStatus,
+					branch,
+					closeReason: null,
+					createdAt: new Date(now),
+					updatedAt: new Date(now),
+					archivedAt: null,
+				}),
+			);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to create milestone: ${e}`));
 		}
@@ -442,21 +445,22 @@ export class SQLiteStateAdapter
 					now,
 					now,
 				);
-			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-			return Ok({
-				id,
-				milestoneId: props.milestoneId ?? null,
-				kind,
-				number: props.number,
-				title: props.title,
-				status: "discussing",
-				tier: props.tier ?? null,
-				baseBranch: props.baseBranch ?? "",
-				branchName: props.branchName ?? "",
-				createdAt: new Date(now),
-				updatedAt: new Date(now),
-				archivedAt: null,
-			} as unknown as Slice);
+			return Ok(
+				Slice.reconstruct({
+					id,
+					milestoneId: props.milestoneId ?? null,
+					kind,
+					number: props.number,
+					title: props.title,
+					status: "discussing",
+					tier: props.tier ?? null,
+					baseBranch: props.baseBranch ?? "",
+					branchName: props.branchName ?? "",
+					createdAt: new Date(now),
+					updatedAt: new Date(now),
+					archivedAt: null,
+				}),
+			);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to create slice: ${e}`));
 		}
@@ -683,22 +687,23 @@ export class SQLiteStateAdapter
 					now,
 					now,
 				);
-			// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-			return Ok({
-				id,
-				sliceId: props.sliceId,
-				number: props.number,
-				title: props.title,
-				description: props.description ?? "",
-				status: "open",
-				wave: props.wave ?? null,
-				difficulty: null,
-				claimedAt: null,
-				claimedBy: null,
-				closedReason: null,
-				createdAt: new Date(now),
-				updatedAt: new Date(now),
-			} as unknown as Task);
+			return Ok(
+				Task.reconstruct({
+					id,
+					sliceId: props.sliceId,
+					number: props.number,
+					title: props.title,
+					description: props.description ?? "",
+					status: "open",
+					wave: props.wave ?? null,
+					difficulty: null,
+					claimedAt: null,
+					claimedBy: null,
+					closedReason: null,
+					createdAt: new Date(now),
+					updatedAt: new Date(now),
+				}),
+			);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to create task: ${e}`));
 		}
@@ -1204,8 +1209,7 @@ export class SQLiteStateAdapter
 
 	// Helpers
 	private rowToSlice(row: SliceRow): Slice {
-		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-		return {
+		return Slice.reconstruct({
 			id: row.id,
 			milestoneId: row.milestone_id ?? null,
 			kind: row.kind as Slice["kind"],
@@ -1218,12 +1222,11 @@ export class SQLiteStateAdapter
 			createdAt: new Date(row.created_at),
 			updatedAt: new Date(row.updated_at),
 			archivedAt: row.archived_at ? new Date(row.archived_at) : null,
-		} as unknown as Slice;
+		});
 	}
 
 	private rowToTask(row: TaskRow): Task {
-		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-		return {
+		return Task.reconstruct({
 			id: row.id,
 			sliceId: row.slice_id,
 			number: row.number,
@@ -1237,12 +1240,11 @@ export class SQLiteStateAdapter
 			closedReason: row.closed_reason ?? null,
 			createdAt: new Date(row.created_at),
 			updatedAt: new Date(row.updated_at),
-		} as unknown as Task;
+		});
 	}
 
 	private rowToMilestone(row: MilestoneRow): Milestone {
-		// TODO(S04): reconstruct() loses getter properties on JSON.stringify.
-		return {
+		return Milestone.reconstruct({
 			id: row.id,
 			projectId: row.project_id,
 			number: row.number,
@@ -1253,7 +1255,7 @@ export class SQLiteStateAdapter
 			createdAt: new Date(row.created_at),
 			updatedAt: new Date(row.updated_at),
 			archivedAt: row.archived_at ? new Date(row.archived_at) : null,
-		} as unknown as Milestone;
+		});
 	}
 
 	private rowToReview(row: {
