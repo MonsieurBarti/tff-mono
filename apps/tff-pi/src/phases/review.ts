@@ -24,7 +24,7 @@ function buildReviewTaskBody(p: {
 		`Milestone branch: ${p.milestoneBranch}`,
 		`Slice branch:     ${p.sliceBranch}`,
 		"",
-		`Read-only except for a single write to ${p.wtPath}/.pi/.tff/artifacts/REVIEW.md.`,
+		`Read-only except for a single write to ${p.wtPath}/.tff/artifacts/REVIEW.md.`,
 		"",
 		"1. Inspect the diff yourself:",
 		`   - \`git -C ${p.wtPath} diff --stat ${p.milestoneBranch}...${p.sliceBranch}\` (file footprint)`,
@@ -38,7 +38,7 @@ function buildReviewTaskBody(p: {
 		"3. Security review lens — audit the same diff per the Security-lens reference above.",
 		"   Cite file:line + severity (Critical / High / Medium / Low / Info).",
 		"",
-		`4. Write ${p.wtPath}/.pi/.tff/artifacts/REVIEW.md containing:`,
+		`4. Write ${p.wtPath}/.tff/artifacts/REVIEW.md containing:`,
 		"   - Summary (one paragraph)",
 		"   - Code Review findings (table or list; file, line, severity, message)",
 		"   - Security Review findings (table or list; same columns)",
@@ -52,7 +52,7 @@ function buildReviewTaskBody(p: {
 		"   STATUS: <DONE|DONE_WITH_CONCERNS|BLOCKED>",
 		"   EVIDENCE: <one-line summary>",
 		"",
-		"`bash` is allowlisted for `git diff` inspection only. Do NOT run mutation commands, network commands, or write outside <cwd>/.pi/.tff/artifacts/.",
+		"`bash` is allowlisted for `git diff` inspection only. Do NOT run mutation commands, network commands, or write outside <cwd>/.tff/artifacts/.",
 	);
 	return lines.join("\n");
 }

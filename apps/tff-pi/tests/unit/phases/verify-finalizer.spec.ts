@@ -33,8 +33,8 @@ import { registerPhaseFinalizers } from "../../../src/phases/finalizers.js";
 import { must } from "../../helpers.js";
 
 // Per-slice worktree path: separate from project root so the finalizer's
-// artifact-source (wtPath/.pi/.tff/artifacts/) and its artifact-destination
-// (root/.pi/.tff/milestones/.../slices/...) don't collide.
+// artifact-source (wtPath/.tff/artifacts/) and its artifact-destination
+// (root/.tff/milestones/.../slices/...) don't collide.
 let worktreePath = "";
 
 vi.mock("../../../src/common/worktree.js", () => ({
@@ -111,7 +111,7 @@ function seedCtx(): TestCtx {
 	const root = mkdtempSync(join(tmpdir(), "tff-verify-fin-root-"));
 	worktreePath = mkdtempSync(join(tmpdir(), "tff-verify-fin-wt-"));
 	initTffDirectory(root);
-	mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+	mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 
 	insertProject(db, { name: "TFF", vision: "V" });
 	const projectId = must(getProject(db)).id;
@@ -209,7 +209,7 @@ function doneResult(): DispatchResult {
 }
 
 function writeWorktreeArtifact(t: TestCtx, name: string, content: string): void {
-	writeFileSync(join(t.worktreePath, ".pi", ".tff", "artifacts", name), content, "utf-8");
+	writeFileSync(join(t.worktreePath, ".tff", "artifacts", name), content, "utf-8");
 }
 
 function getFinalizer(): Finalizer {
@@ -418,7 +418,7 @@ describe("verify finalizer", () => {
 
 	it("Fix-3: symlink for VERIFICATION.md → phase_failed with 'symlink' in reason; no phase_complete; no commit; phase_run stays 'started'", async () => {
 		// Create VERIFICATION.md as a symlink pointing outside the worktree.
-		const artifactsDir = join(t.worktreePath, ".pi", ".tff", "artifacts");
+		const artifactsDir = join(t.worktreePath, ".tff", "artifacts");
 		const symlinkTarget = join(t.root, "outside-target.txt");
 		writeFileSync(symlinkTarget, "should not be read\n");
 		symlinkSync(symlinkTarget, join(artifactsDir, "VERIFICATION.md"));

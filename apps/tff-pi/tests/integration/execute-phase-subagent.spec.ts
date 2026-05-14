@@ -109,7 +109,7 @@ function cloneWave2(): typeof wave2Fixture {
 }
 
 function readDispatchConfig(root: string): DispatchBatch | null {
-	const p = join(root, ".pi", ".tff", "dispatch-config.json");
+	const p = join(root, ".tff", "dispatch-config.json");
 	if (!existsSync(p)) return null;
 	return JSON.parse(readFileSync(p, "utf-8")) as DispatchBatch;
 }
@@ -259,8 +259,8 @@ describe("execute phase → subagent → finalizer (multi-wave end-to-end)", () 
 			true,
 		);
 		// Now the hook should have cleaned both files (continue:false on final wave).
-		expect(existsSync(join(ctx.root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
-		expect(existsSync(join(ctx.root, ".pi", ".tff", "dispatch-result.json"))).toBe(false);
+		expect(existsSync(join(ctx.root, ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(ctx.root, ".tff", "dispatch-result.json"))).toBe(false);
 		// execute-done command recorded in event log.
 		const events = readEvents(ctx.root);
 		expect(events.some((e) => e.cmd === "execute-done")).toBe(true);
@@ -289,7 +289,7 @@ describe("execute phase → subagent → finalizer (multi-wave end-to-end)", () 
 		const events = readEvents(ctx.root);
 		expect(events.some((e) => e.cmd === "execute-done")).toBe(false);
 		// Hook cleaned up (continue:false, no next-wave config written).
-		expect(existsSync(join(ctx.root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(ctx.root, ".tff", "dispatch-config.json"))).toBe(false);
 
 		// Re-entry: prepare() again should partition against still-open tasks (T02 + T03).
 		__resetFinalizersForTest();

@@ -131,7 +131,7 @@ async function createFullCtx(): Promise<FullCtx> {
 	const root = mkdtempSync(join(tmpdir(), "tff-review-int-root-"));
 	worktreePath = mkdtempSync(join(tmpdir(), "tff-review-int-wt-"));
 	initTffDirectory(root);
-	mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+	mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 
 	insertProject(db, { name: "TFF", vision: "V" });
 	const projectId = must(getProject(db)).id;
@@ -210,7 +210,7 @@ describe("review phase → subagent → finalizer (end-to-end)", () => {
 	it("approved: REVIEW.md(VERDICT:approved) → phase_complete + write-review + phase_run completed", async () => {
 		ctx = await createFullCtx();
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nLGTM.\n\nVERDICT: approved",
 			"utf-8",
 		);
@@ -240,7 +240,7 @@ describe("review phase → subagent → finalizer (end-to-end)", () => {
 	it("denied: REVIEW.md(VERDICT:denied) → phase_failed + review-rejected + slice=executing + tasks=open", async () => {
 		ctx = await createFullCtx();
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nCritical issue.\n\n## Tasks to rework\n- T01\n\nVERDICT: denied",
 			"utf-8",
 		);
@@ -273,7 +273,7 @@ describe("review phase → subagent → finalizer (end-to-end)", () => {
 		ctx = await createFullCtx();
 		// Pre-write REVIEW.md in worktree to prove BLOCKED branch does NOT copy it.
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"should not be copied\n\nVERDICT: approved",
 			"utf-8",
 		);
@@ -321,7 +321,7 @@ describe("review phase → subagent → finalizer (end-to-end)", () => {
 	it("malformed VERDICT: REVIEW.md without VERDICT line → phase_failed", async () => {
 		ctx = await createFullCtx();
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nNo trailer line.",
 			"utf-8",
 		);
@@ -337,7 +337,7 @@ describe("review phase → subagent → finalizer (end-to-end)", () => {
 	it("reviewer modified tracked file → phase_failed before artifact read + no write-review", async () => {
 		ctx = await createFullCtx();
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "REVIEW.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "REVIEW.md"),
 			"## Summary\nFine.\n\nVERDICT: approved",
 			"utf-8",
 		);

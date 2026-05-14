@@ -124,12 +124,12 @@ export function __resetFinalizersForTest(): void {
 	finalizers.clear();
 }
 
-const TFF_DIR_PARTS = [".pi", ".tff"] as const;
+const TFF_DIR_PARTS = [".tff"] as const;
 const CONFIG_FILE = "dispatch-config.json";
 const RESULT_FILE = "dispatch-result.json";
 
 const DISPATCHER_PROMPT = `<DISPATCH-ONLY>
-You are a dispatcher. Read .pi/.tff/dispatch-config.json. Make EXACTLY ONE
+You are a dispatcher. Read .tff/dispatch-config.json. Make EXACTLY ONE
 tool call to \`subagent\` with these arguments. Forward ONLY the fields listed
 below — do NOT forward \`taskId\` (it is internal correlation metadata, not
 part of pi-subagents' SubagentParams schema).
@@ -160,7 +160,7 @@ which only sees \`~/.pi/agent/agents/\` and cannot find TFF agents.
     })
 
 After the \`subagent\` tool returns:
-  1. Re-read .pi/.tff/dispatch-config.json.
+  1. Re-read .tff/dispatch-config.json.
   2. If the file exists, make ANOTHER subagent call per the rules above
      (do NOT respond, do NOT call any other tool in between).
   3. If the file is absent, output the literal text "DISPATCH_COMPLETE"

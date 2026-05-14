@@ -32,8 +32,8 @@ import fixture from "../fixtures/subagent-details-verify.json";
 import { must } from "../helpers.js";
 
 // Per-slice worktree path: separate tmp dir so finalizer's artifact-source
-// (wtPath/.pi/.tff/artifacts/) does not collide with finalizer's artifact
-// destination (root/.pi/.tff/milestones/.../slices/...).
+// (wtPath/.tff/artifacts/) does not collide with finalizer's artifact
+// destination (root/.tff/milestones/.../slices/...).
 let worktreePath = "";
 
 vi.mock("../../src/common/worktree.js", () => ({
@@ -147,7 +147,7 @@ const PR_REL = `${SLICE_DIR}/PR.md`;
 const BLOCKED_REL = `${SLICE_DIR}/.audit-blocked`;
 
 function sliceArtifactPath(ctx: FullCtx, rel: string): string {
-	return join(ctx.root, ".pi", ".tff", rel);
+	return join(ctx.root, ".tff", rel);
 }
 
 async function createFullCtx(): Promise<FullCtx> {
@@ -157,7 +157,7 @@ async function createFullCtx(): Promise<FullCtx> {
 	const root = mkdtempSync(join(tmpdir(), "tff-verify-int-root-"));
 	worktreePath = mkdtempSync(join(tmpdir(), "tff-verify-int-wt-"));
 	initTffDirectory(root);
-	mkdirSync(join(worktreePath, ".pi", ".tff", "artifacts"), { recursive: true });
+	mkdirSync(join(worktreePath, ".tff", "artifacts"), { recursive: true });
 
 	insertProject(db, { name: "TFF", vision: "V" });
 	const projectId = must(getProject(db)).id;
@@ -240,12 +240,12 @@ describe("verify phase → subagent → finalizer (end-to-end)", () => {
 		// Fixture's bash result has isError=false for `pnpm test`, so the
 		// "all pass" claim below audits clean.
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "VERIFICATION.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "VERIFICATION.md"),
 			"AC-1: [x] passed\n\nRan `pnpm test` — all pass.",
 			"utf-8",
 		);
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "PR.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "PR.md"),
 			"## Summary\nWired subagent verify.",
 			"utf-8",
 		);
@@ -336,11 +336,11 @@ describe("verify phase → subagent → finalizer (end-to-end)", () => {
 
 		// Subagent would have written VERIFICATION.md claiming pass.
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "VERIFICATION.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "VERIFICATION.md"),
 			"Ran `pnpm test` — all pass.",
 			"utf-8",
 		);
-		writeFileSync(join(ctx.worktreePath, ".pi", ".tff", "artifacts", "PR.md"), "pr body", "utf-8");
+		writeFileSync(join(ctx.worktreePath, ".tff", "artifacts", "PR.md"), "pr body", "utf-8");
 
 		await verifyPhase.prepare(ctx.phaseCtx);
 		ctx.emitted.length = 0;
@@ -364,15 +364,11 @@ describe("verify phase → subagent → finalizer (end-to-end)", () => {
 		ctx = await createFullCtx();
 
 		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "VERIFICATION.md"),
+			join(ctx.worktreePath, ".tff", "artifacts", "VERIFICATION.md"),
 			"AC-1: [x] passed",
 			"utf-8",
 		);
-		writeFileSync(
-			join(ctx.worktreePath, ".pi", ".tff", "artifacts", "PR.md"),
-			"## Summary",
-			"utf-8",
-		);
+		writeFileSync(join(ctx.worktreePath, ".tff", "artifacts", "PR.md"), "## Summary", "utf-8");
 
 		mockedGitDirty.mockReturnValueOnce([" M src/app.ts", "?? extra.log"].slice(0, 1));
 

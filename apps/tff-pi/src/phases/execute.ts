@@ -32,11 +32,11 @@ export interface PendingWorktreeMarker {
 }
 
 export function pendingWorktreeMarkerPath(root: string): string {
-	return join(root, ".pi", ".tff", PENDING_WORKTREE_MARKER);
+	return join(root, ".tff", PENDING_WORKTREE_MARKER);
 }
 
 export function writePendingWorktreeMarker(root: string, marker: PendingWorktreeMarker): void {
-	mkdirSync(join(root, ".pi", ".tff"), { recursive: true });
+	mkdirSync(join(root, ".tff"), { recursive: true });
 	writeFileSync(pendingWorktreeMarkerPath(root), JSON.stringify(marker), "utf-8");
 }
 
@@ -164,7 +164,7 @@ export const executePhase: PhaseModule = {
 		// ctx.feedback, reset tasks, then unlink the artifact so subsequent runs
 		// don't re-apply it. Wave partition below runs against the post-reset DB state.
 		const feedbackRel = `milestones/${mLabel}/slices/${sLabel}/REVIEW_FEEDBACK.md`;
-		const feedbackPath = join(root, ".pi", ".tff", feedbackRel);
+		const feedbackPath = join(root, ".tff", feedbackRel);
 		let combinedFeedback = ctx.feedback ?? "";
 		if (existsSync(feedbackPath)) {
 			const stashed = readArtifact(root, feedbackRel) ?? "";

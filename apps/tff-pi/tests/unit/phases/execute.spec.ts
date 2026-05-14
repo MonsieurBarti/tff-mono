@@ -58,7 +58,7 @@ import {
 } from "../../../src/phases/execute.js";
 
 function readDispatchConfig(root: string): DispatchBatch {
-	const configPath = join(root, ".pi", ".tff", "dispatch-config.json");
+	const configPath = join(root, ".tff", "dispatch-config.json");
 	return JSON.parse(readFileSync(configPath, "utf-8")) as DispatchBatch;
 }
 
@@ -297,7 +297,7 @@ describe("executePhase", () => {
 		// Stash a REVIEW_FEEDBACK.md artifact.
 		const feedbackRel = "milestones/M01/slices/M01-S01/REVIEW_FEEDBACK.md";
 		writeArtifact(root, feedbackRel, "## Issues\n- fix auth guard");
-		const feedbackPath = join(root, ".pi", ".tff", feedbackRel);
+		const feedbackPath = join(root, ".tff", feedbackRel);
 		expect(existsSync(feedbackPath)).toBe(true);
 
 		const slice = must(getSlice(db, sliceId));
@@ -359,7 +359,7 @@ describe("executePhase", () => {
 		expect(__getFinalizerForTest("execute")).toBeUndefined();
 		expect(emitted).toContain("phase_complete");
 		// No dispatch config was written.
-		expect(existsSync(join(root, ".pi", ".tff", "dispatch-config.json"))).toBe(false);
+		expect(existsSync(join(root, ".tff", "dispatch-config.json"))).toBe(false);
 	});
 
 	it("AC-9: short-circuit — idempotent when phase_run already 'completed'", async () => {

@@ -90,7 +90,7 @@ function loadResource(path: string): string {
 		try {
 			let content = readFileSync(corePath, "utf-8");
 			// Placeholder resolution for tff-pi context
-			content = content.replace(/\{\{project-dir\}\}/g, ".pi/.tff");
+			content = content.replace(/\{\{project-dir\}\}/g, ".tff");
 			return content;
 		} catch {
 			return "";

@@ -22,7 +22,7 @@ function sanitizeFilename(label: string): string {
 }
 
 function logsDir(root: string): string {
-	return join(root, ".pi", ".tff", "logs");
+	return join(root, ".tff", "logs");
 }
 
 export interface PerSliceLogLine {

@@ -64,25 +64,23 @@ export function ensureProjectHomeDir(projectId: string): string {
 }
 
 export function createTffSymlink(repoRoot: string, projectId: string): void {
-	const piDir = join(repoRoot, ".pi");
-	mkdirSync(piDir, { recursive: true });
-	const linkPath = join(piDir, ".tff");
+	const linkPath = join(repoRoot, ".tff");
 	const target = projectHomeDir(projectId);
 	if (existsSync(linkPath) || isSymlink(linkPath)) {
 		const stat = lstatSync(linkPath);
 		if (!stat.isSymbolicLink()) {
 			throw new ProjectHomeError(
-				".pi/.tff/ exists as a real directory. TFF centralizes state to ~/.tff/{projectId}/.\n" +
+				".tff/ exists as a real directory. TFF centralizes state to ~/.tff/{projectId}/.\n" +
 					"Before re-initializing:\n" +
-					"  1. Back up .pi/.tff/ if you want to preserve its contents\n" +
-					"  2. rm -rf .pi/.tff/\n" +
+					"  1. Back up .tff/ if you want to preserve its contents\n" +
+					"  2. rm -rf .tff/\n" +
 					"  3. Re-run /tff init",
 			);
 		}
 		const actual = readlinkSync(linkPath);
 		if (actual !== target) {
 			throw new ProjectHomeError(
-				`.pi/.tff/ symlink points to ${actual} but expected ${target}. Run: rm .pi/.tff && /tff init`,
+				`.tff/ symlink points to ${actual} but expected ${target}. Run: rm .tff && /tff init`,
 			);
 		}
 		return;

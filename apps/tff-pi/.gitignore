@@ -29,7 +29,8 @@ yarn-error.log*
 .env.local
 .env.*.local
 
-# PI runtime, hippo DB, tff state (symlink .pi/.tff → ~/.tff/{projectId}/)
+# PI runtime, hippo DB, tff state (symlink .tff → ~/.tff/{projectId}/)
+.tff
 .pi/
 
 # Worktrees
