@@ -25,9 +25,9 @@ git repo ∃
 3. PLAN (lightweight): ask user for 1-2 sentence desc → single task ∈ PLAN.md
    - Write to `{{project-dir}}/quick/<Q-label>/PLAN.md`
 4. HAND OFF to standard pipeline:
-   - invoke plan-slice workflow from step 8 ({{artifact-review}} Review) onward
+   - invoke plan-slice workflow from step 8 (plannotator-annotate Review) onward
    - **step 8 is a REQUIRED gate** per `the artifact review skill` — do NOT skip,
-     even for S-tier quick fixes; if {{artifact-review}} is unavailable, surface to user ∧ pause
+     even for S-tier quick fixes; if plannotator-annotate is unavailable, surface to user ∧ pause
    - then: execute-slice → verify-slice → ship-slice (standard workflows)
 
 Quick is an entry point, ¬ a parallel pipeline. Always standalone (kind=quick).

@@ -40,9 +40,9 @@ exploration, spawn Explore subagents ∧ reason about their findings.
 8. PLAN: write fix strategy + implicated files ∈ PLAN.md
    - Write to `{{project-dir}}/debug/<D-label>/PLAN.md`
 9. HAND OFF to standard pipeline:
-   - invoke plan-slice workflow from step 8 ({{artifact-review}} Review) onward
+   - invoke plan-slice workflow from step 8 (plannotator-annotate Review) onward
    - **step 8 is a REQUIRED gate** per `the artifact review skill` — do NOT skip,
-     even for S-tier debug fixes; if {{artifact-review}} is unavailable, surface to user ∧ pause
+     even for S-tier debug fixes; if plannotator-annotate is unavailable, surface to user ∧ pause
    - then: execute-slice → verify-slice → ship-slice (standard workflows)
 
 Debug Phase 2 is an entry point, ¬ a parallel pipeline. Always standalone (kind=debug).

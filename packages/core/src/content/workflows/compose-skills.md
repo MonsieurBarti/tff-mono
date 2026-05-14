@@ -26,7 +26,9 @@ Pass: `tff-tools compose:detect --min-sessions 3 --min-patterns 2 --max-distance
 3. LOAD @skills/skill-authoring/SKILL.md → SPAWN subagent ("Compose Bundle" mode) for selected cluster:
    - provide cluster skills + co-activation rate → decides bundle vs agent
    - draft → `{{project-dir}}/drafts/<name>.md`
-4. REVIEW: invoke Skill `{{artifact-review}}` with arg `{{project-dir}}/drafts/<name>.md`
+     LOAD @skills/plannotator-usage/SKILL.md
+
+4. REVIEW: invoke Skill `plannotator-annotate` with arg `{{project-dir}}/drafts/<name>.md`
 5. HANDLE:
    - approved bundle → `skills/<name>.md`
    - approved agent → `agents/<name>.md`

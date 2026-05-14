@@ -34,6 +34,7 @@ import {
 } from "./commands/milestone-record-audit.cmd.js";
 import { observeHealthCmd, observeHealthSchema } from "./commands/observe-health.cmd.js";
 import { observeRecordCmd, observeRecordSchema } from "./commands/observe-record.cmd.js";
+import { plannotatorCheckCmd, plannotatorCheckSchema } from "./commands/plannotator-check.cmd.js";
 import {
 	patternsAggregateCmd,
 	patternsAggregateSchema,
@@ -269,6 +270,10 @@ export const COMMAND_REGISTRY: Record<string, CommandEntry> = (() => {
 		"observe:health": {
 			schema: observeHealthSchema,
 			dispatcher: wrap(observeHealthCmd, observeHealthSchema),
+		},
+		"plannotator:check": {
+			schema: plannotatorCheckSchema,
+			dispatcher: wrap(plannotatorCheckCmd, plannotatorCheckSchema),
 		},
 		"observe:record": {
 			schema: observeRecordSchema,
