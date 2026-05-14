@@ -114,85 +114,83 @@ export const transitionSliceOrchestrator = async (
 		};
 	}
 
-	if (!currentSlice.milestoneId) {
-		return {
-			ok: false,
-			error: new SliceNotFoundError(
-				`Slice "${sliceId}" has no milestone (kind=${currentSlice.kind}); transition not yet supported for ad-hoc slices`,
-				sliceId,
-			),
-		};
-	}
 	const milestoneId = currentSlice.milestoneId;
-	const milestoneResult = milestoneStore.getMilestone(milestoneId);
-	if (!milestoneResult.ok) return { ok: false, error: milestoneResult.error };
-	if (!milestoneResult.data) {
-		return {
-			ok: false,
-			error: new SliceNotFoundError(`Milestone "${milestoneId}" not found`, milestoneId),
-		};
-	}
-	const milestoneNumber = milestoneResult.data.number;
-	const displaySliceLabel = sliceLabelFromSlice(currentSlice, milestoneNumber);
-
-	// Render STATE.md content (reflecting the post-transition state).
-	// We patch the slice status in-memory to simulate post-commit state; the
-	// renderer is pure so this is safe.
-	const projectedSlice = Slice.reconstruct({
-		id: currentSlice.id,
-		milestoneId: currentSlice.milestoneId,
-		kind: currentSlice.kind,
-		number: currentSlice.number,
-		title: currentSlice.title,
-		status: targetStatus,
-		tier: currentSlice.tier,
-		baseBranch: currentSlice.baseBranch,
-		branchName: currentSlice.branchName,
-		createdAt: currentSlice.createdAt,
-		updatedAt: currentSlice.updatedAt,
-		archivedAt: currentSlice.archivedAt,
-	});
-	const stateContent = renderStateMd(
-		{ milestoneId },
-		{
-			milestoneStore,
-			sliceStore: {
-				...sliceStore,
-				listSlices: (
-					milestoneIdOrOptions?: string | { milestoneId?: string; includeArchived?: boolean },
-				) => {
-					const base = sliceStore.listSlices(milestoneIdOrOptions);
-					if (!base.ok) return base;
-					const swapped = base.data.map((s) => (s.id === projectedSlice.id ? projectedSlice : s));
-					return { ok: true as const, data: swapped };
-				},
-			},
-			taskStore,
-		},
-	);
-	if (!stateContent.ok) return { ok: false, error: stateContent.error };
-
-	// Pre-tx staging: STATE.md + CHECKPOINT.md to *.tmp.
+	let stateFinalAbs = "";
+	let stateTmpAbs = "";
+	let ckptFinalAbs = "";
+	let ckptTmpAbs = "";
 	const stagedTmps: string[] = [];
 	const stagedDirs: string[] = [];
 
-	const { stateFinalAbs, stateTmpAbs } = stageStateMdTmp(cwd, stagedTmps, stagedDirs);
-	writeFileSync(stateTmpAbs, stateContent.data, "utf8");
+	if (milestoneId) {
+		const milestoneResult = milestoneStore.getMilestone(milestoneId);
+		if (!milestoneResult.ok) return { ok: false, error: milestoneResult.error };
+		if (!milestoneResult.data) {
+			return {
+				ok: false,
+				error: new SliceNotFoundError(`Milestone "${milestoneId}" not found`, milestoneId),
+			};
+		}
+		const milestoneNumber = milestoneResult.data.number;
+		const displaySliceLabel = sliceLabelFromSlice(currentSlice, milestoneNumber);
 
-	const checkpoint = renderCheckpoint({
-		sliceId: displaySliceLabel,
-		baseCommit: "",
-		currentWave: 0,
-		completedWaves: [],
-		completedTasks: [],
-		executorLog: [],
-	});
-	const ckptDirAbs = resolve(cwd, checkpoint.dir);
-	const ckptFinalAbs = resolve(cwd, checkpoint.path);
-	const ckptTmpAbs = `${ckptFinalAbs}.tmp`;
-	stagedDirs.push(...mkdirTracked(ckptDirAbs));
-	writeFileSync(ckptTmpAbs, checkpoint.content, "utf8");
-	stagedTmps.push(ckptTmpAbs);
+		// Render STATE.md content (reflecting the post-transition state).
+		// We patch the slice status in-memory to simulate post-commit state; the
+		// renderer is pure so this is safe.
+		const projectedSlice = Slice.reconstruct({
+			id: currentSlice.id,
+			milestoneId,
+			kind: currentSlice.kind,
+			number: currentSlice.number,
+			title: currentSlice.title,
+			status: targetStatus,
+			tier: currentSlice.tier,
+			baseBranch: currentSlice.baseBranch,
+			branchName: currentSlice.branchName,
+			createdAt: currentSlice.createdAt,
+			updatedAt: currentSlice.updatedAt,
+			archivedAt: currentSlice.archivedAt,
+		});
+		const stateContent = renderStateMd(
+			{ milestoneId },
+			{
+				milestoneStore,
+				sliceStore: {
+					...sliceStore,
+					listSlices: (
+						milestoneIdOrOptions?: string | { milestoneId?: string; includeArchived?: boolean },
+					) => {
+						const base = sliceStore.listSlices(milestoneIdOrOptions);
+						if (!base.ok) return base;
+						const swapped = base.data.map((s) => (s.id === projectedSlice.id ? projectedSlice : s));
+						return { ok: true as const, data: swapped };
+					},
+				},
+				taskStore,
+			},
+		);
+		if (!stateContent.ok) return { ok: false, error: stateContent.error };
+
+		const { stateFinalAbs: sf, stateTmpAbs: st } = stageStateMdTmp(cwd, stagedTmps, stagedDirs);
+		stateFinalAbs = sf;
+		stateTmpAbs = st;
+		writeFileSync(stateTmpAbs, stateContent.data, "utf8");
+
+		const checkpoint = renderCheckpoint({
+			sliceId: displaySliceLabel,
+			baseCommit: "",
+			currentWave: 0,
+			completedWaves: [],
+			completedTasks: [],
+			executorLog: [],
+		});
+		const ckptDirAbs = resolve(cwd, checkpoint.dir);
+		ckptFinalAbs = resolve(cwd, checkpoint.path);
+		ckptTmpAbs = `${ckptFinalAbs}.tmp`;
+		stagedDirs.push(...mkdirTracked(ckptDirAbs));
+		writeFileSync(ckptTmpAbs, checkpoint.content, "utf8");
+		stagedTmps.push(ckptTmpAbs);
+	}
 
 	// Closure-capture pattern (see with-transaction.ts JSDoc): if the TOCTOU
 	// precondition re-check fails we capture the BaseDomainError and throw a
@@ -234,10 +232,12 @@ export const transitionSliceOrchestrator = async (
 			}
 			return {
 				data: { status: targetStatus },
-				tmpRenames: [
-					[stateTmpAbs, stateFinalAbs] as [string, string],
-					[ckptTmpAbs, ckptFinalAbs] as [string, string],
-				],
+				tmpRenames: milestoneId
+					? [
+							[stateTmpAbs, stateFinalAbs] as [string, string],
+							[ckptTmpAbs, ckptFinalAbs] as [string, string],
+						]
+					: [],
 			};
 		},
 		stagedTmps,

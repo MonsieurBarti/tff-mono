@@ -153,4 +153,27 @@ describe("slice-transition integration", () => {
 		expect(result.error.context.expected).toEqual(["verifying"]);
 		expect(result.error.recoveryHint).toContain("verifying");
 	});
+
+	it("should transition ad-hoc slice without milestoneId", async () => {
+		const mockSlice = {
+			id: "550e8400-e29b-41d4-a716-446655440000",
+			milestoneId: null,
+			kind: "quick" as const,
+			number: 1,
+			status: "discussing" as const,
+			title: "Quick Slice",
+			createdAt: new Date(),
+		};
+		mockSliceStore.getSlice.mockReturnValue({ ok: true, data: mockSlice });
+
+		const result = await sliceTransitionCmd([
+			"--slice-id",
+			"550e8400-e29b-41d4-a716-446655440000",
+			"--status",
+			"researching",
+		]);
+		const parsed = JSON.parse(result);
+		expect(parsed.ok).toBe(true);
+		expect(parsed.data.status).toBe("researching");
+	});
 });
