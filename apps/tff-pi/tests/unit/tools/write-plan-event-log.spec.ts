@@ -50,7 +50,7 @@ describe("handleWritePlan — event log", () => {
 		expect((params.tasks as unknown[]).length).toBe(2);
 		expect(Array.isArray(params.dependencies)).toBe(true);
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 

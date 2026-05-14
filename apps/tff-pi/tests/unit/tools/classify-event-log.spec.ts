@@ -34,6 +34,6 @@ describe("handleClassify — event log", () => {
 		expect(events).toHaveLength(1);
 		expect(events[0]?.cmd).toBe("classify");
 
-		expect(loadCursor(db).lastRow).toBe(1);
+		expect(loadCursor(root).lastRow).toBe(1);
 	});
 });

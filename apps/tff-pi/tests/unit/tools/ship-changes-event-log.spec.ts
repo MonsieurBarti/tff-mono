@@ -54,7 +54,7 @@ describe("handleShipChanges — event log", () => {
 		expect(shipChangesEvent).toBeDefined();
 		expect(shipChangesEvent?.params).toMatchObject({ sliceId: sId });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(2);
 		expect(cursor.lastHash).toBe(shipChangesEvent?.hash);
 	});

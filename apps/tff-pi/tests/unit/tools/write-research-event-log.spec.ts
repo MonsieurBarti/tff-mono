@@ -40,7 +40,7 @@ describe("handleWriteResearch — event log", () => {
 		expect(events[0]?.cmd).toBe("write-research");
 		expect(events[0]?.params).toEqual({ sliceId: sId });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 

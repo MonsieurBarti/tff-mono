@@ -30,6 +30,6 @@ describe("handleWriteRequirements — event log", () => {
 		expect(events).toHaveLength(1);
 		expect(events[0]?.cmd).toBe("write-requirements");
 
-		expect(loadCursor(db).lastRow).toBe(1);
+		expect(loadCursor(root).lastRow).toBe(1);
 	});
 });

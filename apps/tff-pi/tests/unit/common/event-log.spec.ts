@@ -1,9 +1,7 @@
 import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import Database from "better-sqlite3";
 import { describe, expect, test } from "vitest";
-import { applyMigrations } from "../../../src/common/db.js";
 import {
 	appendCommand,
 	hashEvent,
@@ -219,19 +217,15 @@ describe("readEvents — physical line offset", () => {
 });
 
 describe("cursor operations", () => {
-	test("loadCursor returns default on fresh db", () => {
-		const db = new Database(":memory:");
-		applyMigrations(db);
-		db.prepare("INSERT INTO project (id, name, vision) VALUES ('p1', 'n', 'v')").run();
-		const cursor = loadCursor(db);
+	test("loadCursor returns default when file missing", () => {
+		const root = tempRoot();
+		const cursor = loadCursor(root);
 		expect(cursor).toEqual({ lastHash: null, lastRow: 0 });
 	});
 
 	test("updateLogCursor persists and loadCursor reads it", () => {
-		const db = new Database(":memory:");
-		applyMigrations(db);
-		db.prepare("INSERT INTO project (id, name, vision) VALUES ('p1', 'n', 'v')").run();
-		updateLogCursor(db, "abc1234567890def", 5);
-		expect(loadCursor(db)).toEqual({ lastHash: "abc1234567890def", lastRow: 5 });
+		const root = tempRoot();
+		updateLogCursor(root, "abc1234567890def", 5);
+		expect(loadCursor(root)).toEqual({ lastHash: "abc1234567890def", lastRow: 5 });
 	});
 });

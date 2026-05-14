@@ -118,7 +118,7 @@ describe("runStateRename — event log (state-rename)", () => {
 			newStateBranch: "tff-state/feature/new-branch",
 		});
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});

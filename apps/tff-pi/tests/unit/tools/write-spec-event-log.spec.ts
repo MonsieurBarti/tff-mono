@@ -32,7 +32,7 @@ describe("handleWriteSpec — event log", () => {
 		expect(events[0]?.cmd).toBe("write-spec");
 		expect(events[0]?.params).toEqual({ sliceId: sId });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});
@@ -63,7 +63,7 @@ describe("handleWriteSpec — projection throw rolls back tx", () => {
 
 		expect(threw).toBe(true);
 		expect(readEvents(root)).toHaveLength(0);
-		expect(loadCursor(db).lastRow).toBe(0);
+		expect(loadCursor(root).lastRow).toBe(0);
 
 		spy.mockRestore();
 	});

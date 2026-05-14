@@ -60,7 +60,7 @@ describe("handleCreateSlice — event log", () => {
 			title: "Auth",
 		});
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 	});
@@ -77,7 +77,7 @@ describe("handleCreateSlice — event log", () => {
 		expect(events[1]?.cmd).toBe("create-slice");
 		expect(events[1]?.params.title).toBe("DB");
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(2);
 	});
 

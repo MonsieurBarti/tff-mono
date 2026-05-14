@@ -37,6 +37,6 @@ describe("handleTransition — event log", () => {
 		expect(events[0]?.params).toMatchObject({ sliceId: sId, to: "verifying", phase: "verify" });
 		expect((events[0]?.params as Record<string, unknown>).startedAt).toBeDefined();
 
-		expect(loadCursor(db).lastRow).toBe(1);
+		expect(loadCursor(root).lastRow).toBe(1);
 	});
 });

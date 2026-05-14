@@ -26,9 +26,9 @@ export function commitCommand(
 	try {
 		db.transaction(() => {
 			projectCommand(db, root, cmd, params);
-			const { hash, row } = appendCommand(root, cmd, params, meta);
-			updateLogCursor(db, hash, row);
 		})();
+		const { hash, row } = appendCommand(root, cmd, params, meta);
+		updateLogCursor(root, hash, row);
 
 		for (let i = 0; i < pending.length; i++) {
 			const op = pending[i];

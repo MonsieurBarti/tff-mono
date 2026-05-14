@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, closeSync, existsSync, fsyncSync, openSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type DatabaseT from "better-sqlite3";
 import { getSessionId, logWarning } from "./logger.js";
+import { readLogCursor, writeLogCursor } from "./log-cursor.js";
 
 export interface CommandEvent {
 	v: 2;
@@ -124,14 +124,10 @@ export function appendCommand(
 	return { hash: event.hash, row: physicalRows };
 }
 
-export function loadCursor(db: DatabaseT.Database): { lastHash: string | null; lastRow: number } {
-	const row = db.prepare("SELECT log_cursor_hash, log_cursor_row FROM project LIMIT 1").get() as
-		| { log_cursor_hash: string | null; log_cursor_row: number }
-		| undefined;
-	if (!row) return { lastHash: null, lastRow: 0 };
-	return { lastHash: row.log_cursor_hash, lastRow: row.log_cursor_row };
+export function loadCursor(root: string): { lastHash: string | null; lastRow: number } {
+	return readLogCursor(root);
 }
 
-export function updateLogCursor(db: DatabaseT.Database, hash: string, row: number): void {
-	db.prepare("UPDATE project SET log_cursor_hash = ?, log_cursor_row = ?").run(hash, row);
+export function updateLogCursor(root: string, hash: string, row: number): void {
+	writeLogCursor(root, hash, row);
 }

@@ -55,7 +55,7 @@ describe("handleShipMerged — event log", () => {
 		expect(events[0]?.cmd).toBe("ship-merged");
 		expect(events[0]?.params).toMatchObject({ sliceId: sId, prUrl });
 
-		const cursor = loadCursor(db);
+		const cursor = loadCursor(root);
 		expect(cursor.lastRow).toBe(1);
 		expect(cursor.lastHash).toBe(events[0]?.hash);
 

@@ -33,7 +33,7 @@ function seedSlice(db: Database.Database): string {
 }
 
 describe("applyMigrations — monitoring tables", () => {
-	it("creates phase_run table (event_log dropped by v5)", () => {
+	it("creates phase_run table and preserves event_log", () => {
 		const db = openDatabase(":memory:");
 		applyMigrations(db);
 		const tables = db
@@ -41,8 +41,8 @@ describe("applyMigrations — monitoring tables", () => {
 			.all() as { name: string }[];
 		const names = tables.map((t) => t.name);
 		expect(names).toContain("phase_run");
-		// event_log was dropped in schema v5 — verify it is gone
-		expect(names).not.toContain("event_log");
+		// event_log is part of the core schema and must exist
+		expect(names).toContain("event_log");
 	});
 
 	it("creates schema_version table and records versions", () => {
