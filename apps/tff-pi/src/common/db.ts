@@ -71,7 +71,7 @@ interface ProjectRow {
 	name: string;
 	vision: string;
 	created_at: string | number;
-	updated_at?: string | number | null;
+	updated_at: string | number;
 }
 
 interface MilestoneRow {
@@ -80,27 +80,27 @@ interface MilestoneRow {
 	number: number;
 	name: string;
 	status: string;
-	close_reason?: string | null;
+	close_reason: string | null;
 	branch: string;
-	archived_at?: number | null;
+	archived_at: number | null;
 	created_at: string | number;
-	updated_at?: string | number | null;
+	updated_at: string | number;
 }
 
 interface SliceRow {
 	id: string;
 	milestone_id: string;
-	kind?: string;
+	kind: string;
 	number: number;
 	title: string;
 	status: string;
 	tier: string | null;
-	base_branch?: string | null;
-	branch_name?: string | null;
-	archived_at?: number | null;
+	base_branch: string | null;
+	branch_name: string | null;
+	archived_at: number | null;
 	pr_url: string | null;
 	created_at: string | number;
-	updated_at?: string | number | null;
+	updated_at: string | number;
 }
 
 interface TaskRow {
@@ -108,14 +108,15 @@ interface TaskRow {
 	slice_id: string;
 	number: number;
 	title: string;
-	description?: string | null;
+	description: string | null;
 	status: string;
 	wave: number | null;
-	claimed_at?: number | null;
+	difficulty: number | null;
+	claimed_at: number | null;
 	claimed_by: string | null;
-	closed_reason?: string | null;
+	closed_reason: string | null;
 	created_at: string | number;
-	updated_at?: string | number | null;
+	updated_at: string | number;
 }
 
 interface DependencyRow {
@@ -129,7 +130,7 @@ function rowToProject(row: ProjectRow): Project {
 		name: row.name,
 		vision: row.vision,
 		createdAt: String(row.created_at),
-		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		updatedAt: String(row.updated_at),
 	};
 }
 
@@ -145,9 +146,9 @@ function rowToMilestone(row: MilestoneRow): Milestone {
 		name: row.name,
 		status: status as MilestoneStatus,
 		branch: row.branch,
-		closeReason: row.close_reason ?? null,
+		closeReason: row.close_reason,
 		createdAt: String(row.created_at),
-		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		updatedAt: String(row.updated_at),
 		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
@@ -163,7 +164,7 @@ function rowToSlice(row: SliceRow): Slice {
 	return {
 		id: row.id,
 		milestoneId: row.milestone_id,
-		kind: row.kind ?? "milestone",
+		kind: row.kind,
 		number: row.number,
 		title: row.title,
 		status,
@@ -172,7 +173,7 @@ function rowToSlice(row: SliceRow): Slice {
 		branchName: row.branch_name ?? "",
 		prUrl: row.pr_url ?? null,
 		createdAt: String(row.created_at),
-		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		updatedAt: String(row.updated_at),
 		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
@@ -186,14 +187,15 @@ function rowToTask(row: TaskRow): Task {
 		sliceId: row.slice_id,
 		number: row.number,
 		title: row.title,
-		description: row.description ?? null,
+		description: row.description ?? "",
 		status: row.status as TaskStatus,
 		wave: row.wave ?? null,
+		difficulty: row.difficulty,
 		claimedAt: row.claimed_at != null ? String(row.claimed_at) : null,
-		claimedBy: row.claimed_by ?? null,
-		closedReason: row.closed_reason ?? null,
+		claimedBy: row.claimed_by,
+		closedReason: row.closed_reason,
 		createdAt: String(row.created_at),
-		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		updatedAt: String(row.updated_at),
 	};
 }
 
@@ -423,11 +425,24 @@ export function getNextOpenSliceInMilestone(
 
 export function insertTask(
 	db: Database.Database,
-	params: { id?: string; sliceId: string; number: number; title: string; wave?: number },
+	params: {
+		id?: string;
+		sliceId: string;
+		number: number;
+		title: string;
+		wave?: number;
+		difficulty?: number;
+	},
 ): string {
+	if (
+		params.difficulty != null &&
+		(!Number.isInteger(params.difficulty) || params.difficulty < 0)
+	) {
+		throw new Error("difficulty must be a non-negative integer");
+	}
 	const id = params.id ?? randomUUID();
 	db.prepare(
-		"INSERT INTO task (id, slice_id, number, title, description, wave, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO task (id, slice_id, number, title, description, wave, difficulty, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	).run(
 		id,
 		params.sliceId,
@@ -435,6 +450,7 @@ export function insertTask(
 		params.title,
 		null,
 		params.wave ?? null,
+		params.difficulty ?? null,
 		null,
 		null,
 		Date.now(),

@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import type { TffContext } from "../common/context.js";
 import * as addRemote from "./add-remote.js";
 import * as askUser from "./ask-user.js";

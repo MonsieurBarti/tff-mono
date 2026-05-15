@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { resolveTffPath } from "@tff/core";
 import { refreshCompressionLevel } from "./common/compress.js";
 import { buildContextBlock } from "./common/context-injection.js";

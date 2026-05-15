@@ -4,12 +4,13 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { initTffDirectory, writeArtifact } from "@tff/core";
 import type { Slice } from "../../../src/common/dto.js";
+import { makeSlice } from "../../helpers.js";
 import { preflightCheck } from "../../../src/phases/ship.js";
 
 describe("preflightCheck", () => {
 	let root: string;
 
-	const fakeSlice: Slice = {
+	const fakeSlice = makeSlice({
 		id: "slice-1",
 		milestoneId: "ms-1",
 		number: 1,
@@ -18,7 +19,8 @@ describe("preflightCheck", () => {
 		tier: "SS",
 		prUrl: null,
 		createdAt: "2025-01-01T00:00:00Z",
-	};
+		updatedAt: "2025-01-01T00:00:00Z",
+	});
 
 	const base = "milestones/M01/slices/M01-S01";
 

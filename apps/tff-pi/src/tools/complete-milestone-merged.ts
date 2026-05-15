@@ -1,4 +1,4 @@
-import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
+import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { handleCompleteMilestoneMerged } from "../commands/complete-milestone-merged.js";
 import { type TffContext, getDb } from "../common/context.js";

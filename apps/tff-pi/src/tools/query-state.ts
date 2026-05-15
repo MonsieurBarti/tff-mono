@@ -1,5 +1,4 @@
-import { StringEnum } from "@mariozechner/pi-ai";
-import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
+import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
 import { type TffContext, getDb } from "../common/context.js";
@@ -79,9 +78,12 @@ export function register(pi: ExtensionAPI, ctx: TffContext): void {
 			description:
 				"Query the current TFF project state. Use scope=overview for project + milestones, scope=milestone with an id for slices, or scope=slice with an id for tasks and dependencies.",
 			parameters: Type.Object({
-				scope: StringEnum(["overview", "milestone", "slice"] as const, {
-					description: "What to query: overview, a specific milestone, or a specific slice",
-				}),
+				scope: Type.Union(
+					(["overview", "milestone", "slice"] as const).map((s) => Type.Literal(s)),
+					{
+						description: "What to query: overview, a specific milestone, or a specific slice",
+					},
+				),
 				id: Type.Optional(
 					Type.String({
 						description:

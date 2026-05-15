@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runStateRename } from "../../../src/commands/state-rename.js";
 import type { TffContext } from "../../../src/common/context.js";

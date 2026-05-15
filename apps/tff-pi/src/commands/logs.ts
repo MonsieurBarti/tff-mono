@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import { type TffContext, getDb } from "../common/context.js";
 import { findSliceByLabel } from "../common/db-resolvers.js";
 import { getMilestone } from "../common/db.js";

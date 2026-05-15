@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { TffContext } from "./context.js";
 import { initFffBridge } from "./fff-integration.js";
 import { PerSliceLog } from "./per-slice-log.js";

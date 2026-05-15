@@ -21,9 +21,9 @@ without spawning a real subagent process.
 3. Copy the dumped payload into this fixture (preserve the top-level
    `{ toolName, details }` shape). Flip `_meta.source` to `"live-capture"`.
 4. Update `_meta.piAiVersion` from
-   `node_modules/@mariozechner/pi-ai/package.json`:
+   `node_modules/@earendil-works/pi-ai/package.json`:
    ```sh
-   node -e "console.log(JSON.parse(require('fs').readFileSync('node_modules/@mariozechner/pi-ai/package.json','utf-8')).version)"
+   node -e "console.log(JSON.parse(require('fs').readFileSync('node_modules/@earendil-works/pi-ai/package.json','utf-8')).version)"
    ```
 5. Update `_meta.piSubagentsVersion` from
    `node_modules/pi-subagents/package.json` the same way.
