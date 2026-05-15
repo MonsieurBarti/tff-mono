@@ -41,6 +41,7 @@ interface ProjectRow {
 	name: string;
 	vision: string;
 	created_at: string | number;
+	updated_at: string | number;
 }
 interface MilestoneRow {
 	id: string;
@@ -49,27 +50,40 @@ interface MilestoneRow {
 	name: string;
 	status: string;
 	branch: string;
+	close_reason: string | null;
+	archived_at: number | null;
 	created_at: string | number;
+	updated_at: string | number;
 }
 interface SliceRow {
 	id: string;
 	milestone_id: string;
+	kind: string;
 	number: number;
 	title: string;
 	status: string;
 	tier: string | null;
+	base_branch: string | null;
+	branch_name: string | null;
 	pr_url: string | null;
+	archived_at: number | null;
 	created_at: string | number;
+	updated_at: string | number;
 }
 interface TaskRow {
 	id: string;
 	slice_id: string;
 	number: number;
 	title: string;
+	description: string | null;
 	status: string;
 	wave: number | null;
+	difficulty: number | null;
+	claimed_at: number | null;
 	claimed_by: string | null;
+	closed_reason: string | null;
 	created_at: string | number;
+	updated_at: string | number;
 }
 interface DependencyRow {
 	from_id: string;
@@ -90,7 +104,13 @@ interface PhaseRunRow {
 }
 
 function toProject(r: ProjectRow): Project {
-	return { id: r.id, name: r.name, vision: r.vision, createdAt: String(r.created_at) };
+	return {
+		id: r.id,
+		name: r.name,
+		vision: r.vision,
+		createdAt: String(r.created_at),
+		updatedAt: String(r.updated_at),
+	};
 }
 function toMilestone(r: MilestoneRow): Milestone {
 	const status = r.status === "open" ? "created" : r.status;
@@ -101,7 +121,10 @@ function toMilestone(r: MilestoneRow): Milestone {
 		name: r.name,
 		status: status as Milestone["status"],
 		branch: r.branch,
+		closeReason: r.close_reason ?? null,
 		createdAt: String(r.created_at),
+		updatedAt: String(r.updated_at),
+		archivedAt: r.archived_at != null ? String(r.archived_at) : null,
 	};
 }
 function toSlice(r: SliceRow): Slice {
@@ -111,12 +134,17 @@ function toSlice(r: SliceRow): Slice {
 	return {
 		id: r.id,
 		milestoneId: r.milestone_id,
+		kind: r.kind ?? "milestone",
 		number: r.number,
 		title: r.title,
 		status: r.status as Slice["status"],
 		tier: (r.tier ?? null) as Slice["tier"],
+		baseBranch: r.base_branch ?? "",
+		branchName: r.branch_name ?? "",
 		prUrl: r.pr_url ?? null,
 		createdAt: String(r.created_at),
+		updatedAt: String(r.updated_at),
+		archivedAt: r.archived_at != null ? String(r.archived_at) : null,
 	};
 }
 function toTask(r: TaskRow): Task {
@@ -125,10 +153,15 @@ function toTask(r: TaskRow): Task {
 		sliceId: r.slice_id,
 		number: r.number,
 		title: r.title,
+		description: r.description ?? "",
 		status: r.status as Task["status"],
 		wave: r.wave ?? null,
+		difficulty: r.difficulty ?? null,
+		claimedAt: r.claimed_at != null ? String(r.claimed_at) : null,
 		claimedBy: r.claimed_by ?? null,
+		closedReason: r.closed_reason ?? null,
 		createdAt: String(r.created_at),
+		updatedAt: String(r.updated_at),
 	};
 }
 function toDependency(r: DependencyRow): SnapshotDependency {
