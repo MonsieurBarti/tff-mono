@@ -3,26 +3,30 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readArtifact, resolveTffPath } from "@tff/core";
 
-const BUILTIN_TEMPLATE_PATH = join(
-	fileURLToPath(new URL(".", import.meta.url)),
-	"..",
-	"resources",
-	"templates",
-	"pr-body.md",
-);
+function resolveResourcesDir(): string {
+	const __dirname = fileURLToPath(new URL(".", import.meta.url));
+	const candidate = join(__dirname, "..", "resources");
+	if (existsSync(candidate)) {
+		return candidate;
+	}
+	return join(__dirname, "resources");
+}
 
-const CORE_TEMPLATES_DIR = join(
-	fileURLToPath(new URL(".", import.meta.url)),
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"core",
-	"src",
-	"content",
-	"templates",
-);
+function resolveCoreContentDir(): string {
+	const __dirname = fileURLToPath(new URL(".", import.meta.url));
+	const publishedDir = join(__dirname, "content");
+	if (existsSync(publishedDir)) {
+		return publishedDir;
+	}
+	const monorepoDir = join(__dirname, "..", "..", "..", "..", "packages", "core", "src", "content");
+	if (existsSync(monorepoDir)) {
+		return monorepoDir;
+	}
+	throw new Error("Cannot resolve @tff/core content directory");
+}
+
+const BUILTIN_TEMPLATE_PATH = join(resolveResourcesDir(), "templates", "pr-body.md");
+const CORE_TEMPLATES_DIR = join(resolveCoreContentDir(), "templates");
 
 export const PR_TEMPLATE_FIELDS = [
 	"description",
