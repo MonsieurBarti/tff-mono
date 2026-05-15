@@ -20,7 +20,7 @@ describe("handleClassify — event log", () => {
 		applyMigrations(db);
 		const root = mkdtempSync(join(tmpdir(), "tff-classify-"));
 		mkdirSync(join(root, ".tff"), { recursive: true });
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, { id: "m1", projectId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "T" });
 		db.prepare("UPDATE slice SET status = 'discussing' WHERE id = ?").run(sId);

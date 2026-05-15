@@ -32,7 +32,7 @@ describe("M10-S04: ship tombstone (single clone end-to-end)", () => {
 		// snapshot diverges from tff-state/main. Otherwise merge is a no-op.
 		await ensureStateBranch(fx.alice, fx.aliceProjectId);
 		const db = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+		const projectId = insertProject(db, { name: "p", vision: "v" });
 		db.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,
@@ -60,7 +60,7 @@ describe("M10-S04: ship tombstone (single clone end-to-end)", () => {
 			.prepare(
 				"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",
 			)
-			.run("M10", fx.aliceProjectId, 10, "Test", "completing", "milestone/M10");
+			.run("M10", projectId, 10, "Test", "completing", "milestone/M10");
 		db2.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,

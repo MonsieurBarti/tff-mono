@@ -2,7 +2,14 @@ import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import type { PhaseRun } from "./db.js";
-import type { Dependency, Milestone, Project, Slice, Task } from "./dto.js";
+import {
+	SLICE_STATUSES,
+	type Dependency,
+	type Milestone,
+	type Project,
+	type Slice,
+	type Task,
+} from "./dto.js";
 
 export const SNAPSHOT_SCHEMA_VERSION = 1;
 export const SNAPSHOT_FILENAME = "state-snapshot.json";
@@ -33,7 +40,7 @@ interface ProjectRow {
 	id: string;
 	name: string;
 	vision: string;
-	created_at: string;
+	created_at: string | number;
 }
 interface MilestoneRow {
 	id: string;
@@ -42,7 +49,7 @@ interface MilestoneRow {
 	name: string;
 	status: string;
 	branch: string;
-	created_at: string;
+	created_at: string | number;
 }
 interface SliceRow {
 	id: string;
@@ -52,7 +59,7 @@ interface SliceRow {
 	status: string;
 	tier: string | null;
 	pr_url: string | null;
-	created_at: string;
+	created_at: string | number;
 }
 interface TaskRow {
 	id: string;
@@ -62,11 +69,11 @@ interface TaskRow {
 	status: string;
 	wave: number | null;
 	claimed_by: string | null;
-	created_at: string;
+	created_at: string | number;
 }
 interface DependencyRow {
-	from_task_id: string;
-	to_task_id: string;
+	from_id: string;
+	to_id: string;
 }
 interface PhaseRunRow {
 	id: string;
@@ -79,24 +86,28 @@ interface PhaseRunRow {
 	error: string | null;
 	feedback: string | null;
 	metadata: string | null;
-	created_at: string;
+	created_at: string | number;
 }
 
 function toProject(r: ProjectRow): Project {
-	return { id: r.id, name: r.name, vision: r.vision, createdAt: r.created_at };
+	return { id: r.id, name: r.name, vision: r.vision, createdAt: String(r.created_at) };
 }
 function toMilestone(r: MilestoneRow): Milestone {
+	const status = r.status === "open" ? "created" : r.status;
 	return {
 		id: r.id,
 		projectId: r.project_id,
 		number: r.number,
 		name: r.name,
-		status: r.status as Milestone["status"],
+		status: status as Milestone["status"],
 		branch: r.branch,
-		createdAt: r.created_at,
+		createdAt: String(r.created_at),
 	};
 }
 function toSlice(r: SliceRow): Slice {
+	if (!(SLICE_STATUSES as readonly string[]).includes(r.status)) {
+		throw new Error(`Invalid slice status in snapshot: ${r.status}`);
+	}
 	return {
 		id: r.id,
 		milestoneId: r.milestone_id,
@@ -105,7 +116,7 @@ function toSlice(r: SliceRow): Slice {
 		status: r.status as Slice["status"],
 		tier: (r.tier ?? null) as Slice["tier"],
 		prUrl: r.pr_url ?? null,
-		createdAt: r.created_at,
+		createdAt: String(r.created_at),
 	};
 }
 function toTask(r: TaskRow): Task {
@@ -117,14 +128,14 @@ function toTask(r: TaskRow): Task {
 		status: r.status as Task["status"],
 		wave: r.wave ?? null,
 		claimedBy: r.claimed_by ?? null,
-		createdAt: r.created_at,
+		createdAt: String(r.created_at),
 	};
 }
 function toDependency(r: DependencyRow): SnapshotDependency {
 	return {
-		id: `${r.from_task_id}:${r.to_task_id}`,
-		fromTaskId: r.from_task_id,
-		toTaskId: r.to_task_id,
+		id: `${r.from_id}:${r.to_id}`,
+		fromTaskId: r.from_id,
+		toTaskId: r.to_id,
 	};
 }
 // SECURITY NOTE — free-text fields in phase_run.
@@ -153,7 +164,7 @@ function toPhaseRun(r: PhaseRunRow): PhaseRun {
 		error: r.error,
 		feedback: r.feedback,
 		metadata: r.metadata,
-		createdAt: r.created_at,
+		createdAt: String(r.created_at),
 	};
 }
 

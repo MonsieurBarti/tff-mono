@@ -8,4 +8,4 @@ export {
 	InvalidTransitionError,
 } from "./milestone.error.js";
 export { type MilestoneProps, type MilestoneUpdateProps } from "./milestone-props.js";
-export { type MilestoneStatus, MILESTONE_TRANSITIONS } from "./transitions.js";
+export { type MilestoneStatus, MILESTONE_STATUSES, MILESTONE_TRANSITIONS } from "./transitions.js";

@@ -35,6 +35,7 @@ const driveSliceToClosed = (sliceId: string): void => {
 	if (!taskR.ok) throw new Error("createTask failed");
 	stores.taskStore.claimTask(taskR.data.id, "exec");
 	for (const target of [
+		"discussing",
 		"researching",
 		"planning",
 		"executing",

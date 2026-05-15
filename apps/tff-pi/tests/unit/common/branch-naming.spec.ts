@@ -20,7 +20,7 @@ describe("branch-naming", () => {
 		tmp = mkdtempSync(join(tmpdir(), "tff-branch-naming-"));
 		dbPath = join(tmp, "state.db");
 		db = openDatabase(dbPath);
-		applyMigrations(db, { root: tmp });
+		applyMigrations(db);
 	});
 
 	afterEach(() => {
@@ -39,7 +39,7 @@ describe("branch-naming", () => {
 	});
 
 	it("resolveBranchToEntity round-trips a slice", () => {
-		const projectId = randomUUID();
+		const projectId = "singleton";
 		db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(projectId, "p", "v");
 		const milestoneId = randomUUID();
 		db.prepare(
@@ -59,7 +59,7 @@ describe("branch-naming", () => {
 	});
 
 	it("resolveBranchToEntity round-trips a milestone", () => {
-		const projectId = randomUUID();
+		const projectId = "singleton";
 		db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(projectId, "p", "v");
 		const milestoneId = randomUUID();
 		db.prepare(
@@ -83,7 +83,7 @@ describe("branch-naming", () => {
 	});
 
 	it("logs a warning when an 8-char prefix matches more than one row", () => {
-		const projectId = randomUUID();
+		const projectId = "singleton";
 		db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(projectId, "p", "v");
 		const milestoneId = randomUUID();
 		db.prepare(

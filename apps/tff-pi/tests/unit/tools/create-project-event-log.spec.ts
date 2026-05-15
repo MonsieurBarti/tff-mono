@@ -43,7 +43,7 @@ describe("handleNew — event log", () => {
 		expect(project).not.toBeNull();
 		expect(project?.name).toBe("MyProject");
 		expect(project?.vision).toBe("Do great things");
-		expect(project?.id).toBe(result.projectId);
+		expect(project?.id).toBe("singleton");
 
 		const events = readEvents(root);
 		expect(events).toHaveLength(1);

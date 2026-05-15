@@ -21,10 +21,12 @@ export { type SliceProps, type SliceUpdateProps } from "./slice-props.js";
 export {
 	type SliceStatus,
 	type ComplexityTier,
+	SLICE_STATUSES,
 	SLICE_TRANSITIONS,
 	HUMAN_GATES,
+	TIERS,
 } from "./transitions.js";
-export { type GuardResult, tierSkipGuard, reviewExistsGuard } from "./guards.js";
+export { type GuardResult, reviewExistsGuard } from "./guards.js";
 export {
 	type PhaseRun,
 	type ArtifactStatus,

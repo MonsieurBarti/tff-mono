@@ -87,9 +87,9 @@ describe("slice:transition TOCTOU re-check", () => {
 		});
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
-		// We target "researching" (valid from "discussing"), but by tx time the slice
+		// We target "discussing" (valid from "created"), but by tx time the slice
 		// has been raced to "executing" — the inner re-check should detect the mismatch.
-		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]);
+		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]);
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
@@ -99,7 +99,7 @@ describe("slice:transition TOCTOU re-check", () => {
 		const sliceResult = adapter.getSlice(sliceId);
 		expect(sliceResult.ok).toBe(true);
 		if (sliceResult.ok && sliceResult.data) {
-			expect(sliceResult.data.status).toBe("discussing");
+			expect(sliceResult.data.status).toBe("created");
 		}
 	});
 
@@ -108,10 +108,10 @@ describe("slice:transition TOCTOU re-check", () => {
 		installStores(adapter);
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
-		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]);
+		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]);
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(true);
-		expect(result.data.status).toBe("researching");
+		expect(result.data.status).toBe("discussing");
 	});
 });

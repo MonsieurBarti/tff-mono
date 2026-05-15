@@ -125,10 +125,10 @@ describe("handleStatus", () => {
 		const runId2 = insertPhaseRun(db, {
 			sliceId,
 			phase: "plan",
-			status: "running",
+			status: "started",
 			startedAt: new Date().toISOString(),
 		});
-		updatePhaseRun(db, runId2, { status: "running" });
+		updatePhaseRun(db, runId2, { status: "started" });
 
 		const result = handleStatus(db);
 		expect(result).toContain("1/2 phases");

@@ -32,7 +32,7 @@ describe("createSliceUseCase", () => {
 			expect(slice.title).toBe("Auth");
 			// ID should be a UUID
 			expect(slice.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-			expect(slice.status).toBe("discussing");
+			expect(slice.status).toBe("created");
 		}
 	});
 

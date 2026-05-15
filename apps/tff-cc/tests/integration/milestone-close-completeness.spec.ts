@@ -91,6 +91,7 @@ describe("milestone-close completeness invariant", () => {
 		// Close each slice: transition through the full state chain and seed required reviews
 		for (const sliceId of sliceIds) {
 			for (const state of [
+				"discussing",
 				"researching",
 				"planning",
 				"executing",

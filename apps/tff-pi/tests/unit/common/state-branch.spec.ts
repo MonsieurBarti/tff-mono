@@ -403,8 +403,8 @@ describe("commitStateAtPhaseEnd — happy path", () => {
 		projectId = r.projectId;
 		seedEnabledSettings(repo);
 		const db = openDatabase(join(home, projectId, "state.db"));
-		applyMigrations(db, { root: repo });
-		insertProject(db, { name: "p", vision: "v", id: projectId });
+		applyMigrations(db);
+		insertProject(db, { name: "p", vision: "v" });
 		db.close();
 		await ensureStateBranch(repo, projectId);
 	});
@@ -439,7 +439,7 @@ describe("commitStateAtPhaseEnd — happy path", () => {
 		});
 		const snap = JSON.parse(snapJson);
 		expect(snap.project).toHaveLength(1);
-		expect(snap.project[0].id).toBe(projectId);
+		expect(snap.project[0].id).toBe("singleton");
 	});
 
 	it("commit message is '<phase>: <sliceLabel>'", async () => {
@@ -622,7 +622,7 @@ describe("commitStateAtPhaseEnd — non-blocking", () => {
 			stdio: "pipe",
 		});
 		const db = openDatabase(join(home, projectId, "state.db"));
-		insertProject(db, { name: "p", vision: "v", id: projectId });
+		insertProject(db, { name: "p", vision: "v" });
 		db.close();
 		await expect(
 			commitStateAtPhaseEnd({
@@ -757,7 +757,7 @@ describe("pushWithRebaseRetry — non-ff with clean rebase", () => {
 		// Alice commits + pushes tff-state/main
 		const aliceProjectId = readFileSync(join(alice, ".tff-project-id"), "utf-8").trim();
 		const db = openDatabase(join(home, aliceProjectId, "state.db"));
-		insertProject(db, { name: "p", vision: "v", id: aliceProjectId });
+		insertProject(db, { name: "p", vision: "v" });
 		db.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: alice,

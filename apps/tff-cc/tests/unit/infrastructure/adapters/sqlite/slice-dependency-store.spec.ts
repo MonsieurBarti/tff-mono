@@ -9,7 +9,7 @@ function makeDb() {
 		"INSERT INTO project (id, name, created_at, updated_at) VALUES ('singleton', 'Test', datetime('now'), datetime('now'))",
 	).run();
 	db.prepare(
-		"INSERT INTO milestone (id, project_id, number, name, status, branch, created_at, updated_at) VALUES ('m1', 'singleton', 1, 'M1', 'open', 'branch-1', datetime('now'), datetime('now'))",
+		"INSERT INTO milestone (id, project_id, number, name, status, branch, created_at, updated_at) VALUES ('m1', 'singleton', 1, 'M1', 'created', 'branch-1', datetime('now'), datetime('now'))",
 	).run();
 	return adapter;
 }

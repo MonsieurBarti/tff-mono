@@ -156,7 +156,7 @@ describe("invariant 1: DB<->STATE.md consistency after writer exits", () => {
 		installStores(adapter);
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
-		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]);
+		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]);
 		const result = JSON.parse(raw);
 		expect(result.ok).toBe(true);
 
@@ -260,12 +260,12 @@ describe("invariant 2: no held lock (back-to-back writer invocations succeed)", 
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
 		const r1 = JSON.parse(
-			await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]),
+			await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]),
 		);
 		expect(r1.ok).toBe(true);
 
 		const r2 = JSON.parse(
-			await sliceTransitionCmd(["--slice-id", "M01-S02", "--status", "researching"]),
+			await sliceTransitionCmd(["--slice-id", "M01-S02", "--status", "discussing"]),
 		);
 		expect(r2.ok).toBe(true);
 	});

@@ -144,6 +144,7 @@ export const transitionSliceOrchestrator = async (
 			number: currentSlice.number,
 			title: currentSlice.title,
 			status: targetStatus,
+			prUrl: currentSlice.prUrl,
 			tier: currentSlice.tier,
 			baseBranch: currentSlice.baseBranch,
 			branchName: currentSlice.branchName,

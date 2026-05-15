@@ -53,7 +53,6 @@ describe("applyMigrations — monitoring tables", () => {
 		}[];
 		const versions = rows.map((r) => r.version);
 		expect(versions).toContain(1);
-		expect(versions).toContain(2);
 	});
 
 	it("is idempotent — running twice does not duplicate schema_version rows", () => {
@@ -64,7 +63,6 @@ describe("applyMigrations — monitoring tables", () => {
 			version: number;
 		}[];
 		expect(rows.filter((r) => r.version === 1)).toHaveLength(1);
-		expect(rows.filter((r) => r.version === 2)).toHaveLength(1);
 	});
 });
 
@@ -81,7 +79,7 @@ describe("phase_run", () => {
 		const id = insertPhaseRun(db, {
 			sliceId,
 			phase: "research",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 		expect(id).toBeDefined();
@@ -92,7 +90,7 @@ describe("phase_run", () => {
 		expect(run.id).toBe(id);
 		expect(run.sliceId).toBe(sliceId);
 		expect(run.phase).toBe("research");
-		expect(run.status).toBe("running");
+		expect(run.status).toBe("started");
 		expect(run.startedAt).toBe("2024-01-01T00:00:00Z");
 		expect(run.finishedAt).toBeNull();
 		expect(run.durationMs).toBeNull();
@@ -106,12 +104,12 @@ describe("phase_run", () => {
 		const id = insertPhaseRun(db, {
 			sliceId,
 			phase: "plan",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 
 		updatePhaseRun(db, id, {
-			status: "done",
+			status: "completed",
 			finishedAt: "2024-01-01T00:01:00Z",
 			durationMs: 60000,
 			feedback: "Looks good",
@@ -120,7 +118,7 @@ describe("phase_run", () => {
 
 		const runs = getPhaseRuns(db, sliceId);
 		const run = must(runs[0]);
-		expect(run.status).toBe("done");
+		expect(run.status).toBe("completed");
 		expect(run.finishedAt).toBe("2024-01-01T00:01:00Z");
 		expect(run.durationMs).toBe(60000);
 		expect(run.feedback).toBe("Looks good");
@@ -132,7 +130,7 @@ describe("phase_run", () => {
 		const id = insertPhaseRun(db, {
 			sliceId,
 			phase: "execute",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 
@@ -160,13 +158,13 @@ describe("phase_run", () => {
 		insertPhaseRun(db, {
 			sliceId,
 			phase: "research",
-			status: "done",
+			status: "completed",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 		const id2 = insertPhaseRun(db, {
 			sliceId,
 			phase: "plan",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:01:00Z",
 		});
 
@@ -178,13 +176,13 @@ describe("phase_run", () => {
 		const id1 = insertPhaseRun(db, {
 			sliceId,
 			phase: "research",
-			status: "done",
+			status: "completed",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 		insertPhaseRun(db, {
 			sliceId,
 			phase: "plan",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:01:00Z",
 		});
 
@@ -203,16 +201,16 @@ describe("phase_run", () => {
 
 		// First update: set feedback and metadata
 		updatePhaseRun(db, id, {
-			status: "running",
+			status: "started",
 			feedback: "initial feedback",
 			metadata: JSON.stringify({ step: 1 }),
 		});
 
 		// Second update: change status only — feedback and metadata must survive
-		updatePhaseRun(db, id, { status: "done" });
+		updatePhaseRun(db, id, { status: "completed" });
 
 		const run = must(getLatestPhaseRun(db, sliceId));
-		expect(run.status).toBe("done");
+		expect(run.status).toBe("completed");
 		expect(run.feedback).toBe("initial feedback");
 		expect(run.metadata).toBe(JSON.stringify({ step: 1 }));
 	});
@@ -233,7 +231,7 @@ describe("phase_run", () => {
 		insertPhaseRun(db, {
 			sliceId,
 			phase: "execute",
-			status: "done",
+			status: "completed",
 			startedAt: "2024-01-01T00:02:00Z",
 		});
 
@@ -252,7 +250,7 @@ describe("phase_run", () => {
 		insertPhaseRun(db, {
 			sliceId,
 			phase: "research",
-			status: "done",
+			status: "completed",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 		expect(recoverOrphanedPhaseRuns(db)).toBe(0);
@@ -262,13 +260,13 @@ describe("phase_run", () => {
 		const id1 = insertPhaseRun(db, {
 			sliceId,
 			phase: "research",
-			status: "done",
+			status: "completed",
 			startedAt: "2024-01-01T00:00:00Z",
 		});
 		const id2 = insertPhaseRun(db, {
 			sliceId,
 			phase: "plan",
-			status: "running",
+			status: "started",
 			startedAt: "2024-01-01T00:01:00Z",
 		});
 

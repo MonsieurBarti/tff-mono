@@ -150,7 +150,7 @@ describe("handleInit DB setup", () => {
 		const db = openDatabase(dbPath);
 		try {
 			db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(
-				"p-1",
+				"singleton",
 				"Test",
 				"Vision",
 			);
@@ -163,7 +163,7 @@ describe("handleInit DB setup", () => {
 		const db2 = openDatabase(dbPath);
 		let row: { name: string } | undefined;
 		try {
-			row = db2.prepare("SELECT name FROM project WHERE id = ?").get("p-1") as
+			row = db2.prepare("SELECT name FROM project WHERE id = ?").get("singleton") as
 				| { name: string }
 				| undefined;
 		} finally {

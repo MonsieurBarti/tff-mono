@@ -7,7 +7,7 @@ import { type TffContext, getDb } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { buildDiscussCompletionSuffix } from "../common/phase-completion.js";
-import { TIERS, type Tier } from "../common/dto.js";
+import { TIERS, type ComplexityTier as Tier } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

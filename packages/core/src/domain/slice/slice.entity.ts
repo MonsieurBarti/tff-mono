@@ -19,7 +19,7 @@ import {
 	ReviewNotFoundError,
 } from "./slice.error.js";
 import { SLICE_TRANSITIONS, type ComplexityTier, type SliceStatus } from "./transitions.js";
-import { reviewExistsGuard, tierSkipGuard } from "./guards.js";
+import { reviewExistsGuard } from "./guards.js";
 
 const createSliceSchema = z.object({
 	milestoneId: z.string().min(1).nullable(),
@@ -43,6 +43,7 @@ export interface SliceState {
 	tier: ComplexityTier | null;
 	baseBranch: string;
 	branchName: string;
+	prUrl: string | null;
 	createdAt: Date;
 	updatedAt: Date;
 	archivedAt: Date | null;
@@ -62,6 +63,7 @@ export class Slice extends AggregateRoot {
 	private _tier: ComplexityTier | null;
 	private readonly _baseBranch: string;
 	private readonly _branchName: string;
+	private readonly _prUrl: string | null;
 	private readonly _createdAt: Date;
 	private _updatedAt: Date;
 	private _archivedAt: Date | null;
@@ -77,6 +79,7 @@ export class Slice extends AggregateRoot {
 		tier: ComplexityTier | null;
 		baseBranch: string;
 		branchName: string;
+		prUrl: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		archivedAt: Date | null;
@@ -91,6 +94,7 @@ export class Slice extends AggregateRoot {
 		this._tier = props.tier;
 		this._baseBranch = props.baseBranch;
 		this._branchName = props.branchName;
+		this._prUrl = props.prUrl;
 		this._createdAt = props.createdAt;
 		this._updatedAt = props.updatedAt;
 		this._archivedAt = props.archivedAt;
@@ -121,6 +125,7 @@ export class Slice extends AggregateRoot {
 			tier: null,
 			baseBranch: validated.baseBranch,
 			branchName,
+			prUrl: null,
 			createdAt: now,
 			updatedAt: now,
 			archivedAt: null,
@@ -152,6 +157,7 @@ export class Slice extends AggregateRoot {
 			tier: state.tier,
 			baseBranch: state.baseBranch,
 			branchName: state.branchName,
+			prUrl: state.prUrl ?? null,
 			createdAt: state.createdAt,
 			updatedAt: state.updatedAt,
 			archivedAt: state.archivedAt,
@@ -191,6 +197,10 @@ export class Slice extends AggregateRoot {
 		return this._branchName;
 	}
 
+	get prUrl(): string | null {
+		return this._prUrl;
+	}
+
 	get createdAt(): Date {
 		return this._createdAt;
 	}
@@ -222,6 +232,7 @@ export class Slice extends AggregateRoot {
 			tier: this._tier,
 			baseBranch: this._baseBranch,
 			branchName: this._branchName,
+			prUrl: this._prUrl,
 			createdAt: this._createdAt,
 			updatedAt: this._updatedAt,
 			archivedAt: this._archivedAt,
@@ -243,8 +254,7 @@ export class Slice extends AggregateRoot {
 		}
 		const allowed = SLICE_TRANSITIONS[this._status];
 		const isAllowed = allowed.includes(to);
-		const isTierSkip = tierSkipGuard(this._status, to, this._tier).ok;
-		if (!isAllowed && !isTierSkip) {
+		if (!isAllowed) {
 			throw new InvalidTransitionError(
 				`Invalid transition from ${this._status} to ${to}`,
 				this._status,

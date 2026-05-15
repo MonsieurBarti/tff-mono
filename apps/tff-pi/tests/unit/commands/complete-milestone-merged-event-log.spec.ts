@@ -55,7 +55,7 @@ describe("handleCompleteMilestoneMerged — event log (complete-milestone-merged
 		root = mkdtempSync(join(tmpdir(), "tff-cmm-el-"));
 		mkdirSync(join(root, ".tff"), { recursive: true });
 
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		milestoneId = insertMilestone(db, {
 			id: "m1",
 			projectId,

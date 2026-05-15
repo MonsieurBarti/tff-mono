@@ -24,8 +24,8 @@ describe("M10-S03: state-branch roundtrip", () => {
 		await ensureStateBranch(fx.alice, fx.aliceProjectId);
 		const aliceDbPath = join(fx.home, fx.aliceProjectId, "state.db");
 		const aliceDb = openDatabase(aliceDbPath);
-		applyMigrations(aliceDb, { root: fx.alice });
-		insertProject(aliceDb, { name: "p", vision: "v", id: fx.aliceProjectId });
+		applyMigrations(aliceDb);
+		insertProject(aliceDb, { name: "p", vision: "v" });
 		aliceDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,
@@ -51,6 +51,6 @@ describe("M10-S03: state-branch roundtrip", () => {
 		});
 		const snap = JSON.parse(snapStr);
 		expect(snap.project).toHaveLength(1);
-		expect(snap.project[0].id).toBe(fx.aliceProjectId);
+		expect(snap.project[0].id).toBe("singleton");
 	});
 });

@@ -23,7 +23,7 @@ describe("M10-S03: multi-machine rebase", () => {
 		// Alice initialises + pushes tff-state/main
 		await ensureStateBranch(fx.alice, fx.aliceProjectId);
 		const aliceDb = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		insertProject(aliceDb, { name: "p", vision: "v", id: fx.aliceProjectId });
+		const projectId = insertProject(aliceDb, { name: "p", vision: "v" });
 		aliceDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,
@@ -46,7 +46,7 @@ describe("M10-S03: multi-machine rebase", () => {
 			.prepare(
 				"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",
 			)
-			.run("M02", fx.aliceProjectId, 2, "Bob's milestone", "created", "main");
+			.run("M02", projectId, 2, "Bob's milestone", "created", "main");
 		bobDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.bob,
@@ -63,7 +63,7 @@ describe("M10-S03: multi-machine rebase", () => {
 			.prepare(
 				"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",
 			)
-			.run("M03", fx.aliceProjectId, 3, "Alice's milestone", "created", "main");
+			.run("M03", projectId, 3, "Alice's milestone", "created", "main");
 		aliceDb2.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,

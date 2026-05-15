@@ -1,7 +1,7 @@
+import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
-import { reconcileSliceStatus } from "./derived-state.js";
-import { logException } from "./logger.js";
+import { runMigrations } from "@tff/core";
 import type { MilestoneStatus, SliceStatus, TaskStatus } from "@tff/core";
 import {
 	type Dependency,
@@ -31,154 +31,34 @@ export function openDatabase(path: string): Database.Database {
 // Migrations
 // ---------------------------------------------------------------------------
 
-export function applyMigrations(db: Database.Database, opts?: { root?: string }): void {
-	db.exec(`
-		CREATE TABLE IF NOT EXISTS schema_version (
-			version    INTEGER NOT NULL,
-			applied_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-	`);
-
-	const currentVersion =
-		(db.prepare("SELECT MAX(version) as v FROM schema_version").get() as { v: number | null })?.v ??
-		0;
-
-	if (currentVersion < 1) {
-		// Original schema (already exists via CREATE IF NOT EXISTS)
-		db.prepare("INSERT INTO schema_version (version) VALUES (1)").run();
-	}
-
-	db.exec(`
-		CREATE TABLE IF NOT EXISTS project (
-			id         TEXT PRIMARY KEY,
-			name       TEXT NOT NULL,
-			vision     TEXT NOT NULL,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-
-		CREATE TABLE IF NOT EXISTS milestone (
-			id         TEXT PRIMARY KEY,
-			project_id TEXT NOT NULL REFERENCES project(id),
-			number     INTEGER NOT NULL,
-			name       TEXT NOT NULL,
-			status     TEXT NOT NULL DEFAULT 'created',
-			branch     TEXT NOT NULL,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-
-		CREATE INDEX IF NOT EXISTS idx_milestone_project_id ON milestone(project_id);
-
-		CREATE TABLE IF NOT EXISTS slice (
-			id           TEXT PRIMARY KEY,
-			milestone_id TEXT NOT NULL REFERENCES milestone(id),
-			number       INTEGER NOT NULL,
-			title        TEXT NOT NULL,
-			status       TEXT NOT NULL DEFAULT 'created',
-			tier         TEXT,
-			created_at   TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-
-		CREATE INDEX IF NOT EXISTS idx_slice_milestone_id ON slice(milestone_id);
-		CREATE INDEX IF NOT EXISTS idx_slice_status ON slice(status);
-
-		CREATE TABLE IF NOT EXISTS task (
-			id         TEXT PRIMARY KEY,
-			slice_id   TEXT NOT NULL REFERENCES slice(id),
-			number     INTEGER NOT NULL,
-			title      TEXT NOT NULL,
-			status     TEXT NOT NULL DEFAULT 'open',
-			wave       INTEGER,
-			claimed_by TEXT,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-
-		CREATE INDEX IF NOT EXISTS idx_task_slice_id ON task(slice_id);
-		CREATE INDEX IF NOT EXISTS idx_task_status ON task(status);
-		CREATE INDEX IF NOT EXISTS idx_task_wave ON task(wave);
-
-		CREATE TABLE IF NOT EXISTS dependency (
-			from_task_id TEXT NOT NULL REFERENCES task(id),
-			to_task_id   TEXT NOT NULL REFERENCES task(id),
-			PRIMARY KEY (from_task_id, to_task_id)
-		);
-	`);
-	// Legacy migration: pr_url column added before schema versioning.
-	// Kept as try/catch for backward compatibility with existing databases.
+export function applyMigrations(
+	db: Database.Database,
+	opts?: { root?: string; dbPath?: string },
+): Database.Database {
 	try {
-		db.exec("ALTER TABLE slice ADD COLUMN pr_url TEXT");
-	} catch {
-		// Column already exists
-	}
-
-	db.exec(`
-		CREATE TABLE IF NOT EXISTS phase_run (
-			id          TEXT PRIMARY KEY,
-			slice_id    TEXT NOT NULL REFERENCES slice(id),
-			phase       TEXT NOT NULL,
-			status      TEXT NOT NULL,
-			started_at  TEXT NOT NULL,
-			finished_at TEXT,
-			duration_ms INTEGER,
-			error       TEXT,
-			feedback    TEXT,
-			metadata    TEXT,
-			created_at  TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-		CREATE INDEX IF NOT EXISTS idx_phase_run_slice ON phase_run(slice_id);
-		CREATE INDEX IF NOT EXISTS idx_phase_run_phase ON phase_run(phase);
-
-		CREATE TABLE IF NOT EXISTS event_log (
-			id         INTEGER PRIMARY KEY AUTOINCREMENT,
-			channel    TEXT NOT NULL,
-			type       TEXT NOT NULL,
-			slice_id   TEXT NOT NULL,
-			payload    TEXT NOT NULL,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
-		);
-		CREATE INDEX IF NOT EXISTS idx_event_log_slice ON event_log(slice_id);
-		CREATE INDEX IF NOT EXISTS idx_event_log_channel ON event_log(channel);
-	`);
-
-	if (currentVersion < 2) {
-		// M04 monitoring tables (already exist via CREATE IF NOT EXISTS)
-		db.prepare("INSERT INTO schema_version (version) VALUES (2)").run();
-	}
-
-	if (currentVersion < 3) {
-		// M07: paused status removed — migrate any orphaned paused slices
-		db.prepare("UPDATE slice SET status = 'created' WHERE status = 'paused'").run();
-		db.prepare("INSERT INTO schema_version (version) VALUES (3)").run();
-	}
-
-	if (currentVersion < 4) {
-		// M09-S4: derive slice.status from evidence on disk. Reconcile every
-		// non-closed slice's cache column from phase_run rows + artifacts.
-		// Without `root` we bump the version but skip the reconcile pass — this
-		// path exists for tests that seed their own state. Runtime callers
-		// (lifecycle.ts, commands/new.ts) always pass root.
-		const root = opts?.root;
-		const runMigration = db.transaction(() => {
-			if (root) {
-				// Must filter status != 'closed' so we don't attempt to reconcile slices
-				// that were explicitly force-closed via overrideSliceStatus (rule 1 would
-				// not fire for out-of-band closes and the closed state could drift).
-				const rows = db.prepare("SELECT id FROM slice WHERE status != 'closed'").all() as {
-					id: string;
-				}[];
-				for (const { id } of rows) {
-					try {
-						reconcileSliceStatus(db, root, id);
-					} catch (err) {
-						// One slice failing to reconcile (e.g., missing milestone, corrupt
-						// artifact path) must not stall the whole migration. Log and
-						// continue; the next /tff doctor run will catch any remaining drift.
-						logException("db", err, { fn: "m09-s4-migration", id });
-					}
-				}
+		runMigrations(db);
+		return db;
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : String(e);
+		if (msg.includes("VERSION_MISMATCH")) {
+			if (!opts?.dbPath || opts.dbPath === ":memory:") {
+				throw new Error(
+					`VERSION_MISMATCH: Database schema is newer than code version. Upgrade tff-tools.`,
+				);
 			}
-			db.prepare("INSERT INTO schema_version (version) VALUES (4)").run();
-		});
-		runMigration();
+			const backupPath = `${opts.dbPath}.backup.${Date.now()}`;
+			copyFileSync(opts.dbPath, backupPath);
+			db.close();
+			unlinkSync(opts.dbPath);
+			for (const suffix of ["-wal", "-shm"]) {
+				const companion = `${opts.dbPath}${suffix}`;
+				if (existsSync(companion)) unlinkSync(companion);
+			}
+			const newDb = openDatabase(opts.dbPath);
+			runMigrations(newDb);
+			return newDb;
+		}
+		throw e;
 	}
 }
 
@@ -190,7 +70,8 @@ interface ProjectRow {
 	id: string;
 	name: string;
 	vision: string;
-	created_at: string;
+	created_at: string | number;
+	updated_at?: string | number | null;
 }
 
 interface MilestoneRow {
@@ -199,19 +80,27 @@ interface MilestoneRow {
 	number: number;
 	name: string;
 	status: string;
+	close_reason?: string | null;
 	branch: string;
-	created_at: string;
+	archived_at?: number | null;
+	created_at: string | number;
+	updated_at?: string | number | null;
 }
 
 interface SliceRow {
 	id: string;
 	milestone_id: string;
+	kind?: string;
 	number: number;
 	title: string;
 	status: string;
 	tier: string | null;
+	base_branch?: string | null;
+	branch_name?: string | null;
+	archived_at?: number | null;
 	pr_url: string | null;
-	created_at: string;
+	created_at: string | number;
+	updated_at?: string | number | null;
 }
 
 interface TaskRow {
@@ -219,15 +108,19 @@ interface TaskRow {
 	slice_id: string;
 	number: number;
 	title: string;
+	description?: string | null;
 	status: string;
 	wave: number | null;
+	claimed_at?: number | null;
 	claimed_by: string | null;
-	created_at: string;
+	closed_reason?: string | null;
+	created_at: string | number;
+	updated_at?: string | number | null;
 }
 
 interface DependencyRow {
-	from_task_id: string;
-	to_task_id: string;
+	from_id: string;
+	to_id: string;
 }
 
 function rowToProject(row: ProjectRow): Project {
@@ -235,43 +128,52 @@ function rowToProject(row: ProjectRow): Project {
 		id: row.id,
 		name: row.name,
 		vision: row.vision,
-		createdAt: row.created_at,
+		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
 	};
 }
 
 function rowToMilestone(row: MilestoneRow): Milestone {
-	if (!(MILESTONE_STATUSES as readonly string[]).includes(row.status)) {
-		throw new Error(`Invalid milestone status in database: ${row.status}`);
+	const status = row.status === "open" ? "created" : row.status;
+	if (!(MILESTONE_STATUSES as readonly string[]).includes(status)) {
+		throw new Error(`Invalid milestone status in database: ${status}`);
 	}
 	return {
 		id: row.id,
 		projectId: row.project_id,
 		number: row.number,
 		name: row.name,
-		status: row.status as MilestoneStatus,
+		status: status as MilestoneStatus,
 		branch: row.branch,
-		createdAt: row.created_at,
+		closeReason: row.close_reason ?? null,
+		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
 
 function rowToSlice(row: SliceRow): Slice {
-	// Coerce unknown statuses to 'created' rather than crashing.
-	// Sub-agents can sometimes write invalid statuses via direct DB access.
-	const status = (SLICE_STATUSES as readonly string[]).includes(row.status)
-		? (row.status as SliceStatus)
-		: ("created" as SliceStatus);
+	if (!(SLICE_STATUSES as readonly string[]).includes(row.status)) {
+		throw new Error(`Invalid slice status in database: ${row.status}`);
+	}
+	const status = row.status as SliceStatus;
 	if (row.tier !== null && !(TIERS as readonly string[]).includes(row.tier)) {
 		throw new Error(`Invalid tier in database: ${row.tier}`);
 	}
 	return {
 		id: row.id,
 		milestoneId: row.milestone_id,
+		kind: row.kind ?? "milestone",
 		number: row.number,
 		title: row.title,
 		status,
 		tier: (row.tier ?? null) as Tier | null,
+		baseBranch: row.base_branch ?? "",
+		branchName: row.branch_name ?? "",
 		prUrl: row.pr_url ?? null,
-		createdAt: row.created_at,
+		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
 
@@ -284,17 +186,21 @@ function rowToTask(row: TaskRow): Task {
 		sliceId: row.slice_id,
 		number: row.number,
 		title: row.title,
+		description: row.description ?? null,
 		status: row.status as TaskStatus,
 		wave: row.wave ?? null,
+		claimedAt: row.claimed_at != null ? String(row.claimed_at) : null,
 		claimedBy: row.claimed_by ?? null,
-		createdAt: row.created_at,
+		closedReason: row.closed_reason ?? null,
+		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
 	};
 }
 
 function rowToDependency(row: DependencyRow): Dependency {
 	return {
-		fromTaskId: row.from_task_id,
-		toTaskId: row.to_task_id,
+		fromTaskId: row.from_id,
+		toTaskId: row.to_id,
 	};
 }
 
@@ -304,13 +210,14 @@ function rowToDependency(row: DependencyRow): Dependency {
 
 export function insertProject(
 	db: Database.Database,
-	params: { name: string; vision: string; id?: string },
+	params: { name: string; vision: string },
 ): string {
-	const id = params.id ?? randomUUID();
-	db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(
+	const id = "singleton";
+	db.prepare("INSERT INTO project (id, name, vision, updated_at) VALUES (?, ?, ?, ?)").run(
 		id,
 		params.name,
 		params.vision,
+		Date.now(),
 	);
 	return id;
 }
@@ -330,8 +237,18 @@ export function insertMilestone(
 ): string {
 	const id = params.id ?? randomUUID();
 	db.prepare(
-		"INSERT INTO milestone (id, project_id, number, name, branch) VALUES (?, ?, ?, ?, ?)",
-	).run(id, params.projectId, params.number, params.name, params.branch);
+		"INSERT INTO milestone (id, project_id, number, name, status, branch, close_reason, archived_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	).run(
+		id,
+		params.projectId,
+		params.number,
+		params.name,
+		"created",
+		params.branch,
+		null,
+		null,
+		Date.now(),
+	);
 	return id;
 }
 
@@ -379,14 +296,29 @@ export function getActiveMilestone(db: Database.Database, projectId: string): Mi
 
 export function insertSlice(
 	db: Database.Database,
-	params: { id?: string; milestoneId: string; number: number; title: string },
+	params: {
+		id?: string;
+		milestoneId: string;
+		number: number;
+		title: string;
+		kind?: string;
+		baseBranch?: string;
+		branchName?: string;
+	},
 ): string {
 	const id = params.id ?? randomUUID();
-	db.prepare("INSERT INTO slice (id, milestone_id, number, title) VALUES (?, ?, ?, ?)").run(
+	db.prepare(
+		"INSERT INTO slice (id, milestone_id, kind, number, title, base_branch, branch_name, archived_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	).run(
 		id,
 		params.milestoneId,
+		params.kind ?? "milestone",
 		params.number,
 		params.title,
+		params.baseBranch ?? "",
+		params.branchName ?? "",
+		null,
+		Date.now(),
 	);
 	return id;
 }
@@ -407,14 +339,14 @@ export function updateSliceTier(db: Database.Database, id: string, tier: Tier): 
 	db.prepare("UPDATE slice SET tier = ? WHERE id = ?").run(tier, id);
 }
 
-export function updateSlicePrUrl(db: Database.Database, id: string, prUrl: string): void {
+export function updateSlicePrUrl(db: Database.Database, id: string, prUrl: string | null): void {
 	db.prepare("UPDATE slice SET pr_url = ? WHERE id = ?").run(prUrl, id);
 }
 
 export function clearSliceTasks(db: Database.Database, sliceId: string): void {
 	db.transaction(() => {
 		db.prepare(
-			"DELETE FROM dependency WHERE from_task_id IN (SELECT id FROM task WHERE slice_id = ?) OR to_task_id IN (SELECT id FROM task WHERE slice_id = ?)",
+			"DELETE FROM dependency WHERE from_id IN (SELECT id FROM task WHERE slice_id = ?) OR to_id IN (SELECT id FROM task WHERE slice_id = ?)",
 		).run(sliceId, sliceId);
 		db.prepare("DELETE FROM task WHERE slice_id = ?").run(sliceId);
 	})();
@@ -494,12 +426,18 @@ export function insertTask(
 	params: { id?: string; sliceId: string; number: number; title: string; wave?: number },
 ): string {
 	const id = params.id ?? randomUUID();
-	db.prepare("INSERT INTO task (id, slice_id, number, title, wave) VALUES (?, ?, ?, ?, ?)").run(
+	db.prepare(
+		"INSERT INTO task (id, slice_id, number, title, description, wave, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	).run(
 		id,
 		params.sliceId,
 		params.number,
 		params.title,
+		null,
 		params.wave ?? null,
+		null,
+		null,
+		Date.now(),
 	);
 	return id;
 }
@@ -541,20 +479,21 @@ export function insertDependency(
 	db: Database.Database,
 	params: { fromTaskId: string; toTaskId: string },
 ): void {
-	db.prepare("INSERT INTO dependency (from_task_id, to_task_id) VALUES (?, ?)").run(
+	db.prepare("INSERT INTO dependency (from_id, to_id, type) VALUES (?, ?, ?)").run(
 		params.fromTaskId,
 		params.toTaskId,
+		"blocks",
 	);
 }
 
 export function getDependencies(db: Database.Database, sliceId: string): Dependency[] {
 	const rows = db
 		.prepare(
-			`SELECT d.from_task_id, d.to_task_id
+			`SELECT d.from_id, d.to_id
 			FROM dependency d
-			JOIN task t ON t.id = d.from_task_id OR t.id = d.to_task_id
+			JOIN task t ON t.id = d.from_id OR t.id = d.to_id
 			WHERE t.slice_id = ?
-			GROUP BY d.from_task_id, d.to_task_id`,
+			GROUP BY d.from_id, d.to_id`,
 		)
 		.all(sliceId) as DependencyRow[];
 	return rows.map(rowToDependency);
@@ -575,7 +514,7 @@ interface PhaseRunRow {
 	error: string | null;
 	feedback: string | null;
 	metadata: string | null;
-	created_at: string;
+	created_at: string | number;
 }
 
 export interface PhaseRun {
@@ -604,7 +543,7 @@ function rowToPhaseRun(row: PhaseRunRow): PhaseRun {
 		error: row.error ?? null,
 		feedback: row.feedback ?? null,
 		metadata: row.metadata ?? null,
-		createdAt: row.created_at,
+		createdAt: String(row.created_at),
 	};
 }
 
@@ -694,10 +633,8 @@ export function getLatestPhaseRun(
 
 export function recoverOrphanedPhaseRuns(db: Database.Database): number {
 	const result = db
-		.prepare(
-			"UPDATE phase_run SET status = 'abandoned', finished_at = datetime('now') WHERE status = 'started'",
-		)
-		.run();
+		.prepare("UPDATE phase_run SET status = 'abandoned', finished_at = ? WHERE status = 'started'")
+		.run(Date.now());
 	return result.changes;
 }
 
@@ -706,15 +643,15 @@ export function recoverOrphanedPhaseRuns(db: Database.Database): number {
 // ---------------------------------------------------------------------------
 
 export function exportState(db: Database.Database): string {
-	const projects = (db.prepare("SELECT * FROM project").all() as ProjectRow[]).map(rowToProject);
-	const milestones = (db.prepare("SELECT * FROM milestone").all() as MilestoneRow[]).map(
+	const project = (db.prepare("SELECT * FROM project").all() as ProjectRow[]).map(rowToProject);
+	const milestone = (db.prepare("SELECT * FROM milestone").all() as MilestoneRow[]).map(
 		rowToMilestone,
 	);
-	const slices = (db.prepare("SELECT * FROM slice").all() as SliceRow[]).map(rowToSlice);
-	const tasks = (db.prepare("SELECT * FROM task").all() as TaskRow[]).map(rowToTask);
-	const dependencies = (db.prepare("SELECT * FROM dependency").all() as DependencyRow[]).map(
+	const slice = (db.prepare("SELECT * FROM slice").all() as SliceRow[]).map(rowToSlice);
+	const task = (db.prepare("SELECT * FROM task").all() as TaskRow[]).map(rowToTask);
+	const dependency = (db.prepare("SELECT * FROM dependency").all() as DependencyRow[]).map(
 		rowToDependency,
 	);
 
-	return JSON.stringify({ projects, milestones, slices, tasks, dependencies }, null, 2);
+	return JSON.stringify({ project, milestone, slice, task, dependency }, null, 2);
 }

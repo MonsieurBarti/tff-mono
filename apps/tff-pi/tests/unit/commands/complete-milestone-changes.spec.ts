@@ -50,7 +50,7 @@ describe("handleCompleteMilestoneChanges", () => {
 
 	function seed(status: "in_progress" | "completing" = "completing") {
 		const db = openDatabase(join(dir, ".tff", "state.db"));
-		applyMigrations(db, { root: dir });
+		applyMigrations(db);
 		insertProject(db, { name: "p", vision: "v" });
 		const p = db.prepare("SELECT id FROM project LIMIT 1").get() as { id: string };
 		db.prepare(

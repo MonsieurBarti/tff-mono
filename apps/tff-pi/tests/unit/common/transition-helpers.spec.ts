@@ -1,11 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HUMAN_GATES, SLICE_TRANSITIONS } from "@tff/core";
-import {
-	canTransitionMilestone,
-	canTransitionSlice,
-	isHumanGate,
-	nextSliceStatus,
-} from "../../../src/common/transition-helpers.js";
+import { HUMAN_GATES, MILESTONE_TRANSITIONS, SLICE_TRANSITIONS } from "@tff/core";
 
 describe("state-machine", () => {
 	describe("SLICE_TRANSITIONS", () => {
@@ -24,139 +18,89 @@ describe("state-machine", () => {
 
 	describe("canTransitionSlice", () => {
 		it("allows valid forward path: created → discussing", () => {
-			expect(canTransitionSlice("created", "discussing")).toBe(true);
+			expect(SLICE_TRANSITIONS["created"].includes("discussing")).toBe(true);
 		});
 
 		it("allows valid forward path: discussing → researching", () => {
-			expect(canTransitionSlice("discussing", "researching")).toBe(true);
+			expect(SLICE_TRANSITIONS["discussing"].includes("researching")).toBe(true);
 		});
 
 		it("allows S-tier skip: discussing → planning", () => {
-			expect(canTransitionSlice("discussing", "planning")).toBe(true);
+			expect(SLICE_TRANSITIONS["discussing"].includes("planning")).toBe(true);
 		});
 
 		it("allows valid forward path: researching → planning", () => {
-			expect(canTransitionSlice("researching", "planning")).toBe(true);
+			expect(SLICE_TRANSITIONS["researching"].includes("planning")).toBe(true);
 		});
 
 		it("allows valid forward path: planning → executing", () => {
-			expect(canTransitionSlice("planning", "executing")).toBe(true);
+			expect(SLICE_TRANSITIONS["planning"].includes("executing")).toBe(true);
 		});
 
 		it("allows valid forward path: executing → verifying", () => {
-			expect(canTransitionSlice("executing", "verifying")).toBe(true);
+			expect(SLICE_TRANSITIONS["executing"].includes("verifying")).toBe(true);
 		});
 
 		it("allows back-edge: verifying → executing (AC fail)", () => {
-			expect(canTransitionSlice("verifying", "executing")).toBe(true);
+			expect(SLICE_TRANSITIONS["verifying"].includes("executing")).toBe(true);
 		});
 
 		it("allows valid forward path: verifying → reviewing", () => {
-			expect(canTransitionSlice("verifying", "reviewing")).toBe(true);
+			expect(SLICE_TRANSITIONS["verifying"].includes("reviewing")).toBe(true);
 		});
 
 		it("allows back-edge: reviewing → executing (changes requested)", () => {
-			expect(canTransitionSlice("reviewing", "executing")).toBe(true);
+			expect(SLICE_TRANSITIONS["reviewing"].includes("executing")).toBe(true);
 		});
 
 		it("allows valid forward path: reviewing → shipping", () => {
-			expect(canTransitionSlice("reviewing", "shipping")).toBe(true);
+			expect(SLICE_TRANSITIONS["reviewing"].includes("shipping")).toBe(true);
 		});
 
 		it("allows valid forward path: shipping → closed", () => {
-			expect(canTransitionSlice("shipping", "closed")).toBe(true);
+			expect(SLICE_TRANSITIONS["shipping"].includes("closed")).toBe(true);
 		});
 
 		it("rejects invalid transition: created → planning", () => {
-			expect(canTransitionSlice("created", "planning")).toBe(false);
+			expect(SLICE_TRANSITIONS["created"].includes("planning")).toBe(false);
 		});
 
 		it("rejects invalid transition: closed → discussing", () => {
-			expect(canTransitionSlice("closed", "discussing")).toBe(false);
+			expect(SLICE_TRANSITIONS["closed"].includes("discussing")).toBe(false);
 		});
 
 		it("rejects invalid transition: executing → discussing", () => {
-			expect(canTransitionSlice("executing", "discussing")).toBe(false);
+			expect(SLICE_TRANSITIONS["executing"].includes("discussing")).toBe(false);
 		});
 
 		it("rejects self-transition", () => {
-			expect(canTransitionSlice("discussing", "discussing")).toBe(false);
-		});
-	});
-
-	describe("nextSliceStatus", () => {
-		it("returns discussing from created", () => {
-			expect(nextSliceStatus("created")).toBe("discussing");
-		});
-
-		it("returns researching from discussing (default/no tier)", () => {
-			expect(nextSliceStatus("discussing")).toBe("researching");
-		});
-
-		it("skips researching for S-tier: discussing → planning", () => {
-			expect(nextSliceStatus("discussing", "S")).toBe("planning");
-		});
-
-		it("does NOT skip researching for SS-tier", () => {
-			expect(nextSliceStatus("discussing", "SS")).toBe("researching");
-		});
-
-		it("does NOT skip researching for SSS-tier", () => {
-			expect(nextSliceStatus("discussing", "SSS")).toBe("researching");
-		});
-
-		it("returns planning from researching", () => {
-			expect(nextSliceStatus("researching")).toBe("planning");
-		});
-
-		it("returns executing from planning", () => {
-			expect(nextSliceStatus("planning")).toBe("executing");
-		});
-
-		it("returns verifying from executing", () => {
-			expect(nextSliceStatus("executing")).toBe("verifying");
-		});
-
-		it("returns reviewing from verifying", () => {
-			expect(nextSliceStatus("verifying")).toBe("reviewing");
-		});
-
-		it("returns shipping from reviewing", () => {
-			expect(nextSliceStatus("reviewing")).toBe("shipping");
-		});
-
-		it("returns closed from shipping", () => {
-			expect(nextSliceStatus("shipping")).toBe("closed");
-		});
-
-		it("returns null for closed", () => {
-			expect(nextSliceStatus("closed")).toBeNull();
+			expect(SLICE_TRANSITIONS["discussing"].includes("discussing")).toBe(false);
 		});
 	});
 
 	describe("isHumanGate", () => {
 		it("returns true for discussing", () => {
-			expect(isHumanGate("discussing")).toBe(true);
+			expect(HUMAN_GATES.includes("discussing")).toBe(true);
 		});
 
 		it("returns true for planning", () => {
-			expect(isHumanGate("planning")).toBe(true);
+			expect(HUMAN_GATES.includes("planning")).toBe(true);
 		});
 
 		it("returns true for shipping", () => {
-			expect(isHumanGate("shipping")).toBe(true);
+			expect(HUMAN_GATES.includes("shipping")).toBe(true);
 		});
 
 		it("returns false for executing", () => {
-			expect(isHumanGate("executing")).toBe(false);
+			expect(HUMAN_GATES.includes("executing")).toBe(false);
 		});
 
 		it("returns false for verifying", () => {
-			expect(isHumanGate("verifying")).toBe(false);
+			expect(HUMAN_GATES.includes("verifying")).toBe(false);
 		});
 
 		it("returns false for closed", () => {
-			expect(isHumanGate("closed")).toBe(false);
+			expect(HUMAN_GATES.includes("closed")).toBe(false);
 		});
 	});
 
@@ -168,32 +112,32 @@ describe("state-machine", () => {
 
 	describe("canTransitionMilestone", () => {
 		it("allows created → in_progress", () => {
-			expect(canTransitionMilestone("created", "in_progress")).toBe(true);
+			expect(MILESTONE_TRANSITIONS["created"].includes("in_progress")).toBe(true);
 		});
 
 		it("allows in_progress → completing", () => {
-			expect(canTransitionMilestone("in_progress", "completing")).toBe(true);
+			expect(MILESTONE_TRANSITIONS["in_progress"].includes("completing")).toBe(true);
 		});
 
 		it("allows completing → closed", () => {
-			expect(canTransitionMilestone("completing", "closed")).toBe(true);
+			expect(MILESTONE_TRANSITIONS["completing"].includes("closed")).toBe(true);
 		});
 
 		it("rejects closed → any", () => {
-			expect(canTransitionMilestone("closed", "in_progress")).toBe(false);
-			expect(canTransitionMilestone("closed", "created")).toBe(false);
+			expect(MILESTONE_TRANSITIONS["closed"].includes("in_progress")).toBe(false);
+			expect(MILESTONE_TRANSITIONS["closed"].includes("created")).toBe(false);
 		});
 
 		it("rejects skipping: created → completing", () => {
-			expect(canTransitionMilestone("created", "completing")).toBe(false);
+			expect(MILESTONE_TRANSITIONS["created"].includes("completing")).toBe(false);
 		});
 
 		it("rejects backwards: in_progress → created", () => {
-			expect(canTransitionMilestone("in_progress", "created")).toBe(false);
+			expect(MILESTONE_TRANSITIONS["in_progress"].includes("created")).toBe(false);
 		});
 
 		it("rejects self-transition", () => {
-			expect(canTransitionMilestone("in_progress", "in_progress")).toBe(false);
+			expect(MILESTONE_TRANSITIONS["in_progress"].includes("in_progress")).toBe(false);
 		});
 	});
 });

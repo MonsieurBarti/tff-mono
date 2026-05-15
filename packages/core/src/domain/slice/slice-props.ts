@@ -9,10 +9,12 @@ export interface SliceProps {
 	tier?: ComplexityTier;
 	baseBranch?: string;
 	branchName?: string;
+	prUrl?: string;
 	id?: string;
 }
 
 export interface SliceUpdateProps {
 	title?: string;
 	tier?: ComplexityTier;
+	prUrl?: string;
 }

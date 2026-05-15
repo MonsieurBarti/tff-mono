@@ -175,23 +175,24 @@ describe("E2E critical path", () => {
 		it("walks from project creation to milestone completion", async () => {
 			// Step 1: handleNew → creates project
 			handleInit(root);
-			const { projectId } = handleNew(db, root, {
+			handleNew(db, root, {
 				projectName: "TestApp",
 				vision: "Build a test application",
 			});
 			const project = must(getProject(db));
 			expect(project.name).toBe("TestApp");
-			expect(project.id).toBe(projectId);
+			expect(project.id).toBe("singleton");
+			const dbProjectId = project.id;
 
 			// Step 2: createMilestone → creates milestone with branch
 			const {
 				milestoneId,
 				number: msNumber,
 				branch,
-			} = createMilestone(db, root, projectId, "Foundation");
+			} = createMilestone(db, root, dbProjectId, "Foundation");
 			expect(msNumber).toBe(1);
 			expect(branch).toMatch(/^milestone\/[0-9a-f]{8}$/);
-			const milestones = getMilestones(db, projectId);
+			const milestones = getMilestones(db, dbProjectId);
 			expect(milestones).toHaveLength(1);
 
 			// Step 3: handleCreateSlice → creates slice, status "created"

@@ -16,7 +16,7 @@ import { seedEnabledSettings } from "../../helpers/settings.js";
 async function seedMilestoneStateBranch(fx: TwoClone, milestoneBranch: string): Promise<void> {
 	await ensureStateBranch(fx.alice, fx.aliceProjectId);
 	const db = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-	insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+	const projectId = insertProject(db, { name: "p", vision: "v" });
 	db.close();
 	await commitStateAtPhaseEnd({
 		repoRoot: fx.alice,
@@ -41,7 +41,7 @@ async function seedMilestoneStateBranch(fx: TwoClone, milestoneBranch: string): 
 		.prepare(
 			"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",
 		)
-		.run("M99", fx.aliceProjectId, 99, "test", "completing", milestoneBranch);
+		.run("M99", projectId, 99, "test", "completing", milestoneBranch);
 	db2.close();
 	await commitStateAtPhaseEnd({
 		repoRoot: fx.alice,
@@ -210,7 +210,7 @@ describe("finalizeStateBranchForMilestone", () => {
 		}
 
 		const db = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+		insertProject(db, { name: "p", vision: "v" });
 		db.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,
