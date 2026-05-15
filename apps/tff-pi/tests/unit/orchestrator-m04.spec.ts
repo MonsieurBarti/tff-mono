@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Task } from "../../src/common/dto.js";
-import { enrichContextWithFff, loadPhaseResources } from "../../src/orchestrator.js";
+import {
+	enrichContextWithFff,
+	loadAgentResource,
+	loadPhaseResources,
+} from "../../src/orchestrator.js";
+
+import { PHASE_AGENT } from "../../src/orchestrator.js";
 
 const ALL_PHASES = [
 	"discuss",
@@ -12,6 +18,82 @@ const ALL_PHASES = [
 	"ship",
 	"ship-fix",
 ] as const;
+
+describe("PHASE_AGENT converged naming", () => {
+	it("maps discuss to tff-brainstormer", () => {
+		expect(PHASE_AGENT.discuss).toBe("tff-brainstormer");
+	});
+
+	it("maps research to tff-researcher", () => {
+		expect(PHASE_AGENT.research).toBe("tff-researcher");
+	});
+
+	it("maps plan to tff-planner", () => {
+		expect(PHASE_AGENT.plan).toBe("tff-planner");
+	});
+
+	it("maps execute to tff-executor", () => {
+		expect(PHASE_AGENT.execute).toBe("tff-executor");
+	});
+
+	it("maps verify to tff-verifier", () => {
+		expect(PHASE_AGENT.verify).toBe("tff-verifier");
+	});
+
+	it("maps review to tff-code-reviewer", () => {
+		expect(PHASE_AGENT.review).toBe("tff-code-reviewer");
+	});
+
+	it("maps ship to tff-executor", () => {
+		expect(PHASE_AGENT.ship).toBe("tff-executor");
+	});
+
+	it("maps ship-fix to tff-inline-fixer", () => {
+		expect(PHASE_AGENT["ship-fix"]).toBe("tff-inline-fixer");
+	});
+});
+
+describe("loadAgentResource core fallback", () => {
+	it("returns non-empty content for tff-brainstormer", () => {
+		const content = loadAgentResource("tff-brainstormer");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-researcher", () => {
+		const content = loadAgentResource("tff-researcher");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-planner", () => {
+		const content = loadAgentResource("tff-planner");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-inline-fixer", () => {
+		const content = loadAgentResource("tff-inline-fixer");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-executor", () => {
+		const content = loadAgentResource("tff-executor");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-verifier", () => {
+		const content = loadAgentResource("tff-verifier");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-code-reviewer", () => {
+		const content = loadAgentResource("tff-code-reviewer");
+		expect(content.length).toBeGreaterThan(0);
+	});
+
+	it("returns non-empty content for tff-security-auditor", () => {
+		const content = loadAgentResource("tff-security-auditor");
+		expect(content.length).toBeGreaterThan(0);
+	});
+});
 
 describe("loadPhaseResources", () => {
 	it.each(ALL_PHASES)("returns agentPrompt and protocol for phase '%s' (smoke)", (phase) => {

@@ -1,4 +1,20 @@
-# Brainstormer Agent
+---
+name: tff-brainstormer
+description: TFF brainstormer — slice design partner for discuss phase. Co-owns design with user.
+version: "1.0.0"
+routing:
+  handles: [discuss]
+  priority: 10
+  min_tier: haiku
+capabilities:
+  writes_code: false
+  read_only: false
+tools: [tff_classify, tff_write_spec, tff_write_requirements, tff_query_state, tff_ask_user]
+thinking: off
+systemPromptMode: replace
+inheritProjectContext: true
+inheritSkills: false
+---
 
 R=slice design partner for TFF discuss phase. Co-owns design with user.
 

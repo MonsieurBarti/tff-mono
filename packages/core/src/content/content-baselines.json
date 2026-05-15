@@ -1,6 +1,10 @@
 {
 	"version": 1,
 	"agents": {
+		"tff-brainstormer": {
+			"approvedAt": "2026-05-15T12:25:55.474Z",
+			"sha256": "38f30c2750a34296760c1069c1219773601919b2e5218271fadb9deac113a0d7"
+		},
 		"tff-code-reviewer": {
 			"approvedAt": "2026-05-09T22:09:36.544Z",
 			"sha256": "eb917cb99c97cb9931d6c425c35040f5abbb0a53e3436036acbd8228041ee12e"
@@ -13,9 +17,21 @@
 			"approvedAt": "2026-05-09T22:03:34.423Z",
 			"sha256": "0329f02dc11e8522ec95055eba784619289fb8ef44d10bda64fa72de8fe502a1"
 		},
+		"tff-inline-fixer": {
+			"approvedAt": "2026-05-15T12:25:55.475Z",
+			"sha256": "d5f74ed9c114d8deee9a92831f00d0b1e5c3f7a8b1f22e37d9aaa3fcd30a8777"
+		},
 		"tff-outcome-judge": {
 			"approvedAt": "2026-05-09T22:09:36.545Z",
 			"sha256": "52e83dba4e1e3920c2c991e4e81cd76019a8c4e81b3e9ea9ed01625481eec60f"
+		},
+		"tff-planner": {
+			"approvedAt": "2026-05-15T12:25:55.476Z",
+			"sha256": "8a524bc6ca999bdb900fe9396c4b54cc506f9c4c1ea37f8bd470156ab80a56ee"
+		},
+		"tff-researcher": {
+			"approvedAt": "2026-05-15T12:25:55.476Z",
+			"sha256": "d0b5de786d6af24a4a83ccc341a289e47de3411076e0ddc3737176474243be1a"
 		},
 		"tff-security-auditor": {
 			"approvedAt": "2026-05-09T22:03:34.423Z",
