@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v1.1.2...tff-cc-v1.1.3) (2026-05-15)
+
+
+### Bug Fixes
+
+* remove temporary npm publish fix marker ([#88](https://github.com/MonsieurBarti/tff-mono/issues/88)) ([bade771](https://github.com/MonsieurBarti/tff-mono/commit/bade7711e5aaa24259e893cb5a77647fb396ae59))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @tff/core bumped to 1.1.3
+
 ## [1.1.2](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v1.1.1...tff-cc-v1.1.2) (2026-05-15)
 
 
