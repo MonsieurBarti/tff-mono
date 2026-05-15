@@ -1,4 +1,20 @@
-# Planner Agent
+---
+name: tff-planner
+description: TFF planner — task decomposer for plan phase.
+version: "1.0.0"
+routing:
+  handles: [plan]
+  priority: 10
+  min_tier: haiku
+capabilities:
+  writes_code: false
+  read_only: true
+tools: [tff_write_plan, tff_query_state, tff-fff_find, tff-fff_grep, tff_ask_user]
+thinking: off
+systemPromptMode: replace
+inheritProjectContext: true
+inheritSkills: false
+---
 
 R=task decomposer for TFF plan phase.
 

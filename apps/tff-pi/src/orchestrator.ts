@@ -50,6 +50,19 @@ const CORE_SKILLS_DIR = join(
 	"skills",
 );
 
+const CORE_AGENTS_DIR = join(
+	RESOURCES_DIR,
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"core",
+	"src",
+	"content",
+	"agents",
+);
+
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);
 	if (!project) return null;
@@ -112,15 +125,15 @@ export function loadSkill(skillName: string): string {
 	}
 }
 
-const PHASE_AGENT: Record<Phase, string> = {
-	discuss: "brainstormer",
-	research: "researcher",
-	plan: "planner",
-	execute: "executor",
-	verify: "verifier",
-	review: "code-reviewer",
-	ship: "executor",
-	"ship-fix": "inline-fixer",
+export const PHASE_AGENT: Record<Phase, string> = {
+	discuss: "tff-brainstormer",
+	research: "tff-researcher",
+	plan: "tff-planner",
+	execute: "tff-executor",
+	verify: "tff-verifier",
+	review: "tff-code-reviewer",
+	ship: "tff-executor",
+	"ship-fix": "tff-inline-fixer",
 };
 
 export const PHASE_TOOLS: Record<Phase, string[]> = {
@@ -159,12 +172,22 @@ function validateResourceName(name: string): void {
 
 export function loadAgentResource(agentName: string): string {
 	validateResourceName(agentName);
-	return loadResource(join(RESOURCES_DIR, "agents", `${agentName}.md`));
+	const localPath = join(RESOURCES_DIR, "agents", `${agentName}.md`);
+	try {
+		return readFileSync(localPath, "utf-8");
+	} catch {
+		const corePath = join(CORE_AGENTS_DIR, `${agentName}.md`);
+		try {
+			return readFileSync(corePath, "utf-8");
+		} catch {
+			return "";
+		}
+	}
 }
 
 export function loadPhaseResources(phase: Phase): { agentPrompt: string; protocol: string } {
 	const agentName = PHASE_AGENT[phase];
-	const agentPrompt = loadResource(join(RESOURCES_DIR, "agents", `${agentName}.md`));
+	const agentPrompt = loadAgentResource(agentName);
 	const protocolFile = phase === "discuss" ? "discuss-interactive" : phase;
 	const protocol = loadResource(join(RESOURCES_DIR, "protocols", `${protocolFile}.md`));
 	return { agentPrompt, protocol };
@@ -207,7 +230,7 @@ export function buildPhasePrompt(
 	compressed: boolean,
 ): PhasePrompt {
 	const agentName = PHASE_AGENT[phase];
-	const agentMd = loadResource(join(RESOURCES_DIR, "agents", `${agentName}.md`));
+	const agentMd = loadAgentResource(agentName);
 	const protocolMd = loadResource(join(RESOURCES_DIR, "protocols", `${phase}.md`));
 
 	const sLabel = sliceLabel(milestoneNumber, slice.number);

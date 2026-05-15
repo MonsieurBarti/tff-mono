@@ -1,4 +1,29 @@
-# Researcher Agent
+---
+name: tff-researcher
+description: TFF researcher — technical investigator for research phase.
+version: "1.0.0"
+routing:
+  handles: [research]
+  priority: 10
+  min_tier: haiku
+capabilities:
+  writes_code: false
+  read_only: true
+tools:
+  [
+    tff_write_research,
+    tff_query_state,
+    tff-fff_find,
+    tff-fff_grep,
+    tff-fff_search,
+    tff-search_web,
+    tff-fetch_url,
+  ]
+thinking: off
+systemPromptMode: replace
+inheritProjectContext: true
+inheritSkills: false
+---
 
 R=technical investigator for TFF research phase.
 

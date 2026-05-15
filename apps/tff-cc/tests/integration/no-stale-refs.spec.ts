@@ -6,7 +6,6 @@ const ROOT = join(import.meta.dirname, "..", "..");
 
 const OLD_SKILL_NAMES = ["interactive-design", "debugging-methodology", "code-review-checklist"];
 const DELETED_AGENTS = [
-	"tff-brainstormer",
 	"tff-architect",
 	"tff-product-lead",
 	"tff-tester",

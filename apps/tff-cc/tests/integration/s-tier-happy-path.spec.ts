@@ -8,7 +8,6 @@ const AGENTS_DIR = join(ROOT, "agents");
 const WORKFLOWS_DIR = join(ROOT, "workflows");
 
 const DELETED_AGENTS = [
-	"tff-brainstormer",
 	"tff-architect",
 	"tff-product-lead",
 	"tff-tester",
@@ -20,11 +19,11 @@ const DELETED_AGENTS = [
 ];
 
 describe("S-tier integration: skill/agent/workflow consistency", () => {
-	it("should have exactly 7 agent files", () => {
+	it("should have exactly 11 agent files", () => {
 		const agents = readdirSync(AGENTS_DIR).filter(
 			(f) => f.endsWith(".md") && !f.endsWith(".original.md"),
 		);
-		expect(agents).toHaveLength(7);
+		expect(agents).toHaveLength(11);
 	});
 
 	it("should have no deleted agent references in workflows", () => {

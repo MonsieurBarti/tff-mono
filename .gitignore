@@ -9,3 +9,4 @@ coverage/
 /.tff
 build/
 .claude/
+docs/
