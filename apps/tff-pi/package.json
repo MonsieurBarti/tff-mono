@@ -27,7 +27,8 @@
 		"format": "oxfmt --write --config ../../.oxfmtrc.json .",
 		"format:check": "oxfmt --check --config ../../.oxfmtrc.json .",
 		"typecheck": "tsc --noEmit",
-		"clean": "rm -rf dist"
+		"clean": "rm -rf dist",
+		"prepublishOnly": "pnpm run build"
 	},
 	"keywords": [
 		"pi",

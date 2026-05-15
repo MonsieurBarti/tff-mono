@@ -5,6 +5,10 @@
 			"component": "tff-cc",
 			"extra-files": ["plugin/.claude-plugin/plugin.json"]
 		},
+		"apps/tff-pi": {
+			"package-name": "@the-forge-flow/tff-pi",
+			"component": "tff-pi"
+		},
 		"packages/core": {
 			"package-name": "@tff/core",
 			"component": "tff-core"
@@ -15,7 +19,7 @@
 		{
 			"type": "linked-versions",
 			"groupName": "tff",
-			"components": ["tff-cc", "tff-core"]
+			"components": ["tff-cc", "tff-pi", "tff-core"]
 		}
 	]
 }
