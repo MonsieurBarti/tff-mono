@@ -4,7 +4,6 @@ import type Database from "better-sqlite3";
 import { beforeEach, describe, expect, it } from "vitest";
 import { runMigrations } from "@tff/core";
 import {
-	applyMigrations,
 	countOpenSlicesInMilestone,
 	exportState,
 	getActiveMilestone,
@@ -39,14 +38,14 @@ import { must } from "../../helpers.js";
 
 function createTestDb(): Database.Database {
 	const db = openDatabase(":memory:");
-	applyMigrations(db);
+	runMigrations(db);
 	return db;
 }
 
-describe("applyMigrations", () => {
+describe("runMigrations", () => {
 	it("creates all tables", () => {
 		const db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		const tables = db
 			.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
 			.all() as { name: string }[];
@@ -60,8 +59,8 @@ describe("applyMigrations", () => {
 
 	it("is idempotent — can be called twice without error", () => {
 		const db = openDatabase(":memory:");
-		applyMigrations(db);
-		expect(() => applyMigrations(db)).not.toThrow();
+		runMigrations(db);
+		expect(() => runMigrations(db)).not.toThrow();
 	});
 });
 
@@ -425,7 +424,7 @@ describe("pr_url column", () => {
 	let db: Database.Database;
 	beforeEach(() => {
 		db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -453,7 +452,7 @@ describe("getTasksByWave", () => {
 	let sliceId: string;
 	beforeEach(() => {
 		db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -480,7 +479,7 @@ describe("resetTasksToOpen", () => {
 	let sliceId: string;
 	beforeEach(() => {
 		db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -508,7 +507,7 @@ describe("insertPhaseRun — duplicate-started guard", () => {
 
 	beforeEach(() => {
 		db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "Vision" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -567,7 +566,7 @@ describe("insertProject with explicit id", () => {
 
 	beforeEach(() => {
 		db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 	});
 
 	it("always uses singleton id", () => {
@@ -586,7 +585,7 @@ describe("insertProject with explicit id", () => {
 describe("countOpenSlicesInMilestone", () => {
 	it("returns 0 for a milestone with no slices", () => {
 		const db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "V" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -596,7 +595,7 @@ describe("countOpenSlicesInMilestone", () => {
 
 	it("returns the count of slices whose status is not 'closed'", () => {
 		const db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "V" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });
@@ -611,7 +610,7 @@ describe("countOpenSlicesInMilestone", () => {
 
 	it("returns 0 when every slice is closed", () => {
 		const db = openDatabase(":memory:");
-		applyMigrations(db);
+		runMigrations(db);
 		insertProject(db, { name: "TFF", vision: "V" });
 		const projectId = must(getProject(db)).id;
 		insertMilestone(db, { projectId, number: 1, name: "M1", branch: "milestone/M01" });

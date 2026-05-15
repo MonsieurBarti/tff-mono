@@ -8,28 +8,22 @@ import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { expectedInProgressStatusFor } from "../common/derived-state.js";
 import { makeBaseEvent } from "../common/events.js";
-import { SLICE_STATUSES, SLICE_TRANSITIONS, sliceLabel, type SliceStatus } from "@tff/core";
+import {
+	SLICE_STATUSES,
+	SLICE_TRANSITIONS,
+	sliceLabel,
+	type ComplexityTier,
+	type SliceStatus,
+} from "@tff/core";
 import { type Phase } from "../common/dto.js";
 
-function nextSliceStatus(current: SliceStatus, tier?: string): SliceStatus | null {
+function nextSliceStatus(current: SliceStatus, tier?: ComplexityTier): SliceStatus | null {
 	if (current === "closed") return null;
 	if (current === "discussing" && tier === "S") return "planning";
 
-	const forwardPath: SliceStatus[] = [
-		"created",
-		"discussing",
-		"researching",
-		"planning",
-		"executing",
-		"verifying",
-		"reviewing",
-		"shipping",
-		"closed",
-	];
-
-	const idx = forwardPath.indexOf(current);
-	if (idx === -1 || idx === forwardPath.length - 1) return null;
-	return forwardPath[idx + 1] ?? null;
+	const idx = SLICE_STATUSES.indexOf(current);
+	if (idx === -1 || idx === SLICE_STATUSES.length - 1) return null;
+	return SLICE_STATUSES[idx + 1] ?? null;
 }
 
 export interface ToolResult {
