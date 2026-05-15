@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { chmodSync } from "node:fs";
 import { join } from "node:path";
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type { TffContext } from "../common/context.js";
 import { applyMigrations, openDatabase } from "../common/db.js";
 import { ensureGitignoreEntries, getGitRoot, gitEnv, initRepo } from "../common/git.js";

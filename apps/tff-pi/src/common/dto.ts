@@ -89,6 +89,7 @@ export interface Task {
 	description?: string | null;
 	status: TaskStatus;
 	wave: number | null;
+	difficulty: number | null;
 	claimedAt?: string | null;
 	claimedBy: string | null;
 	closedReason?: string | null;

@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { readArtifact, writeArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { milestoneBranchName, sliceBranchName } from "../common/branch-naming.js";

@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { commitCommand } from "../common/commit.js";
 import { type TffContext, requireProject } from "../common/context.js";

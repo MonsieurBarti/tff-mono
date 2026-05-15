@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { initMilestoneDir, writeArtifact, milestoneLabel } from "@tff/core";
 import { milestoneBranchName } from "../common/branch-naming.js";

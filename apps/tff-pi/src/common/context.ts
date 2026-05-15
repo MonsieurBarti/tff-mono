@@ -1,4 +1,4 @@
-import type { ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import type { FffBridge } from "./fff-integration.js";
 import type { PerSliceLog } from "./per-slice-log.js";

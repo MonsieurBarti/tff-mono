@@ -153,7 +153,7 @@ describe("tool registry consistency", () => {
 			registerTool: (def: { name: string }) => {
 				registeredRuntime.add(def.name);
 			},
-		} as unknown as import("@mariozechner/pi-coding-agent").ExtensionAPI;
+		} as unknown as import("@earendil-works/pi-coding-agent").ExtensionAPI;
 		const ctx = createTffContext();
 		registerAllTools(mockPi, ctx);
 
@@ -188,7 +188,7 @@ describe("tool registry consistency", () => {
 			registerTool: (def: { name: string }) => {
 				registeredRuntime.add(def.name);
 			},
-		} as unknown as import("@mariozechner/pi-coding-agent").ExtensionAPI;
+		} as unknown as import("@earendil-works/pi-coding-agent").ExtensionAPI;
 		const ctx = createTffContext();
 		registerAllTools(mockPi, ctx);
 		expect(registeredRuntime.has("tff_write_verification")).toBe(false);

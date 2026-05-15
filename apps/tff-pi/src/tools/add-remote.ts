@@ -1,4 +1,4 @@
-import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
+import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type { TffContext } from "../common/context.js";
 import { addRemote, initialCommitAndPush } from "../common/git.js";

@@ -28,13 +28,13 @@
  * individual methods don't need it.
  */
 
-import type { Theme } from "@mariozechner/pi-coding-agent";
+import type { Theme } from "@earendil-works/pi-coding-agent";
 import {
 	truncateToWidth,
 	visibleWidth,
 	wrapTextWithAnsi,
 	type EditorTheme,
-} from "@mariozechner/pi-tui";
+} from "@earendil-works/pi-tui";
 
 // ─── Glyphs ───────────────────────────────────────────────────────────────────
 // Change these to restyle every cursor, checkbox, and indicator at once.

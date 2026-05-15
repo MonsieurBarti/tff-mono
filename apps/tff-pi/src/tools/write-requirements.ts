@@ -1,4 +1,4 @@
-import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
+import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { type TffContext, getDb } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";

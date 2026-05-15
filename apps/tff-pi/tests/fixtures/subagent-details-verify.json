@@ -1,7 +1,7 @@
 {
 	"_meta": {
 		"source": "hand-authored",
-		"piAiVersion": "0.66.1",
+		"piAiVersion": "0.74.0",
 		"piSubagentsVersion": "0.17.5",
 		"note": "Hand-authored reference matching the pi-ai AssistantMessage/ToolResultMessage shape and pi-subagents SubagentDetails envelope. Regenerate from a live pi-subagents run per tests/fixtures/README.md when either dependency is bumped."
 	},

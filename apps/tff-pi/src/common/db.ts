@@ -111,6 +111,7 @@ interface TaskRow {
 	description?: string | null;
 	status: string;
 	wave: number | null;
+	difficulty?: number | null;
 	claimed_at?: number | null;
 	claimed_by: string | null;
 	closed_reason?: string | null;
@@ -189,6 +190,7 @@ function rowToTask(row: TaskRow): Task {
 		description: row.description ?? null,
 		status: row.status as TaskStatus,
 		wave: row.wave ?? null,
+		difficulty: row.difficulty ?? null,
 		claimedAt: row.claimed_at != null ? String(row.claimed_at) : null,
 		claimedBy: row.claimed_by ?? null,
 		closedReason: row.closed_reason ?? null,
@@ -423,11 +425,18 @@ export function getNextOpenSliceInMilestone(
 
 export function insertTask(
 	db: Database.Database,
-	params: { id?: string; sliceId: string; number: number; title: string; wave?: number },
+	params: {
+		id?: string;
+		sliceId: string;
+		number: number;
+		title: string;
+		wave?: number;
+		difficulty?: number;
+	},
 ): string {
 	const id = params.id ?? randomUUID();
 	db.prepare(
-		"INSERT INTO task (id, slice_id, number, title, description, wave, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO task (id, slice_id, number, title, description, wave, difficulty, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 	).run(
 		id,
 		params.sliceId,
@@ -435,6 +444,7 @@ export function insertTask(
 		params.title,
 		null,
 		params.wave ?? null,
+		params.difficulty ?? null,
 		null,
 		null,
 		Date.now(),

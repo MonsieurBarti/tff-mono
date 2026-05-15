@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { determineNextPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 import { getLatestPhaseRun, getMilestone, getNextOpenSliceInMilestone, getSlice } from "./db.js";

@@ -275,6 +275,20 @@ describe("task", () => {
 		updateTaskStatus(db, id, "in_progress", "agent-007");
 		expect(must(getTask(db, id)).claimedBy).toBe("agent-007");
 	});
+
+	it("round-trips difficulty", () => {
+		insertTask(db, { sliceId, number: 1, title: "User entity", difficulty: 3 });
+		const id = must(getTasks(db, sliceId)[0]).id;
+		const t = must(getTask(db, id));
+		expect(t.difficulty).toBe(3);
+	});
+
+	it("defaults difficulty to null", () => {
+		insertTask(db, { sliceId, number: 1, title: "User entity" });
+		const id = must(getTasks(db, sliceId)[0]).id;
+		const t = must(getTask(db, id));
+		expect(t.difficulty).toBeNull();
+	});
 });
 
 describe("dependency", () => {

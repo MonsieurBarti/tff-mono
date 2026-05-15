@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { type TffContext, getDb } from "../common/context.js";
 import {
