@@ -1,4 +1,3 @@
-import { StringEnum } from "@earendil-works/pi-ai";
 import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
@@ -218,10 +217,13 @@ export function register(pi: ExtensionAPI, ctx: TffContext): void {
 					description: "Slice ID (UUID) or label (e.g., M01-S01)",
 				}),
 				targetStatus: Type.Optional(
-					StringEnum([...SLICE_STATUSES], {
-						description:
-							"The target status to transition to. If omitted, advances to the next logical status.",
-					}),
+					Type.Union(
+						SLICE_STATUSES.map((s) => Type.Literal(s)),
+						{
+							description:
+								"The target status to transition to. If omitted, advances to the next logical status.",
+						},
+					),
 				),
 			}),
 			async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {

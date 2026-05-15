@@ -22,7 +22,7 @@ function extractInterfaceProps(source: string, interfaceName: string): string[] 
 		if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("/*")) continue;
 		// Match property name before optional marker or type annotation
 		const propMatch = /^([a-zA-Z_][a-zA-Z0-9_]*)[?:]/.exec(trimmed);
-		if (propMatch) props.push(propMatch[1]);
+		if (propMatch && propMatch[1] !== undefined) props.push(propMatch[1]);
 	}
 	return props;
 }

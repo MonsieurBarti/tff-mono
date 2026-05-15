@@ -1,4 +1,3 @@
-import { StringEnum } from "@earendil-works/pi-ai";
 import { type ExtensionAPI, defineTool } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
@@ -58,9 +57,12 @@ export function register(pi: ExtensionAPI, ctx: TffContext): void {
 				sliceId: Type.String({
 					description: "Slice ID (UUID) or label (e.g., M01-S01)",
 				}),
-				tier: StringEnum([...TIERS], {
-					description: "Tier: S (simple), SS (standard), SSS (complex)",
-				}),
+				tier: Type.Union(
+					TIERS.map((t) => Type.Literal(t)),
+					{
+						description: "Tier: S (simple), SS (standard), SSS (complex)",
+					},
+				),
 			}),
 			async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
 				try {
