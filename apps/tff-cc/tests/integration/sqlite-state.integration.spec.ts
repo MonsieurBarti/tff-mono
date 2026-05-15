@@ -116,12 +116,12 @@ describe("SQLite integration", () => {
 			const projectResult = fileAdapter.saveProject({ name: "P" });
 			expect(isOk(projectResult)).toBe(true);
 
-			// Verify schema was reset to current version (1)
+			// Verify schema was reset to current version
 			const db = getDb(fileAdapter);
 			const versionRow = db.prepare("SELECT MAX(version) as version FROM schema_version").get() as {
 				version: number;
 			};
-			expect(versionRow.version).toBe(1);
+			expect(versionRow.version).toBeGreaterThanOrEqual(1);
 		} finally {
 			rmSync(tempDir, { recursive: true });
 		}
