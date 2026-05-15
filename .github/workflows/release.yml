@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      apps/tff-cc--tag_name: ${{ steps.release.outputs['apps/tff-cc--tag_name'] }}
+      apps/tff-cc--release_created: ${{ steps.release.outputs['apps/tff-cc--release_created'] }}
+      apps/tff-pi--tag_name: ${{ steps.release.outputs['apps/tff-pi--tag_name'] }}
+      apps/tff-pi--release_created: ${{ steps.release.outputs['apps/tff-pi--release_created'] }}
+      packages/core--tag_name: ${{ steps.release.outputs['packages/core--tag_name'] }}
+      packages/core--release_created: ${{ steps.release.outputs['packages/core--release_created'] }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-forge-flow/tff-pi... build
+      - name: Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  attach-artifact:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs['apps/tff-cc--release_created'] == 'true' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-forge-flow/tff-cc... build
+      - name: Package artifact
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs['apps/tff-cc--tag_name'] }}
+        run: |
+          set -e
+          cd apps/tff-cc
+          tar czf ../../tff-cc-"$TAG_NAME".tar.gz \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='docs' \
+            --exclude='*.db' \
+            --exclude='*.map' \
+            --exclude='.env*' \
+            --exclude='.gitignore' \
+            dist/ bin/ package.json README.md \
+            skills/ commands/ workflows/ agents/ references/ \
+            plugin/ native/ hooks/ .claude-plugin/
+      - name: Upload to release
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs['apps/tff-cc--tag_name'] }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          gh release upload \
+            "$TAG_NAME" \
+            tff-cc-"$TAG_NAME".tar.gz
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - name: Publish @the-forge-flow/tff-cc
+        if: ${{ needs.release-please.outputs['apps/tff-cc--release_created'] == 'true' }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          pnpm --filter @the-forge-flow/tff-cc publish --access public --no-git-checks
+      - name: Publish @the-forge-flow/tff-pi
+        if: ${{ needs.release-please.outputs['apps/tff-pi--release_created'] == 'true' }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          pnpm --filter @the-forge-flow/tff-pi publish --access public --no-git-checks
+
+  sync-release-branch:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs['apps/tff-cc--release_created'] == 'true' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-forge-flow/tff-cc... build
+      - name: Sync release branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          cd apps/tff-cc
+          bash scripts/sync-release-branch.sh

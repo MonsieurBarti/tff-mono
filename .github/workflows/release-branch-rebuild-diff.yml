@@ -1,0 +1,89 @@
+name: Release Branch Rebuild-Diff
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  rebuild-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: release
+          path: release-tree
+          persist-credentials: false
+
+      - name: Read source sha from manifest
+        id: manifest
+        run: |
+          set -e
+          SOURCE_SHA=$(sed -n 's/.*"sourceSha" *: *"\([0-9a-f]*\)".*/\1/p' release-tree/dist/.build-manifest.json)
+          SHIPPED_SHA=$(sed -n 's/.*"bundleSha256" *: *"\([0-9a-f]*\)".*/\1/p' release-tree/dist/.build-manifest.json)
+          if [ -z "$SOURCE_SHA" ] || [ -z "$SHIPPED_SHA" ]; then
+            echo "manifest missing required fields" >&2
+            exit 2
+          fi
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "shipped_sha=$SHIPPED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout main@sourceSha
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.manifest.outputs.source_sha }}
+          path: main-tree
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Rebuild from main@sourceSha
+        working-directory: main-tree
+        run: |
+          set -e
+          pnpm install --frozen-lockfile
+          pnpm --filter @the-forge-flow/tff-cc... build
+
+      - name: Compare bundle sha256
+        id: diff
+        run: |
+          set -e
+          REBUILT_SHA=$(sha256sum main-tree/apps/tff-cc/dist/cli/index.js | awk '{print $1}')
+          SHIPPED_SHA="${{ steps.manifest.outputs.shipped_sha }}"
+          echo "rebuilt: $REBUILT_SHA"
+          echo "shipped: $SHIPPED_SHA"
+          if [ "$REBUILT_SHA" = "$SHIPPED_SHA" ]; then
+            echo "status=match" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=mismatch" >> "$GITHUB_OUTPUT"
+          fi
+          echo "rebuilt_sha=$REBUILT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Open issue on mismatch
+        if: steps.diff.outputs.status == 'mismatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          gh label create release-pipeline --color B60205 --description "issues from release-pipeline automation" --force
+          gh issue create \
+            --title "release-branch rebuild-diff mismatch ($(date -u +%Y-%m-%d))" \
+            --body "The scheduled rebuild-diff found a bundle sha256 mismatch.
+
+          - source sha: ${{ steps.manifest.outputs.source_sha }}
+          - shipped bundleSha256: ${{ steps.manifest.outputs.shipped_sha }}
+          - rebuilt bundleSha256: ${{ steps.diff.outputs.rebuilt_sha }}
+
+          This may indicate non-reproducible esbuild output across Node minor versions, or tampering with the release branch.
+          If this fires repeatedly for the same source sha with the same runner image, downgrade the schedule to monthly (docs/specs/ROADMAP-0.10.0.md Stage C open question)." \
+            --label "release-pipeline"

@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "skills": {
+    "acceptance-criteria-validation": {
+      "approvedAt": "2026-05-10T14:56:26.450Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "f72d619ef11f2a34437c31830fd864fc6fd0a9e94ec080a90ef95895fe6ba6cd"
+    },
+    "agent-authoring": {
+      "approvedAt": "2026-05-10T14:56:26.451Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "e57cf523ac578e977e17bff8633f5f6965daad63cecb129060bc08dab67738cc"
+    },
+    "architecture-review": {
+      "approvedAt": "2026-05-14T18:45:57.000Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "d92856e3a169738f0889eb9344fc9b659876da5ffb3132f371fbe60bb94138da"
+    },
+    "brainstorming": {
+      "approvedAt": "2026-05-10T14:56:26.451Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "98808a8bab4685c8d0b0177a58d25d2bfcd33b2318b841a2d567d6b2edafc15f"
+    },
+    "code-review-protocol": {
+      "approvedAt": "2026-05-10T14:56:26.451Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "e72d2ef49c3099008461230e50bc331fc732d37f8d2289030854f6d620a28d5b"
+    },
+    "codebase-documentation": {
+      "approvedAt": "2026-05-10T14:56:26.451Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "43f9c4e17ab47d4e4cf1641b1b0687431bea7e4ca336279a49597231fe7cfa30"
+    },
+    "commit-conventions": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "3af47bd5d9b78a860bca1d4aec093c06c63ef3a6ffb0b14e6166833914e7315e"
+    },
+    "create-skill": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "49867caad3721934c4280846f2f025e1500488c6b3a98d3494d591b3def8ecf8"
+    },
+    "executing-plans": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "b2e5521c29c6744c4277dc8965321f84ecbc11c54b0c6f2d4da4ee539b1eed36"
+    },
+    "finishing-work": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "c0346eb41e2efe60ba140148d654f6c8f90857b080502ba0fb3087f779ee32c3"
+    },
+    "grill-with-docs": {
+      "approvedAt": "2026-05-14T18:45:57.002Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "73dafdd1f3a0f3449a5ba7f382ed1389a0acee0cfad5618cd0671c94d0374cf2"
+    },
+    "hexagonal-architecture": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "3d7dc5b7a624f2654e9361bac1446b88a51d8b28ae3271a4f51e109aba193a4e"
+    },
+    "plannotator-usage": {
+      "approvedAt": "2026-05-14T18:45:57.002Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "19a15c6e0213fa5e4790ba4e8e30fddae5e6b1933483b64d6f8b581b01a26fec"
+    },
+    "prototype": {
+      "approvedAt": "2026-05-14T18:45:57.002Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "8263338297f2eefdd398215c296b077f28cb3d357b966bae71428339be4121eb"
+    },
+    "receiving-code-review": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "9b9ad044d4cb65d8f34b6c03034b253e96e3ec86da82f79db38a63871b41fb6e"
+    },
+    "report-issue": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "7c23378f5c036084ea8d8baa9e7baeed0f0cba982961617f7dd37c9517b6cb1a"
+    },
+    "security-review": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "9c065203e81200e626f7ac28306134d632b6197bd9ee1c4694a05163c3a3dc0e"
+    },
+    "setup-project-skills": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "bfad41201eb9d7ce97e7e0cd7936b9d523c7f437422d08ef495d1515ae1e68f1"
+    },
+    "skill-authoring": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "a5262d0ed46ca956dcf4ea2d70d8ddadb3d9ac067956ac380986f02ad3428556"
+    },
+    "stress-testing-specs": {
+      "approvedAt": "2026-05-10T14:56:26.452Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "6f8ad9dec5468fe248689c605f77bfe8e58137ff9fb7a06634af7a80691b21a3"
+    },
+    "systematic-debugging": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "d23138be0c62d369e685d948ec5e80664a3dc0e5130f42e21e589d45cad6ad54"
+    },
+    "test-driven-development": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "35dd35206652e1a9f556d40b3ea7a8bc0bd910beb5c97fdf5b54ec6298ad9d93"
+    },
+    "to-prd": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "92a310543fed694e7cf0ac3610f759043e25fa7f48771f016f0667655469e7c0"
+    },
+    "triage": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "72fa566a3ccd2f0d34eb34831674c6cb31f278c57aecb8e75c772d31799472ce"
+    },
+    "verification-before-completion": {
+      "approvedAt": "2026-05-10T14:56:26.453Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "f1f5bbb48bb55f99219a216f63c2cbe0ffa2e74427a35cd37fba02b695be4d7a"
+    },
+    "writing-plans": {
+      "approvedAt": "2026-05-14T18:45:57.003Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "69a6fdcd4d7ee5138ec959ca50ef8d60995a340993c34f49816287db55b3a57d"
+    },
+    "zoom-out": {
+      "approvedAt": "2026-05-14T18:45:57.004Z",
+      "originalCommitSha": null,
+      "refinementId": null,
+      "sha256": "9359f38598860b00e8ed46aba589c7a28350c3a42747d448f32381c1013530b3"
+    }
+  }
+}
