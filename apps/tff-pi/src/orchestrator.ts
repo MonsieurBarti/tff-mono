@@ -24,44 +24,33 @@ export interface PhasePrompt {
 
 export const RESOURCES_DIR = join(fileURLToPath(new URL(".", import.meta.url)), "resources");
 
-const CORE_PROTOCOLS_DIR = join(
-	RESOURCES_DIR,
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"core",
-	"src",
-	"content",
-	"protocols",
-);
+function resolveCoreContentDir(): string {
+	const __dirname = fileURLToPath(new URL(".", import.meta.url));
+	const publishedDir = join(__dirname, "content");
+	if (existsSync(publishedDir)) {
+		return publishedDir;
+	}
+	const monorepoDir = join(
+		RESOURCES_DIR,
+		"..",
+		"..",
+		"..",
+		"..",
+		"packages",
+		"core",
+		"src",
+		"content",
+	);
+	if (existsSync(monorepoDir)) {
+		return monorepoDir;
+	}
+	throw new Error("Cannot resolve @tff/core content directory");
+}
 
-const CORE_SKILLS_DIR = join(
-	RESOURCES_DIR,
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"core",
-	"src",
-	"content",
-	"skills",
-);
-
-const CORE_AGENTS_DIR = join(
-	RESOURCES_DIR,
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"core",
-	"src",
-	"content",
-	"agents",
-);
+const CORE_CONTENT_DIR = resolveCoreContentDir();
+const CORE_PROTOCOLS_DIR = join(CORE_CONTENT_DIR, "protocols");
+const CORE_SKILLS_DIR = join(CORE_CONTENT_DIR, "skills");
+const CORE_AGENTS_DIR = join(CORE_CONTENT_DIR, "agents");
 
 export function findActiveSlice(db: Database.Database): Slice | null {
 	const project = getProject(db);

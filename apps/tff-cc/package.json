@@ -32,11 +32,14 @@
 	},
 	"license": "MIT",
 	"author": "MonsieurBarti",
+	"publishConfig": {
+		"access": "public"
+	},
 	"dependencies": {
-		"@tff/core": "workspace:*",
 		"better-sqlite3": "^12.8.0"
 	},
 	"devDependencies": {
+		"@tff/core": "workspace:*",
 		"@commitlint/cli": "^19.8.0",
 		"@commitlint/config-conventional": "^19.8.0",
 		"@types/better-sqlite3": "^7.6.13",
