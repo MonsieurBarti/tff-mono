@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
@@ -172,16 +172,20 @@ function validateResourceName(name: string): void {
 
 export function loadAgentResource(agentName: string): string {
 	validateResourceName(agentName);
-	const localPath = join(RESOURCES_DIR, "agents", `${agentName}.md`);
-	try {
-		return readFileSync(localPath, "utf-8");
-	} catch {
-		const corePath = join(CORE_AGENTS_DIR, `${agentName}.md`);
+	const localAgentsDir = join(RESOURCES_DIR, "agents");
+	if (existsSync(localAgentsDir)) {
+		const localPath = join(localAgentsDir, `${agentName}.md`);
 		try {
-			return readFileSync(corePath, "utf-8");
+			return readFileSync(localPath, "utf-8");
 		} catch {
-			return "";
+			// fall through to core
 		}
+	}
+	const corePath = join(CORE_AGENTS_DIR, `${agentName}.md`);
+	try {
+		return readFileSync(corePath, "utf-8");
+	} catch {
+		return "";
 	}
 }
 
