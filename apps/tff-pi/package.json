@@ -1,6 +1,6 @@
 {
 	"name": "@the-forge-flow/tff-pi",
-	"version": "0.1.9",
+	"version": "1.1.0",
 	"description": "TFF PI",
 	"type": "module",
 	"main": "./dist/index.js",

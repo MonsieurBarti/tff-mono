@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v1.0.1...tff-cc-v1.1.0) (2026-05-15)
+
+
+### Features
+
+* **#50, #52:** unify tff-pi state directory + PI log cursor storage ([f927448](https://github.com/MonsieurBarti/tff-mono/commit/f9274489f81de1c3448d07662cafa387b551fa53))
+* **#51:** converge agents to tff-* naming with core fallback ([bb889ad](https://github.com/MonsieurBarti/tff-mono/commit/bb889ad4a2fa9d78d5c87f7877c2b94e6c20b8d8))
+* **#51:** converge agents to tff-* naming with core fallback ([56bc0d4](https://github.com/MonsieurBarti/tff-mono/commit/56bc0d468254d460b4b98a0ed49951d61cf74711))
+* agent convergence — tff-pi agents moved to packages/core ([1845284](https://github.com/MonsieurBarti/tff-mono/commit/1845284078903b9c567c9ac9469bae622fc22c6c))
+* **core:** converge db schema and state-machine to tff-pi behavior ([#48](https://github.com/MonsieurBarti/tff-mono/issues/48) [#49](https://github.com/MonsieurBarti/tff-mono/issues/49)) ([379e93e](https://github.com/MonsieurBarti/tff-mono/commit/379e93e3b0d1cdb3f573c159adc466b00c59ab09))
+* **core:** converge DB schema and state-machine to tff-pi behavior ([#48](https://github.com/MonsieurBarti/tff-mono/issues/48) [#49](https://github.com/MonsieurBarti/tff-mono/issues/49)) ([c9c8f3d](https://github.com/MonsieurBarti/tff-mono/commit/c9c8f3d201a3ac191f6feacbc978a159dc103fe8))
+* **M05:** deprecate upstream repo + tff-cc 1.1 technical-debt cleanup ([#44](https://github.com/MonsieurBarti/tff-mono/issues/44)) ([894d696](https://github.com/MonsieurBarti/tff-mono/commit/894d6960f26860abd91847c533fa3dabc14fcfd2))
+* **S03:** add plannotator:check cli command and health probe ([#40](https://github.com/MonsieurBarti/tff-mono/issues/40)) ([e051e90](https://github.com/MonsieurBarti/tff-mono/commit/e051e906322d9c6145ff2dce954942d2df1d4b8e))
+* unblock ci, align schemas, rename deps, add parity monitoring ([9c5c4fa](https://github.com/MonsieurBarti/tff-mono/commit/9c5c4fac645f937dc270757e0024333befad75b9))
+
+
+### Bug Fixes
+
+* **M05:** address security audit findings from milestone review ([aa576df](https://github.com/MonsieurBarti/tff-mono/commit/aa576df2c02c766695462bc3d6766759e09912e8))
+* **tff-cc:** regenerate raw-sql-whitelist after datetime to date-now migration ([08dce93](https://github.com/MonsieurBarti/tff-mono/commit/08dce93f63b6031d65f2319a05c1f0ff377fa44c))
+* **ultrareview:** p0 blockers and all 21 findings from feat/51-agent-convergence review ([4e646d5](https://github.com/MonsieurBarti/tff-mono/commit/4e646d508a1ff99c1a5c2d8df839cd5ac1a15ddd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @tff/core bumped to 1.1.0
+
 ## [1.0.1](https://github.com/MonsieurBarti/tff-mono/compare/tff-cc-v1.0.0...tff-cc-v1.0.1) (2026-05-13)
 
 

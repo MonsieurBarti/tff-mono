@@ -1,5 +1,5 @@
 {
-	"apps/tff-cc": "1.0.1",
-	"apps/tff-pi": "0.1.9",
-	"packages/core": "1.0.1"
+	"apps/tff-cc": "1.1.0",
+	"apps/tff-pi": "1.1.0",
+	"packages/core": "1.1.0"
 }
