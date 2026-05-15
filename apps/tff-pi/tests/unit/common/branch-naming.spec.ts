@@ -20,7 +20,7 @@ describe("branch-naming", () => {
 		tmp = mkdtempSync(join(tmpdir(), "tff-branch-naming-"));
 		dbPath = join(tmp, "state.db");
 		db = openDatabase(dbPath);
-		applyMigrations(db, { root: tmp });
+		applyMigrations(db);
 	});
 
 	afterEach(() => {

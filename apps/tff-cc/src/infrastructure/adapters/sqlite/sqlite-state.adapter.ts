@@ -69,9 +69,9 @@ interface SliceRow {
 	tier: string | null;
 	base_branch: string | null;
 	branch_name: string | null;
-	created_at: string;
-	updated_at: string;
-	archived_at: string | null;
+	created_at: number;
+	updated_at: number;
+	archived_at: number | null;
 	pr_url: string | null;
 }
 
@@ -83,9 +83,9 @@ interface MilestoneRow {
 	status: string;
 	branch: string;
 	close_reason: string | null;
-	created_at: string;
-	updated_at: string;
-	archived_at: string | null;
+	created_at: number;
+	updated_at: number;
+	archived_at: number | null;
 }
 
 interface TaskRow {
@@ -97,11 +97,11 @@ interface TaskRow {
 	status: string;
 	wave: number | null;
 	difficulty: number | null;
-	claimed_at: string | null;
+	claimed_at: number | null;
 	claimed_by: string | null;
 	closed_reason: string | null;
-	created_at: string;
-	updated_at: string;
+	created_at: number;
+	updated_at: number;
 }
 
 export class SQLiteStateAdapter
@@ -346,7 +346,8 @@ export class SQLiteStateAdapter
 				values.push(updates.status);
 			}
 			if (sets.length === 0) return Ok(undefined);
-			sets.push("updated_at = datetime('now')");
+			sets.push("updated_at = ?");
+			values.push(Date.now());
 			values.push(id);
 			this.db.prepare(`UPDATE milestone SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
@@ -360,14 +361,14 @@ export class SQLiteStateAdapter
 			try {
 				const sliceInfo = this.db
 					.prepare(
-						"UPDATE slice SET archived_at = datetime('now'), updated_at = datetime('now') WHERE milestone_id = ? AND archived_at IS NULL",
+						"UPDATE slice SET archived_at = ?, updated_at = ? WHERE milestone_id = ? AND archived_at IS NULL",
 					)
-					.run(id);
+					.run(Date.now(), Date.now(), id);
 				this.db
 					.prepare(
-						"UPDATE milestone SET archived_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND archived_at IS NULL",
+						"UPDATE milestone SET archived_at = ?, updated_at = ? WHERE id = ? AND archived_at IS NULL",
 					)
-					.run(id);
+					.run(Date.now(), Date.now(), id);
 				return Ok({ slicesArchived: sliceInfo.changes });
 			} catch (e) {
 				return Err(this.writeFailure(`Failed to archive milestone cascade: ${e}`));
@@ -413,9 +414,9 @@ export class SQLiteStateAdapter
 				}
 				this.db
 					.prepare(
-						"UPDATE milestone SET status = 'closed', close_reason = ?, updated_at = datetime('now') WHERE id = ?",
+						"UPDATE milestone SET status = 'closed', close_reason = ?, updated_at = ? WHERE id = ?",
 					)
-					.run(reason ?? null, id);
+					.run(reason ?? null, Date.now(), id);
 				return Ok(undefined);
 			} catch (e) {
 				return Err(this.writeFailure(`Failed to close milestone: ${e}`));
@@ -559,7 +560,8 @@ export class SQLiteStateAdapter
 				values.push(updates.prUrl);
 			}
 			if (sets.length === 0) return Ok(undefined);
-			sets.push("updated_at = datetime('now')");
+			sets.push("updated_at = ?");
+			values.push(Date.now());
 			values.push(id);
 			this.db.prepare(`UPDATE slice SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
@@ -612,7 +614,7 @@ export class SQLiteStateAdapter
 					verdict: string;
 					commit_sha: string;
 					notes: string | null;
-					created_at: string;
+					created_at: number;
 				}>;
 				const reviews: ReviewState[] = reviewRows.map((r) => ({
 					id: r.id,
@@ -634,6 +636,7 @@ export class SQLiteStateAdapter
 					tier: getResult.data.tier,
 					baseBranch: getResult.data.baseBranch,
 					branchName: getResult.data.branchName,
+					prUrl: getResult.data.prUrl,
 					createdAt: getResult.data.createdAt,
 					updatedAt: getResult.data.updatedAt,
 					archivedAt: getResult.data.archivedAt,
@@ -641,8 +644,8 @@ export class SQLiteStateAdapter
 				});
 				slice.transition(target);
 				this.db
-					.prepare("UPDATE slice SET status = ?, updated_at = datetime('now') WHERE id = ?")
-					.run(target, id);
+					.prepare("UPDATE slice SET status = ?, updated_at = ? WHERE id = ?")
+					.run(target, Date.now(), id);
 				if (target === "closed") {
 					this.db
 						.prepare(
@@ -665,9 +668,9 @@ export class SQLiteStateAdapter
 		try {
 			this.db
 				.prepare(
-					"UPDATE slice SET archived_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND archived_at IS NULL",
+					"UPDATE slice SET archived_at = ?, updated_at = ? WHERE id = ? AND archived_at IS NULL",
 				)
-				.run(id);
+				.run(Date.now(), Date.now(), id);
 			return Ok(undefined);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to archive slice: ${e}`));
@@ -754,7 +757,8 @@ export class SQLiteStateAdapter
 				values.push(updates.wave);
 			}
 			if (sets.length === 0) return Ok(undefined);
-			sets.push("updated_at = datetime('now')");
+			sets.push("updated_at = ?");
+			values.push(Date.now());
 			values.push(id);
 			this.db.prepare(`UPDATE task SET ${sets.join(", ")} WHERE id = ?`).run(...values);
 			return Ok(undefined);
@@ -769,14 +773,14 @@ export class SQLiteStateAdapter
 				claimedBy !== undefined
 					? this.db
 							.prepare(
-								"UPDATE task SET status = 'in_progress', claimed_at = datetime('now'), claimed_by = ?, updated_at = datetime('now') WHERE id = ? AND status = 'open'",
+								"UPDATE task SET status = 'in_progress', claimed_at = ?, claimed_by = ?, updated_at = ? WHERE id = ? AND status = 'open'",
 							)
-							.run(claimedBy, id)
+							.run(Date.now(), claimedBy, Date.now(), id)
 					: this.db
 							.prepare(
-								"UPDATE task SET status = 'in_progress', claimed_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND status = 'open'",
+								"UPDATE task SET status = 'in_progress', claimed_at = ?, updated_at = ? WHERE id = ? AND status = 'open'",
 							)
-							.run(id);
+							.run(Date.now(), Date.now(), id);
 			if (info.changes === 0) {
 				return Err(
 					new AlreadyClaimedError(`Task "${id}" is already claimed`, id, claimedBy ?? "unknown"),
@@ -792,9 +796,9 @@ export class SQLiteStateAdapter
 		try {
 			this.db
 				.prepare(
-					"UPDATE task SET status = 'closed', closed_reason = ?, updated_at = datetime('now') WHERE id = ?",
+					"UPDATE task SET status = 'closed', closed_reason = ?, updated_at = ? WHERE id = ?",
 				)
-				.run(reason ?? null, id);
+				.run(reason ?? null, Date.now(), id);
 			return Ok(undefined);
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to close task: ${e}`));
@@ -823,14 +827,15 @@ export class SQLiteStateAdapter
 
 	listStaleClaims(ttlMinutes: number): Result<Task[], DomainError> {
 		try {
+			const cutoff = Date.now() - ttlMinutes * 60 * 1000;
 			const rows = this.db
 				.prepare(
 					`SELECT * FROM task
            WHERE status = 'in_progress'
-           AND claimed_at < datetime('now', (-1 * ?) || ' minutes')
+           AND claimed_at < ?
            ORDER BY claimed_at`,
 				)
-				.all(ttlMinutes) as Array<TaskRow>;
+				.all(cutoff) as Array<TaskRow>;
 			return Ok(rows.map((r) => this.rowToTask(r)));
 		} catch (e) {
 			return Err(this.writeFailure(`Failed to list stale claims: ${e}`));
@@ -948,10 +953,10 @@ export class SQLiteStateAdapter
 				this.db
 					.prepare(
 						`INSERT INTO workflow_session (id, phase, active_slice_id, active_milestone_id, paused_at, context_json, updated_at)
-             VALUES (1, ?, ?, ?, ?, ?, datetime('now'))
+             VALUES (1, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(id) DO UPDATE SET phase = excluded.phase, active_slice_id = excluded.active_slice_id,
              active_milestone_id = excluded.active_milestone_id, paused_at = excluded.paused_at,
-             context_json = excluded.context_json, updated_at = datetime('now')`,
+             context_json = excluded.context_json, updated_at = ?`,
 					)
 					.run(
 						session.phase,
@@ -959,6 +964,8 @@ export class SQLiteStateAdapter
 						session.activeMilestoneId ?? null,
 						session.pausedAt ?? null,
 						session.contextJson ?? null,
+						Date.now(),
+						Date.now(),
 					);
 			} finally {
 				this.db.pragma("foreign_keys = ON");
@@ -1019,7 +1026,7 @@ export class SQLiteStateAdapter
 						verdict: string;
 						commit_sha: string;
 						notes: string | null;
-						created_at: string;
+						created_at: number;
 				  }
 				| undefined;
 			if (!row) return Ok(null);
@@ -1040,7 +1047,7 @@ export class SQLiteStateAdapter
 				verdict: string;
 				commit_sha: string;
 				notes: string | null;
-				created_at: string;
+				created_at: number;
 			}>;
 			return Ok(rows.map((r) => this.rowToReview(r)));
 		} catch (e) {
@@ -1252,12 +1259,13 @@ export class SQLiteStateAdapter
 	}
 
 	private rowToMilestone(row: MilestoneRow): Milestone {
+		const status = row.status === "open" ? "created" : row.status;
 		return Milestone.reconstruct({
 			id: row.id,
 			projectId: row.project_id,
 			number: row.number,
 			name: row.name,
-			status: row.status as Milestone["status"],
+			status: status as Milestone["status"],
 			branch: row.branch,
 			closeReason: row.close_reason ?? null,
 			createdAt: new Date(row.created_at),
@@ -1273,7 +1281,7 @@ export class SQLiteStateAdapter
 		verdict: string;
 		commit_sha: string;
 		notes: string | null;
-		created_at: string;
+		created_at: number;
 	}): ReviewRecord {
 		return {
 			sliceId: row.slice_id,
@@ -1282,7 +1290,7 @@ export class SQLiteStateAdapter
 			verdict: row.verdict as ReviewRecord["verdict"],
 			commitSha: row.commit_sha,
 			notes: row.notes ?? undefined,
-			createdAt: row.created_at,
+			createdAt: new Date(row.created_at).toISOString(),
 		};
 	}
 }

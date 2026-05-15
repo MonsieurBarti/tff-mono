@@ -172,13 +172,13 @@ function validateResourceName(name: string): void {
 
 export function loadAgentResource(agentName: string): string {
 	validateResourceName(agentName);
-	const localPath = join(RESOURCES_DIR, "agents", `${agentName}.md`);
+	const corePath = join(CORE_AGENTS_DIR, `${agentName}.md`);
 	try {
-		return readFileSync(localPath, "utf-8");
+		return readFileSync(corePath, "utf-8");
 	} catch {
-		const corePath = join(CORE_AGENTS_DIR, `${agentName}.md`);
+		const localPath = join(RESOURCES_DIR, "agents", `${agentName}.md`);
 		try {
-			return readFileSync(corePath, "utf-8");
+			return readFileSync(localPath, "utf-8");
 		} catch {
 			return "";
 		}

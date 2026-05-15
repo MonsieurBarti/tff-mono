@@ -49,6 +49,7 @@ export interface Project {
 	name: string;
 	vision: string;
 	createdAt: string;
+	updatedAt?: string | null;
 }
 
 export interface Milestone {
@@ -58,18 +59,26 @@ export interface Milestone {
 	name: string;
 	status: MilestoneStatus;
 	branch: string;
+	closeReason?: string | null;
 	createdAt: string;
+	updatedAt?: string | null;
+	archivedAt?: string | null;
 }
 
 export interface Slice {
 	id: string;
 	milestoneId: string;
+	kind?: string;
 	number: number;
 	title: string;
 	status: SliceStatus;
 	tier: Tier | null;
+	baseBranch?: string;
+	branchName?: string;
 	prUrl: string | null;
 	createdAt: string;
+	updatedAt?: string | null;
+	archivedAt?: string | null;
 }
 
 export interface Task {
@@ -77,10 +86,14 @@ export interface Task {
 	sliceId: string;
 	number: number;
 	title: string;
+	description?: string | null;
 	status: TaskStatus;
 	wave: number | null;
+	claimedAt?: string | null;
 	claimedBy: string | null;
+	closedReason?: string | null;
 	createdAt: string;
+	updatedAt?: string | null;
 }
 
 export interface Dependency {

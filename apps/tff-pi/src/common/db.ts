@@ -1,3 +1,4 @@
+import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import { runMigrations } from "@tff/core";
@@ -30,8 +31,35 @@ export function openDatabase(path: string): Database.Database {
 // Migrations
 // ---------------------------------------------------------------------------
 
-export function applyMigrations(db: Database.Database, _opts?: { root?: string }): void {
-	runMigrations(db);
+export function applyMigrations(
+	db: Database.Database,
+	opts?: { root?: string; dbPath?: string },
+): Database.Database {
+	try {
+		runMigrations(db);
+		return db;
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : String(e);
+		if (msg.includes("VERSION_MISMATCH")) {
+			if (!opts?.dbPath || opts.dbPath === ":memory:") {
+				throw new Error(
+					`VERSION_MISMATCH: Database schema is newer than code version. Upgrade tff-tools.`,
+				);
+			}
+			const backupPath = `${opts.dbPath}.backup.${Date.now()}`;
+			copyFileSync(opts.dbPath, backupPath);
+			db.close();
+			unlinkSync(opts.dbPath);
+			for (const suffix of ["-wal", "-shm"]) {
+				const companion = `${opts.dbPath}${suffix}`;
+				if (existsSync(companion)) unlinkSync(companion);
+			}
+			const newDb = openDatabase(opts.dbPath);
+			runMigrations(newDb);
+			return newDb;
+		}
+		throw e;
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -101,6 +129,7 @@ function rowToProject(row: ProjectRow): Project {
 		name: row.name,
 		vision: row.vision,
 		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
 	};
 }
 
@@ -116,28 +145,35 @@ function rowToMilestone(row: MilestoneRow): Milestone {
 		name: row.name,
 		status: status as MilestoneStatus,
 		branch: row.branch,
+		closeReason: row.close_reason ?? null,
 		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
 
 function rowToSlice(row: SliceRow): Slice {
-	// Coerce unknown statuses to 'created' rather than crashing.
-	// Sub-agents can sometimes write invalid statuses via direct DB access.
-	const status = (SLICE_STATUSES as readonly string[]).includes(row.status)
-		? (row.status as SliceStatus)
-		: ("created" as SliceStatus);
+	if (!(SLICE_STATUSES as readonly string[]).includes(row.status)) {
+		throw new Error(`Invalid slice status in database: ${row.status}`);
+	}
+	const status = row.status as SliceStatus;
 	if (row.tier !== null && !(TIERS as readonly string[]).includes(row.tier)) {
 		throw new Error(`Invalid tier in database: ${row.tier}`);
 	}
 	return {
 		id: row.id,
 		milestoneId: row.milestone_id,
+		kind: row.kind ?? "milestone",
 		number: row.number,
 		title: row.title,
 		status,
 		tier: (row.tier ?? null) as Tier | null,
+		baseBranch: row.base_branch ?? "",
+		branchName: row.branch_name ?? "",
 		prUrl: row.pr_url ?? null,
 		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
+		archivedAt: row.archived_at != null ? String(row.archived_at) : null,
 	};
 }
 
@@ -150,10 +186,14 @@ function rowToTask(row: TaskRow): Task {
 		sliceId: row.slice_id,
 		number: row.number,
 		title: row.title,
+		description: row.description ?? null,
 		status: row.status as TaskStatus,
 		wave: row.wave ?? null,
+		claimedAt: row.claimed_at != null ? String(row.claimed_at) : null,
 		claimedBy: row.claimed_by ?? null,
+		closedReason: row.closed_reason ?? null,
 		createdAt: String(row.created_at),
+		updatedAt: row.updated_at != null ? String(row.updated_at) : null,
 	};
 }
 
@@ -170,7 +210,7 @@ function rowToDependency(row: DependencyRow): Dependency {
 
 export function insertProject(
 	db: Database.Database,
-	params: { name: string; vision: string; id?: string },
+	params: { name: string; vision: string },
 ): string {
 	const id = "singleton";
 	db.prepare("INSERT INTO project (id, name, vision, updated_at) VALUES (?, ?, ?, ?)").run(
@@ -256,12 +296,30 @@ export function getActiveMilestone(db: Database.Database, projectId: string): Mi
 
 export function insertSlice(
 	db: Database.Database,
-	params: { id?: string; milestoneId: string; number: number; title: string },
+	params: {
+		id?: string;
+		milestoneId: string;
+		number: number;
+		title: string;
+		kind?: string;
+		baseBranch?: string;
+		branchName?: string;
+	},
 ): string {
 	const id = params.id ?? randomUUID();
 	db.prepare(
 		"INSERT INTO slice (id, milestone_id, kind, number, title, base_branch, branch_name, archived_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-	).run(id, params.milestoneId, "milestone", params.number, params.title, "", "", null, Date.now());
+	).run(
+		id,
+		params.milestoneId,
+		params.kind ?? "milestone",
+		params.number,
+		params.title,
+		params.baseBranch ?? "",
+		params.branchName ?? "",
+		null,
+		Date.now(),
+	);
 	return id;
 }
 
@@ -281,7 +339,7 @@ export function updateSliceTier(db: Database.Database, id: string, tier: Tier): 
 	db.prepare("UPDATE slice SET tier = ? WHERE id = ?").run(tier, id);
 }
 
-export function updateSlicePrUrl(db: Database.Database, id: string, prUrl: string): void {
+export function updateSlicePrUrl(db: Database.Database, id: string, prUrl: string | null): void {
 	db.prepare("UPDATE slice SET pr_url = ? WHERE id = ?").run(prUrl, id);
 }
 
@@ -421,9 +479,10 @@ export function insertDependency(
 	db: Database.Database,
 	params: { fromTaskId: string; toTaskId: string },
 ): void {
-	db.prepare("INSERT INTO dependency (from_id, to_id) VALUES (?, ?)").run(
+	db.prepare("INSERT INTO dependency (from_id, to_id, type) VALUES (?, ?, ?)").run(
 		params.fromTaskId,
 		params.toTaskId,
+		"blocks",
 	);
 }
 
@@ -574,10 +633,8 @@ export function getLatestPhaseRun(
 
 export function recoverOrphanedPhaseRuns(db: Database.Database): number {
 	const result = db
-		.prepare(
-			"UPDATE phase_run SET status = 'abandoned', finished_at = datetime('now') WHERE status = 'started'",
-		)
-		.run();
+		.prepare("UPDATE phase_run SET status = 'abandoned', finished_at = ? WHERE status = 'started'")
+		.run(Date.now());
 	return result.changes;
 }
 
@@ -586,15 +643,15 @@ export function recoverOrphanedPhaseRuns(db: Database.Database): number {
 // ---------------------------------------------------------------------------
 
 export function exportState(db: Database.Database): string {
-	const projects = (db.prepare("SELECT * FROM project").all() as ProjectRow[]).map(rowToProject);
-	const milestones = (db.prepare("SELECT * FROM milestone").all() as MilestoneRow[]).map(
+	const project = (db.prepare("SELECT * FROM project").all() as ProjectRow[]).map(rowToProject);
+	const milestone = (db.prepare("SELECT * FROM milestone").all() as MilestoneRow[]).map(
 		rowToMilestone,
 	);
-	const slices = (db.prepare("SELECT * FROM slice").all() as SliceRow[]).map(rowToSlice);
-	const tasks = (db.prepare("SELECT * FROM task").all() as TaskRow[]).map(rowToTask);
-	const dependencies = (db.prepare("SELECT * FROM dependency").all() as DependencyRow[]).map(
+	const slice = (db.prepare("SELECT * FROM slice").all() as SliceRow[]).map(rowToSlice);
+	const task = (db.prepare("SELECT * FROM task").all() as TaskRow[]).map(rowToTask);
+	const dependency = (db.prepare("SELECT * FROM dependency").all() as DependencyRow[]).map(
 		rowToDependency,
 	);
 
-	return JSON.stringify({ projects, milestones, slices, tasks, dependencies }, null, 2);
+	return JSON.stringify({ project, milestone, slice, task, dependency }, null, 2);
 }

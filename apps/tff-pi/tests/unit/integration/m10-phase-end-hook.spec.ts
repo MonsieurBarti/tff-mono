@@ -39,7 +39,7 @@ describe("M10-S03: commitStateAtPhaseEnd wired into runPhaseWithFreshContext", (
 		const dbPath = join(fx.home, fx.aliceProjectId, "state.db");
 		const db = openDatabase(dbPath);
 		applyMigrations(db);
-		const projectId = insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+		const projectId = insertProject(db, { name: "p", vision: "v" });
 		const milestoneId = insertMilestone(db, {
 			projectId,
 			number: 1,

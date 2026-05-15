@@ -2,7 +2,14 @@ import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import type { PhaseRun } from "./db.js";
-import type { Dependency, Milestone, Project, Slice, Task } from "./dto.js";
+import {
+	SLICE_STATUSES,
+	type Dependency,
+	type Milestone,
+	type Project,
+	type Slice,
+	type Task,
+} from "./dto.js";
 
 export const SNAPSHOT_SCHEMA_VERSION = 1;
 export const SNAPSHOT_FILENAME = "state-snapshot.json";
@@ -86,17 +93,21 @@ function toProject(r: ProjectRow): Project {
 	return { id: r.id, name: r.name, vision: r.vision, createdAt: String(r.created_at) };
 }
 function toMilestone(r: MilestoneRow): Milestone {
+	const status = r.status === "open" ? "created" : r.status;
 	return {
 		id: r.id,
 		projectId: r.project_id,
 		number: r.number,
 		name: r.name,
-		status: r.status as Milestone["status"],
+		status: status as Milestone["status"],
 		branch: r.branch,
 		createdAt: String(r.created_at),
 	};
 }
 function toSlice(r: SliceRow): Slice {
+	if (!(SLICE_STATUSES as readonly string[]).includes(r.status)) {
+		throw new Error(`Invalid slice status in snapshot: ${r.status}`);
+	}
 	return {
 		id: r.id,
 		milestoneId: r.milestone_id,

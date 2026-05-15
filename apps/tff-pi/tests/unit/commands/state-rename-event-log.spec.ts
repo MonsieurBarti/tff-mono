@@ -76,7 +76,7 @@ describe("runStateRename — event log (state-rename)", () => {
 		root = mkdtempSync(join(tmpdir(), "tff-sr-el-"));
 		mkdirSync(join(root, ".tff"), { recursive: true });
 		// Need a project row for updateLogCursor to work
-		insertProject(db, { id: "p1", name: "P", vision: "V" });
+		insertProject(db, { name: "P", vision: "V" });
 	});
 
 	afterEach(() => {

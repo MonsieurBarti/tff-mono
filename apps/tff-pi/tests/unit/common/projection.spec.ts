@@ -51,7 +51,7 @@ describe("projectCommand — simple handlers", () => {
 
 	test("create-milestone inserts milestone", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		projectCommand(db, root, "create-milestone", {
 			id: "m1",
 			projectId,
@@ -65,7 +65,7 @@ describe("projectCommand — simple handlers", () => {
 
 	test("create-slice inserts slice", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -87,7 +87,7 @@ describe("projectCommand — simple handlers", () => {
 
 	test("write-spec is a no-op on DB (artifact-only) but still runs reconcile", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -101,7 +101,7 @@ describe("projectCommand — simple handlers", () => {
 
 	test("write-requirements is a no-op on DB", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -117,7 +117,7 @@ describe("projectCommand — simple handlers", () => {
 describe("projectCommand — phase_run handlers", () => {
 	function seededSlice() {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -182,7 +182,7 @@ describe("projectCommand — phase_run handlers", () => {
 describe("projectCommand — slice mutators", () => {
 	function seededSlice() {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -271,7 +271,7 @@ describe("projectCommand — slice mutators", () => {
 describe("projectCommand — milestone mutators", () => {
 	test("complete-milestone-changes transitions milestone to 'completing'", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -285,7 +285,7 @@ describe("projectCommand — milestone mutators", () => {
 
 	test("complete-milestone-merged closes milestone", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, {
 			id: "m1",
 			projectId,
@@ -319,7 +319,7 @@ describe("projectCommand — defense-in-depth guards", () => {
 		const db = new Database(":memory:");
 		applyMigrations(db);
 		const root = mkdtempSync(join(tmpdir(), "tff-proj-guard-"));
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, { id: "m1", projectId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "T" });
 		return { db, root, sId };
@@ -351,7 +351,7 @@ describe("projectCommand — defense-in-depth guards", () => {
 describe("projectCommand — enum validation", () => {
 	test("projectTransition rejects invalid target status", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, { id: "m1", projectId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "T" });
 		expect(() =>
@@ -364,7 +364,7 @@ describe("projectCommand — enum validation", () => {
 
 	test("projectOverrideStatus rejects invalid status", () => {
 		const { db, root } = seeded();
-		const projectId = insertProject(db, { id: "p1", name: "P", vision: "V" });
+		const projectId = insertProject(db, { name: "P", vision: "V" });
 		const mId = insertMilestone(db, { id: "m1", projectId, number: 1, name: "M", branch: "b" });
 		const sId = insertSlice(db, { milestoneId: mId, number: 1, title: "T" });
 		expect(() =>

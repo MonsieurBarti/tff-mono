@@ -1,9 +1,8 @@
-import { randomUUID } from "node:crypto";
-
 import type Database from "better-sqlite3";
 import { beforeEach, describe, expect, it } from "vitest";
 import { runMigrations } from "@tff/core";
 import {
+	applyMigrations,
 	countOpenSlicesInMilestone,
 	exportState,
 	getActiveMilestone,
@@ -61,6 +60,40 @@ describe("runMigrations", () => {
 		const db = openDatabase(":memory:");
 		runMigrations(db);
 		expect(() => runMigrations(db)).not.toThrow();
+	});
+});
+
+describe("applyMigrations", () => {
+	it("throws on in-memory DB when schema is ahead of code", () => {
+		const db = openDatabase(":memory:");
+		runMigrations(db);
+		db.prepare("INSERT INTO schema_version (version) VALUES (?)").run(99);
+		expect(() => applyMigrations(db)).toThrow("VERSION_MISMATCH");
+	});
+
+	it("recovers file-backed DB on VERSION_MISMATCH by backing up and recreating", () => {
+		const { mkdtempSync } = require("node:fs");
+		const { join } = require("node:path");
+		const { tmpdir } = require("node:os");
+		const tmpDir = mkdtempSync(join(tmpdir(), "tff-applyMigrations-"));
+		const dbPath = join(tmpDir, "state.db");
+		let db = openDatabase(dbPath);
+		runMigrations(db);
+		db.prepare("INSERT INTO schema_version (version) VALUES (?)").run(99);
+		db.close();
+
+		db = openDatabase(dbPath);
+		const newDb = applyMigrations(db, { dbPath });
+		expect(newDb).not.toBe(db);
+		const tables = newDb
+			.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+			.all() as { name: string }[];
+		expect(tables.map((t) => t.name)).toContain("schema_version");
+		const backups = require("node:fs")
+			.readdirSync(tmpDir)
+			.filter((f: string) => f.startsWith("state.db.backup."));
+		expect(backups.length).toBe(1);
+		newDb.close();
 	});
 });
 
@@ -295,11 +328,11 @@ describe("exportState", () => {
 
 		const json = exportState(db);
 		const state = JSON.parse(json);
-		expect(state.projects).toHaveLength(1);
-		expect(state.milestones).toHaveLength(1);
-		expect(state.slices).toHaveLength(1);
-		expect(state.tasks).toHaveLength(2);
-		expect(state.dependencies).toHaveLength(1);
+		expect(state.project).toHaveLength(1);
+		expect(state.milestone).toHaveLength(1);
+		expect(state.slice).toHaveLength(1);
+		expect(state.task).toHaveLength(2);
+		expect(state.dependency).toHaveLength(1);
 	});
 });
 
@@ -561,7 +594,7 @@ describe("insertPhaseRun — duplicate-started guard", () => {
 	});
 });
 
-describe("insertProject with explicit id", () => {
+describe("insertProject", () => {
 	let db: Database.Database;
 
 	beforeEach(() => {
@@ -570,15 +603,10 @@ describe("insertProject with explicit id", () => {
 	});
 
 	it("always uses singleton id", () => {
-		const returned = insertProject(db, { name: "X", vision: "V", id: randomUUID() });
+		const returned = insertProject(db, { name: "X", vision: "V" });
 		expect(returned).toBe("singleton");
 		const proj = getProject(db);
 		expect(proj?.id).toBe("singleton");
-	});
-
-	it("generates singleton id when id is omitted", () => {
-		const returned = insertProject(db, { name: "X", vision: "V" });
-		expect(returned).toBe("singleton");
 	});
 });
 

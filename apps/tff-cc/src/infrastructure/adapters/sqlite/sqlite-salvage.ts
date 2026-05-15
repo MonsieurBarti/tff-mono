@@ -313,6 +313,7 @@ export class SQLiteSalvage {
 				tier: string | null;
 				base_branch: string | null;
 				branch_name: string | null;
+				pr_url: string | null;
 				created_at: string;
 			}>;
 
@@ -359,6 +360,7 @@ export class SQLiteSalvage {
 							tier: (row.tier as Slice["tier"]) ?? null,
 							baseBranch: row.base_branch ?? "",
 							branchName: row.branch_name ?? "",
+							prUrl: row.pr_url ?? null,
 							createdAt,
 							updatedAt: createdAt,
 							archivedAt: null,

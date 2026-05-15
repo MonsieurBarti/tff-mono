@@ -21,7 +21,7 @@ describe("M11-S4: parallel milestone creation in two clones", () => {
 		// Alice creates a milestone in her clone
 		const aDb = openDatabase(join(fx.home, projectId, "state.db"));
 		applyMigrations(aDb);
-		const dbProjectId = insertProject(aDb, { name: "shared", vision: "v", id: projectId });
+		const dbProjectId = insertProject(aDb, { name: "shared", vision: "v" });
 		const aResult = createMilestone(aDb, fx.alice, dbProjectId, "Alice's milestone");
 		aDb.close();
 

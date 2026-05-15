@@ -25,7 +25,7 @@ describe("M10-S03: state-branch roundtrip", () => {
 		const aliceDbPath = join(fx.home, fx.aliceProjectId, "state.db");
 		const aliceDb = openDatabase(aliceDbPath);
 		applyMigrations(aliceDb);
-		insertProject(aliceDb, { name: "p", vision: "v", id: fx.aliceProjectId });
+		insertProject(aliceDb, { name: "p", vision: "v" });
 		aliceDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,

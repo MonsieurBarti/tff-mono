@@ -50,7 +50,6 @@ export {
 	HUMAN_GATES,
 	TIERS,
 	type GuardResult,
-	tierSkipGuard,
 	reviewExistsGuard,
 	type PhaseRun,
 	type ArtifactStatus,

@@ -20,7 +20,7 @@ describe("M10-S04: milestone-needs-changes integration", () => {
 
 	it("writes MILESTONE_REVIEW_FEEDBACK.md and does not touch state branches", async () => {
 		const db = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+		insertProject(db, { name: "p", vision: "v" });
 		const p = db.prepare("SELECT id FROM project LIMIT 1").get() as { id: string };
 		db.prepare(
 			"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",

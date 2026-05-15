@@ -23,7 +23,7 @@ describe("M10-S03: multi-machine rebase", () => {
 		// Alice initialises + pushes tff-state/main
 		await ensureStateBranch(fx.alice, fx.aliceProjectId);
 		const aliceDb = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		const projectId = insertProject(aliceDb, { name: "p", vision: "v", id: fx.aliceProjectId });
+		const projectId = insertProject(aliceDb, { name: "p", vision: "v" });
 		aliceDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,

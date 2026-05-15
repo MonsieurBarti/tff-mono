@@ -71,8 +71,8 @@ function buildShadowDbFromEvents(
 	root: string,
 	events: ReturnType<typeof readEventsWithPositions>,
 ): Database.Database {
-	const shadow = openDatabase(":memory:");
-	applyMigrations(shadow);
+	let shadow = openDatabase(":memory:");
+	shadow = applyMigrations(shadow);
 	for (const { event } of events) {
 		try {
 			projectCommand(shadow, root, event.cmd, event.params as Record<string, unknown>);
@@ -98,8 +98,8 @@ function checkInvariantSweepFromEvents(
 	sweepDbFactory?: () => Database.Database,
 ): InvariantViolation[] {
 	const violations: InvariantViolation[] = [];
-	const sweepDb = sweepDbFactory ? sweepDbFactory() : openDatabase(":memory:");
-	applyMigrations(sweepDb);
+	let sweepDb = sweepDbFactory ? sweepDbFactory() : openDatabase(":memory:");
+	sweepDb = applyMigrations(sweepDb);
 
 	for (const { event, physicalLine } of events) {
 		const result = validateCommandPreconditions(

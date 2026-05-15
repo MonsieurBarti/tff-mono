@@ -29,7 +29,7 @@ describe("M10-S04: clone-and-resume two-clone", () => {
 		// Alice: seed parent state branch + push
 		await ensureStateBranch(fx.alice, fx.aliceProjectId);
 		const aDb = openDatabase(join(fx.home, fx.aliceProjectId, "state.db"));
-		insertProject(aDb, { name: "p", vision: "v", id: fx.aliceProjectId });
+		insertProject(aDb, { name: "p", vision: "v" });
 		aDb.close();
 		await commitStateAtPhaseEnd({
 			repoRoot: fx.alice,

@@ -19,7 +19,7 @@ import {
 	ReviewNotFoundError,
 } from "./slice.error.js";
 import { SLICE_TRANSITIONS, type ComplexityTier, type SliceStatus } from "./transitions.js";
-import { reviewExistsGuard, tierSkipGuard } from "./guards.js";
+import { reviewExistsGuard } from "./guards.js";
 
 const createSliceSchema = z.object({
 	milestoneId: z.string().min(1).nullable(),
@@ -254,8 +254,7 @@ export class Slice extends AggregateRoot {
 		}
 		const allowed = SLICE_TRANSITIONS[this._status];
 		const isAllowed = allowed.includes(to);
-		const isTierSkip = tierSkipGuard(this._status, to, this._tier).ok;
-		if (!isAllowed && !isTierSkip) {
+		if (!isAllowed) {
 			throw new InvalidTransitionError(
 				`Invalid transition from ${this._status} to ${to}`,
 				this._status,

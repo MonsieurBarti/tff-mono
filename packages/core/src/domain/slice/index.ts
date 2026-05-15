@@ -26,7 +26,7 @@ export {
 	HUMAN_GATES,
 	TIERS,
 } from "./transitions.js";
-export { type GuardResult, tierSkipGuard, reviewExistsGuard } from "./guards.js";
+export { type GuardResult, reviewExistsGuard } from "./guards.js";
 export {
 	type PhaseRun,
 	type ArtifactStatus,
