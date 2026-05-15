@@ -24,6 +24,7 @@ import { runRecover } from "./recover.js";
 import { runResearch } from "./research.js";
 import { runReview } from "./review.js";
 import { runSettings } from "./settings.js";
+import { runSettingsSet } from "./settings-set.js";
 import { runShipChanges } from "./ship-changes.js";
 import { runShipMerged } from "./ship-merged.js";
 import { runShip } from "./ship.js";
@@ -54,7 +55,14 @@ COMMANDS.set("progress", runProgress);
 COMMANDS.set("logs", runLogs);
 COMMANDS.set("health", runHealth);
 COMMANDS.set("doctor", runDoctor);
-COMMANDS.set("settings", runSettings);
+// Dispatch /tff settings <sub>
+const runSettingsSub: CommandHandler = async (pi, ctx, uiCtx, args) => {
+	const sub = args[0];
+	const rest = args.slice(1);
+	if (sub === "set") return runSettingsSet(pi, ctx, uiCtx, rest);
+	return runSettings(pi, ctx, uiCtx, args);
+};
+COMMANDS.set("settings", runSettingsSub);
 COMMANDS.set("help", runHelp);
 COMMANDS.set("new", runNew);
 COMMANDS.set("new-milestone", runNewMilestone);
