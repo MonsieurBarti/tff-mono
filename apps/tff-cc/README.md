@@ -518,3 +518,7 @@ For the full operator guide (failure modes, verification checklist, prerequisite
 ## License
 
 MIT
+
+---
+
+**Install via npm:** `npm install -g @the-forge-flow/tff-cc`
