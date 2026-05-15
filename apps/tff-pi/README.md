@@ -163,3 +163,7 @@ MIT © [MonsieurBarti](https://github.com/MonsieurBarti)
 <div align="center">
   <sub>Built with ⚡ by <a href="https://github.com/MonsieurBarti">MonsieurBarti</a></sub>
 </div>
+
+---
+
+**Install via npm:** `npm install @the-forge-flow/tff-pi`
