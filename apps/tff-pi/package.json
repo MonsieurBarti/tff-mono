@@ -40,12 +40,13 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/MonsieurBarti/tff-pi.git"
+		"url": "https://github.com/MonsieurBarti/tff-mono.git",
+		"directory": "apps/tff-pi"
 	},
 	"bugs": {
-		"url": "https://github.com/MonsieurBarti/tff-pi/issues"
+		"url": "https://github.com/MonsieurBarti/tff-mono/issues"
 	},
-	"homepage": "https://github.com/MonsieurBarti/tff-pi#readme",
+	"homepage": "https://github.com/MonsieurBarti/tff-mono/tree/main/apps/tff-pi#readme",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -55,22 +56,13 @@
 	"pi": {
 		"extensions": [
 			"./dist/index.js"
-		],
-		"skills": [
-			"./dist/resources/skills"
 		]
 	},
 	"peerDependencies": {
 		"@mariozechner/pi-ai": "*",
 		"@mariozechner/pi-coding-agent": "*",
 		"@mariozechner/pi-tui": "*",
-		"@plannotator/pi-extension": "*",
-		"@sinclair/typebox": "*",
-		"@the-forge-flow/fff-pi": "*",
-		"@the-forge-flow/gh-pi": "*",
-		"@the-forge-flow/camoufox-pi": "*",
-		"@the-forge-flow/ultra-compress-pi": "*",
-		"pi-subagents": "^0.17.1"
+		"@sinclair/typebox": "*"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^19.8.0",
