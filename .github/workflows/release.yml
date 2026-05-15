@@ -96,13 +96,17 @@ jobs:
       - name: Publish @the-forge-flow/tff-cc
         if: ${{ needs.release-please.outputs['apps/tff-cc--release_created'] == 'true' }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter @the-forge-flow/tff-cc publish --access public --no-git-checks
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          pnpm --filter @the-forge-flow/tff-cc publish --access public --no-git-checks
       - name: Publish @the-forge-flow/tff-pi
         if: ${{ needs.release-please.outputs['apps/tff-pi--release_created'] == 'true' }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter @the-forge-flow/tff-pi publish --access public --no-git-checks
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          pnpm --filter @the-forge-flow/tff-pi publish --access public --no-git-checks
 
   sync-release-branch:
     runs-on: ubuntu-latest
