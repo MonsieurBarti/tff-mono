@@ -143,6 +143,7 @@ describe("milestone:close — pending-judgment gate", () => {
 		stores.taskStore.claimTask(taskR.data.id, "exec");
 		// Drive slice through the chain.
 		for (const target of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",

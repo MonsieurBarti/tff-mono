@@ -1,7 +1,7 @@
 import type Database from "better-sqlite3";
 import { commitCommand } from "./commit.js";
 import { getLatestPhaseRun } from "./db.js";
-import { canTransitionSlice } from "./transition-helpers.js";
+import { SLICE_TRANSITIONS } from "@tff/core";
 import type { Phase, Slice, SliceStatus } from "./dto.js";
 
 const PHASE_IN_PROGRESS_STATUS: Partial<Record<Phase, SliceStatus>> = {
@@ -48,7 +48,7 @@ export function ensurePhaseTransition(
 		return;
 	}
 
-	if (!canTransitionSlice(slice.status, target)) {
+	if (!SLICE_TRANSITIONS[slice.status].includes(target)) {
 		throw new Error(
 			`Cannot enter ${phase} phase: slice is in '${slice.status}' and the state machine does not allow '${slice.status}' → '${target}'.`,
 		);

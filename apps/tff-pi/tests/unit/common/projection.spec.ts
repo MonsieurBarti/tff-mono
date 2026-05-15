@@ -41,7 +41,7 @@ describe("projectCommand — simple handlers", () => {
 	test("create-project inserts project row", () => {
 		const { db, root } = seeded();
 		projectCommand(db, root, "create-project", { id: "p1", name: "TestProj", vision: "V" });
-		const row = db.prepare("SELECT * FROM project WHERE id = 'p1'").get() as {
+		const row = db.prepare("SELECT * FROM project WHERE id = 'singleton'").get() as {
 			name: string;
 			vision: string;
 		};

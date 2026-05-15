@@ -97,18 +97,18 @@ describe("slice-transition atomicity", () => {
 		});
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
-		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]);
+		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]);
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(false);
 		expect(result.error.errorLabel).toBe("TRANSACTION_ROLLBACK");
 
-		// DB: status should still be discussing.
+		// DB: status should still be created.
 		spy.mockRestore();
 		const sliceResult = adapter.getSlice(sliceId);
 		expect(sliceResult.ok).toBe(true);
 		if (sliceResult.ok && sliceResult.data) {
-			expect(sliceResult.data.status).toBe("discussing");
+			expect(sliceResult.data.status).toBe("created");
 		}
 
 		// No *.tmp files left in cwd.
@@ -129,7 +129,7 @@ describe("slice-transition atomicity", () => {
 		});
 
 		const { sliceTransitionCmd } = await import("../../src/cli/commands/slice-transition.cmd.js");
-		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "researching"]);
+		const raw = await sliceTransitionCmd(["--slice-id", "M01-S01", "--status", "discussing"]);
 		const result = JSON.parse(raw);
 
 		expect(result.ok).toBe(true);
@@ -143,7 +143,7 @@ describe("slice-transition atomicity", () => {
 		// DB committed.
 		const slice = adapter.getSlice(sliceId);
 		if (slice.ok && slice.data) {
-			expect(slice.data.status).toBe("researching");
+			expect(slice.data.status).toBe("discussing");
 		}
 	});
 });

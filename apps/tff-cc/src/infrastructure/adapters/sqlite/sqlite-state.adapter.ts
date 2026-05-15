@@ -72,6 +72,7 @@ interface SliceRow {
 	created_at: string;
 	updated_at: string;
 	archived_at: string | null;
+	pr_url: string | null;
 }
 
 interface MilestoneRow {
@@ -271,7 +272,7 @@ export class SQLiteStateAdapter
 			this.db
 				.prepare(
 					`INSERT INTO milestone (id, project_id, number, name, status, branch, created_at, updated_at)
-           VALUES (?, 'singleton', ?, ?, 'open', ?, ?, ?)`,
+           VALUES (?, 'singleton', ?, ?, 'created', ?, ?, ?)`,
 				)
 				.run(id, props.number, props.name, branch, now, now);
 			return Ok(
@@ -280,7 +281,7 @@ export class SQLiteStateAdapter
 					projectId: "singleton",
 					number: props.number,
 					name: props.name,
-					status: "open" as MilestoneStatus,
+					status: "created" as MilestoneStatus,
 					branch,
 					closeReason: null,
 					createdAt: new Date(now),
@@ -430,8 +431,8 @@ export class SQLiteStateAdapter
 			const now = new Date().toISOString();
 			this.db
 				.prepare(
-					`INSERT INTO slice (id, milestone_id, kind, number, title, status, tier, base_branch, branch_name, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, 'discussing', ?, ?, ?, ?, ?)`,
+					`INSERT INTO slice (id, milestone_id, kind, number, title, status, tier, base_branch, branch_name, pr_url, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, 'created', ?, ?, ?, ?, ?, ?)`,
 				)
 				.run(
 					id,
@@ -442,6 +443,7 @@ export class SQLiteStateAdapter
 					props.tier ?? null,
 					props.baseBranch ?? null,
 					props.branchName ?? null,
+					props.prUrl ?? null,
 					now,
 					now,
 				);
@@ -452,7 +454,8 @@ export class SQLiteStateAdapter
 					kind,
 					number: props.number,
 					title: props.title,
-					status: "discussing",
+					status: "created",
+					prUrl: props.prUrl ?? null,
 					tier: props.tier ?? null,
 					baseBranch: props.baseBranch ?? "",
 					branchName: props.branchName ?? "",
@@ -550,6 +553,10 @@ export class SQLiteStateAdapter
 			if (updates.tier !== undefined) {
 				sets.push("tier = ?");
 				values.push(updates.tier);
+			}
+			if (updates.prUrl !== undefined) {
+				sets.push("pr_url = ?");
+				values.push(updates.prUrl);
 			}
 			if (sets.length === 0) return Ok(undefined);
 			sets.push("updated_at = datetime('now')");
@@ -1219,6 +1226,7 @@ export class SQLiteStateAdapter
 			tier: row.tier as Slice["tier"] | null,
 			baseBranch: row.base_branch ?? "",
 			branchName: row.branch_name ?? "",
+			prUrl: row.pr_url ?? null,
 			createdAt: new Date(row.created_at),
 			updatedAt: new Date(row.updated_at),
 			archivedAt: row.archived_at ? new Date(row.archived_at) : null,

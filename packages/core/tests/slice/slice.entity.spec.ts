@@ -943,6 +943,59 @@ describe("Slice errors", () => {
 	});
 });
 
+describe("prUrl", () => {
+	it("defaults to null on createNew", () => {
+		const slice = Slice.createNew({
+			milestoneId: "ms-1",
+			kind: "milestone",
+			number: 1,
+			title: "Test",
+			baseBranch: "main",
+		});
+		expect(slice.prUrl).toBeNull();
+	});
+
+	it("round-trips through toJSON and reconstruct", () => {
+		const state = {
+			id: "sl-1",
+			milestoneId: "ms-1",
+			kind: "milestone" as const,
+			number: 1,
+			title: "Test",
+			status: "shipping" as SliceStatus,
+			tier: null,
+			prUrl: "https://github.com/example/pr/42",
+			baseBranch: "main",
+			branchName: "slice/00000001",
+			createdAt: new Date("2024-01-01"),
+			updatedAt: new Date("2024-01-02"),
+			archivedAt: null as Date | null,
+		};
+		const slice = Slice.reconstruct(state);
+		expect(slice.prUrl).toBe("https://github.com/example/pr/42");
+		expect(slice.toJSON().prUrl).toBe("https://github.com/example/pr/42");
+	});
+
+	it("defaults to null when reconstruct omits prUrl", () => {
+		const state = {
+			id: "sl-1",
+			milestoneId: "ms-1",
+			kind: "milestone" as const,
+			number: 1,
+			title: "Test",
+			status: "created" as SliceStatus,
+			tier: null,
+			baseBranch: "main",
+			branchName: "slice/00000001",
+			createdAt: new Date("2024-01-01"),
+			updatedAt: new Date("2024-01-02"),
+			archivedAt: null,
+		};
+		const slice = Slice.reconstruct(state);
+		expect(slice.prUrl).toBeNull();
+	});
+});
+
 describe("SLICE_TRANSITIONS", () => {
 	it("defines the correct allowed transitions", () => {
 		expect(SLICE_TRANSITIONS.created).toEqual(["discussing"]);

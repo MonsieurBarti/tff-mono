@@ -6,9 +6,13 @@ import {
 	type PhaseRun,
 	type ArtifactStatus,
 } from "../../src/domain/slice/next-slice-status.js";
-import { SLICE_TRANSITIONS } from "../../src/domain/slice/transitions.js";
-import { MILESTONE_TRANSITIONS } from "../../src/domain/milestone/transitions.js";
-import { TASK_TRANSITIONS } from "../../src/domain/task/transitions.js";
+import { SLICE_TRANSITIONS, SLICE_STATUSES } from "../../src/domain/slice/transitions.js";
+import {
+	MILESTONE_TRANSITIONS,
+	MILESTONE_STATUSES,
+} from "../../src/domain/milestone/transitions.js";
+import { TASK_TRANSITIONS, TASK_STATUSES } from "../../src/domain/task/transitions.js";
+import { TIERS } from "../../src/domain/slice/transitions.js";
 
 describe("validateTransition", () => {
 	it("returns ok:true for a valid slice transition", () => {
@@ -361,5 +365,33 @@ describe("computeSliceStatus", () => {
 		];
 		const result = computeSliceStatus(phaseRuns, "created", emptyArtifacts);
 		expect(result).toBe("discussing");
+	});
+});
+
+describe("status constants", () => {
+	it("SLICE_STATUSES contains all slice statuses", () => {
+		expect(SLICE_STATUSES).toEqual([
+			"created",
+			"discussing",
+			"researching",
+			"planning",
+			"executing",
+			"verifying",
+			"reviewing",
+			"shipping",
+			"closed",
+		]);
+	});
+
+	it("MILESTONE_STATUSES contains all milestone statuses", () => {
+		expect(MILESTONE_STATUSES).toEqual(["created", "in_progress", "completing", "closed"]);
+	});
+
+	it("TASK_STATUSES contains all task statuses", () => {
+		expect(TASK_STATUSES).toEqual(["open", "in_progress", "closed"]);
+	});
+
+	it("TIERS contains all complexity tiers", () => {
+		expect(TIERS).toEqual(["S", "SS", "SSS"]);
 	});
 });

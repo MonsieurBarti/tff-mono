@@ -10,6 +10,7 @@ describe("slice-close completeness invariant", () => {
 
 	const driveToCompleting = (id: string): void => {
 		const path = [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",
@@ -109,7 +110,7 @@ describe("slice-close completeness invariant", () => {
 	});
 
 	it("does not fire on non-terminal transitions", () => {
-		// Create a second fresh slice (starts in `discussing`).
+		// Create a second fresh slice (starts in `created`).
 		const msResult = stores.milestoneStore.listMilestones();
 		if (!msResult.ok || msResult.data.length === 0) throw new Error("No milestones found");
 		const milestoneId = msResult.data[0].id;
@@ -122,7 +123,8 @@ describe("slice-close completeness invariant", () => {
 		if (!slice2Result.ok) throw new Error("Failed to create second slice");
 		const slice2Id = slice2Result.data.id;
 
-		// Transition to `researching` — no reviews at all; gate must not fire.
+		// Transition through `discussing` to `researching` — no reviews at all; gate must not fire.
+		expect(stores.sliceStore.transitionSlice(slice2Id, "discussing").ok).toBe(true);
 		const r = stores.sliceStore.transitionSlice(slice2Id, "researching");
 		expect(r.ok).toBe(true);
 	});

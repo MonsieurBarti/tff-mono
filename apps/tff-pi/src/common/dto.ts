@@ -1,12 +1,23 @@
 import {
 	PHASE_VALUES,
 	PIPELINE_PHASE_ORDER,
+	SLICE_STATUSES,
+	MILESTONE_STATUSES,
+	TASK_STATUSES,
+	TIERS,
 	type SliceStatus,
 	type MilestoneStatus,
 	type TaskStatus,
 	type ComplexityTier as Tier,
 } from "@tff/core";
-export { PIPELINE_PHASE_ORDER, PHASE_VALUES };
+export {
+	PIPELINE_PHASE_ORDER,
+	PHASE_VALUES,
+	SLICE_STATUSES,
+	MILESTONE_STATUSES,
+	TASK_STATUSES,
+	TIERS,
+};
 export type { SliceStatus, MilestoneStatus, TaskStatus, Tier };
 
 export type Phase = (typeof PHASE_VALUES)[number] | "ship-fix";
@@ -23,22 +34,6 @@ export const ALL_PHASES: Phase[] = [
 ];
 
 export const SIDE_CHANNEL_PHASES: readonly Phase[] = ["ship-fix"];
-
-export const SLICE_STATUSES = [
-	"created",
-	"discussing",
-	"researching",
-	"planning",
-	"executing",
-	"verifying",
-	"reviewing",
-	"shipping",
-	"closed",
-] as const;
-
-export const MILESTONE_STATUSES = ["created", "in_progress", "completing", "closed"] as const;
-export const TASK_STATUSES = ["open", "in_progress", "closed"] as const;
-export const TIERS = ["S", "SS", "SSS"] as const;
 
 export const PHASE_RUN_STATUSES = [
 	"started",

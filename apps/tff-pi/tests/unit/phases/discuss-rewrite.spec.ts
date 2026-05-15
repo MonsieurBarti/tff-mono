@@ -12,10 +12,14 @@ function makeCtx(overrides: Partial<PhaseContext> = {}): PhaseContext {
 	const db = openDatabase(":memory:");
 	applyMigrations(db);
 
-	db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run("p1", "Test", "V");
+	db.prepare("INSERT INTO project (id, name, vision) VALUES (?, ?, ?)").run(
+		"singleton",
+		"Test",
+		"V",
+	);
 	db.prepare(
 		"INSERT INTO milestone (id, project_id, number, name, status, branch) VALUES (?, ?, ?, ?, ?, ?)",
-	).run("m1", "p1", 1, "M1", "in_progress", "main");
+	).run("m1", "singleton", 1, "M1", "in_progress", "main");
 	db.prepare(
 		"INSERT INTO slice (id, milestone_id, number, title, status) VALUES (?, ?, ?, ?, ?)",
 	).run("s1", "m1", 1, "Test Slice", "created");

@@ -9,7 +9,21 @@ export type SliceStatus =
 	| "shipping"
 	| "closed";
 
+export const SLICE_STATUSES = [
+	"created",
+	"discussing",
+	"researching",
+	"planning",
+	"executing",
+	"verifying",
+	"reviewing",
+	"shipping",
+	"closed",
+] as const;
+
 export type ComplexityTier = "S" | "SS" | "SSS";
+
+export const TIERS = ["S", "SS", "SSS"] as const;
 
 export const SLICE_TRANSITIONS: Record<SliceStatus, readonly SliceStatus[]> = {
 	created: ["discussing"],

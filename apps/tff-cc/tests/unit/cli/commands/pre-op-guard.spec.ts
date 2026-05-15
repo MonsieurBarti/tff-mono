@@ -92,6 +92,7 @@ function seedAdapter(): { adapter: SQLiteStateAdapter; sliceId: string } {
 	if (!msR.ok || msR.data.length === 0) throw new Error("No milestones seeded");
 	const milestoneId = msR.data[0].id;
 	adapter.createSlice({ milestoneId, number: 1, title: "Slice One", id: "M01-S01" });
+	adapter.transitionSlice("M01-S01", "discussing");
 	return { adapter, sliceId: "M01-S01" };
 }
 

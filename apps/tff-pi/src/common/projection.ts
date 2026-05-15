@@ -15,8 +15,13 @@ import {
 	updateSliceTier,
 } from "./db.js";
 import { overrideSliceStatus, reconcileSliceStatus } from "./derived-state.js";
-import { canTransitionSlice } from "./transition-helpers.js";
-import { SLICE_STATUSES, type Phase, type SliceStatus, type Tier } from "./dto.js";
+import {
+	SLICE_STATUSES,
+	SLICE_TRANSITIONS,
+	type SliceStatus,
+	type ComplexityTier as Tier,
+} from "@tff/core";
+import { type Phase } from "./dto.js";
 
 // oxlint-disable-next-line no-explicit-any -- dispatch table needs a base type; each handler has a concrete params type
 type ProjectionHandler = (db: Database.Database, root: string, params: any) => void;
@@ -167,7 +172,7 @@ function projectTransition(
 	if (!(SLICE_STATUSES as readonly string[]).includes(currentRow.status)) {
 		throw new ProjectionIntegrityError(`Corrupt slice status in DB: ${currentRow.status}`);
 	}
-	if (!canTransitionSlice(currentRow.status as SliceStatus, params.to)) {
+	if (!SLICE_TRANSITIONS[currentRow.status as SliceStatus].includes(params.to)) {
 		throw new ProjectionIntegrityError(
 			`Invalid transition ${currentRow.status} → ${params.to} for slice ${params.sliceId}`,
 		);

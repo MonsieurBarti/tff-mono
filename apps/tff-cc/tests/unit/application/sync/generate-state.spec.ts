@@ -25,12 +25,14 @@ describe("generateState", () => {
 		const sl2Result = adapter.createSlice({ milestoneId, number: 2, title: "Billing" });
 		slice2Id = isOk(sl2Result) ? sl2Result.data.id : "M01-S02";
 
+		adapter.transitionSlice(slice1Id, "discussing");
 		adapter.transitionSlice(slice1Id, "researching");
 		adapter.transitionSlice(slice1Id, "planning");
 		adapter.transitionSlice(slice1Id, "executing");
 		adapter.transitionSlice(slice1Id, "reviewing");
 		adapter.transitionSlice(slice1Id, "shipping");
 		adapter.transitionSlice(slice1Id, "closed");
+		adapter.transitionSlice(slice2Id, "discussing");
 		adapter.transitionSlice(slice2Id, "researching");
 		adapter.transitionSlice(slice2Id, "planning");
 		adapter.transitionSlice(slice2Id, "executing");
@@ -147,6 +149,7 @@ describe("generateState — kind scope", () => {
 		const q2Id = isOk(q2) ? q2.data.id : "";
 
 		// q1 → shipping (closed requires approved reviews — shipping exercises mixed-status path)
+		adapter.transitionSlice(q1Id, "discussing");
 		adapter.transitionSlice(q1Id, "researching");
 		adapter.transitionSlice(q1Id, "planning");
 		adapter.transitionSlice(q1Id, "executing");
@@ -154,6 +157,7 @@ describe("generateState — kind scope", () => {
 		adapter.transitionSlice(q1Id, "reviewing");
 		adapter.transitionSlice(q1Id, "shipping");
 		// q2 → executing
+		adapter.transitionSlice(q2Id, "discussing");
 		adapter.transitionSlice(q2Id, "researching");
 		adapter.transitionSlice(q2Id, "planning");
 		adapter.transitionSlice(q2Id, "executing");

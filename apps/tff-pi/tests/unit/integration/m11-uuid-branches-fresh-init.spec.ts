@@ -36,7 +36,7 @@ describe("M11-S4: fresh init → UUID branches end-to-end", () => {
 		writeFileSync(join(tmp, ".tff-project-id"), "11111111-2222-4333-8444-555555555555");
 		mkdirSync(join(tmp, ".tff"), { recursive: true });
 		db = openDatabase(join(tmp, "state.db"));
-		applyMigrations(db, { root: tmp });
+		applyMigrations(db);
 		projectId = insertProject(db, { name: "demo", vision: "v" });
 	});
 

@@ -38,10 +38,10 @@ describe("M10-S03: commitStateAtPhaseEnd wired into runPhaseWithFreshContext", (
 		// getSlice() returns a real row.
 		const dbPath = join(fx.home, fx.aliceProjectId, "state.db");
 		const db = openDatabase(dbPath);
-		applyMigrations(db, { root: fx.alice });
-		insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
+		applyMigrations(db);
+		const projectId = insertProject(db, { name: "p", vision: "v", id: fx.aliceProjectId });
 		const milestoneId = insertMilestone(db, {
-			projectId: fx.aliceProjectId,
+			projectId,
 			number: 1,
 			name: "M01",
 			branch: "main",

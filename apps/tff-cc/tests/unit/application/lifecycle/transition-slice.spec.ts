@@ -18,12 +18,12 @@ describe("transitionSliceUseCase", () => {
 
 	it("should transition slice and update store status", async () => {
 		const result = await transitionSliceUseCase(
-			{ sliceId, targetStatus: "researching" },
+			{ sliceId, targetStatus: "discussing" },
 			{ sliceStore: adapter },
 		);
 		expect(isOk(result)).toBe(true);
 		if (isOk(result)) {
-			expect(result.data.slice.status).toBe("researching");
+			expect(result.data.slice.status).toBe("discussing");
 			expect(result.data.events).toHaveLength(1);
 		}
 	});
@@ -51,7 +51,7 @@ describe("transitionSlice with EventBus", () => {
 		const eventBus = { publish: publishFn, subscribe: () => {} };
 
 		const result = await transitionSliceUseCase(
-			{ sliceId, targetStatus: "researching" },
+			{ sliceId, targetStatus: "discussing" },
 			{ sliceStore: adapter, eventBus },
 		);
 		expect(isOk(result)).toBe(true);

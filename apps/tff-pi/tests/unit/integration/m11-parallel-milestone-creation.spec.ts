@@ -20,15 +20,15 @@ describe("M11-S4: parallel milestone creation in two clones", () => {
 
 		// Alice creates a milestone in her clone
 		const aDb = openDatabase(join(fx.home, projectId, "state.db"));
-		applyMigrations(aDb, { root: fx.alice });
-		insertProject(aDb, { name: "shared", vision: "v", id: projectId });
-		const aResult = createMilestone(aDb, fx.alice, projectId, "Alice's milestone");
+		applyMigrations(aDb);
+		const dbProjectId = insertProject(aDb, { name: "shared", vision: "v", id: projectId });
+		const aResult = createMilestone(aDb, fx.alice, dbProjectId, "Alice's milestone");
 		aDb.close();
 
 		// Bob creates a milestone in his clone (same project, same DB)
 		const bDb = openDatabase(join(fx.home, projectId, "state.db"));
-		applyMigrations(bDb, { root: fx.bob });
-		const bResult = createMilestone(bDb, fx.bob, projectId, "Bob's milestone");
+		applyMigrations(bDb);
+		const bResult = createMilestone(bDb, fx.bob, dbProjectId, "Bob's milestone");
 		bDb.close();
 
 		// Both milestones got UUID-form branches (milestone/<8hex>)

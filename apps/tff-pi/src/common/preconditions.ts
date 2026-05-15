@@ -4,8 +4,7 @@ import type Database from "better-sqlite3";
 import { getLatestPhaseRun, getMilestone, getSlice } from "./db.js";
 import { expectedInProgressStatusFor } from "./derived-state.js";
 import { readEvents } from "./event-log.js";
-import { canTransitionSlice } from "./transition-helpers.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
+import { SLICE_TRANSITIONS, milestoneLabel, sliceLabel } from "@tff/core";
 import type { Phase, SliceStatus } from "./dto.js";
 
 export interface PreconditionResult {
@@ -176,7 +175,7 @@ const CHECKERS: Record<string, Checker> = {
 		if (!p.to) return fail("params.to missing");
 		const slice = getSlice(db, p.sliceId);
 		if (!slice) return fail(`Slice not found: ${p.sliceId}`);
-		if (!canTransitionSlice(slice.status, p.to)) {
+		if (!SLICE_TRANSITIONS[slice.status].includes(p.to)) {
 			return fail(`Invalid transition '${slice.status}' → '${p.to}'`);
 		}
 		if (p.to === "verifying") {

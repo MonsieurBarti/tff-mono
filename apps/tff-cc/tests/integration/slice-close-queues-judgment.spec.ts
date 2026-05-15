@@ -39,6 +39,7 @@ describe("slice transition to closed queues a pending judgment", () => {
 		).toBe(true);
 
 		for (const target of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",
@@ -106,6 +107,7 @@ describe("slice transition to closed queues a pending judgment", () => {
 			}).ok,
 		).toBe(true);
 		for (const target of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",

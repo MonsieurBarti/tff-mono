@@ -21,7 +21,7 @@ describe("v4 migration — slice_dependency table", () => {
 			"INSERT INTO project (id, name, created_at, updated_at) VALUES ('singleton', 'Test', datetime('now'), datetime('now'))",
 		).run();
 		db.prepare(
-			"INSERT INTO milestone (id, project_id, number, name, status, branch, created_at, updated_at) VALUES ('m-uuid-1', 'singleton', 1, 'M1', 'open', 'branch-1', datetime('now'), datetime('now'))",
+			"INSERT INTO milestone (id, project_id, number, name, status, branch, created_at, updated_at) VALUES ('m-uuid-1', 'singleton', 1, 'M1', 'created', 'branch-1', datetime('now'), datetime('now'))",
 		).run();
 		db.prepare(
 			"INSERT INTO slice (id, milestone_id, number, title, status, created_at, updated_at) VALUES ('s-uuid-1', 'm-uuid-1', 1, 'S1', 'discussing', datetime('now'), datetime('now'))",

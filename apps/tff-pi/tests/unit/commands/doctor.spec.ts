@@ -369,7 +369,7 @@ describe("checkInvariantSweep", () => {
 	});
 
 	it("returns empty for a valid sequence of events", () => {
-		const projectId = "proj-1";
+		const projectId = "singleton";
 		appendCommand(root, "create-project", { id: projectId, name: "P", vision: "V" });
 		const milestoneId = "m-1";
 		appendCommand(root, "create-milestone", {
@@ -412,7 +412,7 @@ describe("checkInvariantSweep", () => {
 	});
 
 	it("continues projecting after a violation so subsequent checks use correct state", () => {
-		const projectId = "proj-2";
+		const projectId = "singleton";
 		// First: valid create-project
 		appendCommand(root, "create-project", { id: projectId, name: "P", vision: "V" });
 		// Second: invalid write-plan (no slice) — should record violation

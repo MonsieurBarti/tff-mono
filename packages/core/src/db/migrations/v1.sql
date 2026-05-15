@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS milestone (
   project_id TEXT NOT NULL REFERENCES project(id),
   number INTEGER NOT NULL,
   name TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+  status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'in_progress', 'completing', 'closed')),
   close_reason TEXT,
   branch TEXT NOT NULL DEFAULT '',
   archived_at INTEGER,

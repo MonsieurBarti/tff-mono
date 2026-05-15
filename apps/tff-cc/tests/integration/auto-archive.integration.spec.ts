@@ -71,6 +71,7 @@ const seedReview = (
 
 const driveSliceToClosed = (adapter: SQLiteStateAdapter, sliceId: string): void => {
 	for (const state of [
+		"discussing",
 		"researching",
 		"planning",
 		"executing",
@@ -167,6 +168,7 @@ describe("auto-archive on milestone close", () => {
 		// Drive partly through; we close via slice:close cmd which is the path
 		// that runs the post-tx archive hook.
 		for (const state of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",
@@ -216,6 +218,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 
 		// Drive to closed manually (slice-close uses sliceStore.transitionSlice).
 		for (const state of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",
@@ -260,6 +263,7 @@ describe("auto-archive on ad-hoc slice close", () => {
 		expect(seedSpecApproval(adapter, slice.data.id, "plannotator-1").ok).toBe(true);
 
 		for (const state of [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",

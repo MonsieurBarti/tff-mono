@@ -15,6 +15,7 @@ export {
 	type MilestoneProps,
 	type MilestoneUpdateProps,
 	type MilestoneStatus,
+	MILESTONE_STATUSES,
 	MILESTONE_TRANSITIONS,
 	InvalidTransitionError as MilestoneInvalidTransitionError,
 } from "./domain/milestone/index.js";
@@ -44,8 +45,10 @@ export {
 	InvalidTransitionError as SliceInvalidTransitionError,
 	type SliceStatus,
 	type ComplexityTier,
+	SLICE_STATUSES,
 	SLICE_TRANSITIONS,
 	HUMAN_GATES,
+	TIERS,
 	type GuardResult,
 	tierSkipGuard,
 	reviewExistsGuard,
@@ -70,6 +73,7 @@ export {
 	type TaskUpdateProps,
 	type Difficulty,
 	type TaskStatus,
+	TASK_STATUSES,
 	TASK_TRANSITIONS,
 } from "./domain/task/index.js";
 export {

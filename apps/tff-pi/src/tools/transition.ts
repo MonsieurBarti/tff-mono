@@ -8,9 +8,29 @@ import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { expectedInProgressStatusFor } from "../common/derived-state.js";
 import { makeBaseEvent } from "../common/events.js";
-import { SLICE_TRANSITIONS, sliceLabel } from "@tff/core";
-import { canTransitionSlice, nextSliceStatus } from "../common/transition-helpers.js";
-import { SLICE_STATUSES, type Phase, type SliceStatus } from "../common/dto.js";
+import { SLICE_STATUSES, SLICE_TRANSITIONS, sliceLabel, type SliceStatus } from "@tff/core";
+import { type Phase } from "../common/dto.js";
+
+function nextSliceStatus(current: SliceStatus, tier?: string): SliceStatus | null {
+	if (current === "closed") return null;
+	if (current === "discussing" && tier === "S") return "planning";
+
+	const forwardPath: SliceStatus[] = [
+		"created",
+		"discussing",
+		"researching",
+		"planning",
+		"executing",
+		"verifying",
+		"reviewing",
+		"shipping",
+		"closed",
+	];
+
+	const idx = forwardPath.indexOf(current);
+	if (idx === -1 || idx === forwardPath.length - 1) return null;
+	return forwardPath[idx + 1] ?? null;
+}
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;
@@ -96,7 +116,7 @@ export function handleTransition(
 		};
 	}
 
-	if (!canTransitionSlice(slice.status, target)) {
+	if (!SLICE_TRANSITIONS[slice.status].includes(target)) {
 		return {
 			content: [
 				{

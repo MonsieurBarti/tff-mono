@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import type Database from "better-sqlite3";
 import { beforeEach, describe, expect, it } from "vitest";
+import { runMigrations } from "@tff/core";
 import {
 	applyMigrations,
 	countOpenSlicesInMilestone,
@@ -61,6 +62,24 @@ describe("applyMigrations", () => {
 		const db = openDatabase(":memory:");
 		applyMigrations(db);
 		expect(() => applyMigrations(db)).not.toThrow();
+	});
+});
+
+describe("core runMigrations integration", () => {
+	it("creates a schema that tff-pi CRUD functions can use", () => {
+		const db = openDatabase(":memory:");
+		runMigrations(db);
+		insertProject(db, { name: "TFF", vision: "Make coding great" });
+		const projectId = must(getProject(db)).id;
+		insertMilestone(db, { projectId, number: 1, name: "Foundation", branch: "main" });
+		const milestoneId = must(getMilestones(db, projectId)[0]).id;
+		insertSlice(db, { milestoneId, number: 1, title: "Auth" });
+		const slice = must(getSlice(db, must(getSlices(db, milestoneId)[0]).id));
+		expect(slice.status).toBe("created");
+		expect(slice.prUrl).toBeNull();
+		updateSlicePrUrl(db, slice.id, "https://github.com/example/pr/42");
+		const updated = must(getSlice(db, slice.id));
+		expect(updated.prUrl).toBe("https://github.com/example/pr/42");
 	});
 });
 
@@ -551,19 +570,16 @@ describe("insertProject with explicit id", () => {
 		applyMigrations(db);
 	});
 
-	it("round-trips a provided id as project.id", () => {
-		const id = randomUUID();
-		const returned = insertProject(db, { name: "X", vision: "V", id });
-		expect(returned).toBe(id);
+	it("always uses singleton id", () => {
+		const returned = insertProject(db, { name: "X", vision: "V", id: randomUUID() });
+		expect(returned).toBe("singleton");
 		const proj = getProject(db);
-		expect(proj?.id).toBe(id);
+		expect(proj?.id).toBe("singleton");
 	});
 
-	it("generates a random UUID when id is omitted", () => {
+	it("generates singleton id when id is omitted", () => {
 		const returned = insertProject(db, { name: "X", vision: "V" });
-		expect(returned).toMatch(
-			/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-		);
+		expect(returned).toBe("singleton");
 	});
 });
 

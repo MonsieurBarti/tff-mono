@@ -439,7 +439,7 @@ describe("commitStateAtPhaseEnd — happy path", () => {
 		});
 		const snap = JSON.parse(snapJson);
 		expect(snap.project).toHaveLength(1);
-		expect(snap.project[0].id).toBe(projectId);
+		expect(snap.project[0].id).toBe("singleton");
 	});
 
 	it("commit message is '<phase>: <sliceLabel>'", async () => {

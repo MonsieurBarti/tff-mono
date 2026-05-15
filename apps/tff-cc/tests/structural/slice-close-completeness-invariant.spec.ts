@@ -8,6 +8,7 @@ describe("slice-close completeness invariant is wired", () => {
 
 	const driveToShipping = (id: string) => {
 		const path = [
+			"discussing",
 			"researching",
 			"planning",
 			"executing",
@@ -98,7 +99,7 @@ describe("slice-close completeness invariant is wired", () => {
 	});
 
 	it("transitionSlice to a non-terminal target does not call listReviews", () => {
-		// Create a second slice in `discussing`; transition to `researching`.
+		// Create a second slice in `created`; transition to `discussing`.
 		const msResult = stores.milestoneStore.listMilestones();
 		if (!msResult.ok || msResult.data.length === 0) throw new Error("No milestones found");
 		const milestoneId = msResult.data[0].id;
@@ -113,7 +114,7 @@ describe("slice-close completeness invariant is wired", () => {
 
 		// Spy BEFORE the transition call.
 		const spy = vi.spyOn(stores.reviewStore, "listReviews");
-		stores.sliceStore.transitionSlice(slice2Id, "researching");
+		stores.sliceStore.transitionSlice(slice2Id, "discussing");
 		// Assert the spy was NOT called for this new slice id.
 		expect(spy).not.toHaveBeenCalledWith(slice2Id);
 		spy.mockRestore();
