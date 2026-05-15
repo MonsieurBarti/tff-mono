@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
+import { makeSlice } from "../../helpers.js";
 import { applyMigrations, openDatabase } from "../../../src/common/db.js";
 import type { PhaseContext } from "../../../src/common/phase.js";
 import { discussPhase } from "../../../src/phases/discuss.js";
@@ -32,16 +32,7 @@ function makeCtx(overrides: Partial<PhaseContext> = {}): PhaseContext {
 		} as unknown as PhaseContext["pi"],
 		db,
 		root,
-		slice: {
-			id: "s1",
-			milestoneId: "m1",
-			number: 1,
-			title: "Test Slice",
-			status: "created",
-			tier: null,
-			prUrl: null,
-			createdAt: "",
-		},
+		slice: makeSlice({ title: "Test Slice", status: "created", createdAt: "", updatedAt: "" }),
 		milestoneNumber: 1,
 		settings: {
 			model_profile: "balanced" as const,

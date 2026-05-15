@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { describe, expect, it, vi } from "vitest";
-import type { Task } from "../../src/common/dto.js";
+import { makeTask } from "../helpers.js";
 import {
 	enrichContextWithFff,
 	loadAgentResource,
@@ -106,22 +105,13 @@ describe("loadPhaseResources", () => {
 	});
 });
 
-function makeTask(title: string): Task {
-	return {
-		id: `task-${Math.random()}`,
-		sliceId: "s1",
-		number: 1,
-		title,
-		status: "open" as const,
-		wave: null,
-		claimedBy: null,
-		createdAt: "",
-	};
+function createTask(title: string) {
+	return makeTask({ id: `task-${Math.random()}`, title, createdAt: "", updatedAt: "" });
 }
 
 describe("enrichContextWithFff", () => {
 	it("adds RELATED_FILES to context when grep returns results", async () => {
-		const tasks = [makeTask("implement authentication middleware")];
+		const tasks = [createTask("implement authentication middleware")];
 		const fffBridge = {
 			grep: vi.fn().mockResolvedValue([{ path: "src/auth.ts" }, { path: "src/middleware.ts" }]),
 		};
@@ -134,7 +124,7 @@ describe("enrichContextWithFff", () => {
 	});
 
 	it("does nothing when grep returns empty array", async () => {
-		const tasks = [makeTask("implement database schema")];
+		const tasks = [createTask("implement database schema")];
 		const fffBridge = {
 			grep: vi.fn().mockResolvedValue([]),
 		};
@@ -146,7 +136,7 @@ describe("enrichContextWithFff", () => {
 	});
 
 	it("does nothing when all task words are 3 chars or fewer", async () => {
-		const tasks = [makeTask("fix bug")];
+		const tasks = [createTask("fix bug")];
 		const fffBridge = {
 			grep: vi.fn(),
 		};
@@ -159,7 +149,7 @@ describe("enrichContextWithFff", () => {
 	});
 
 	it("silently catches errors from fffBridge.grep", async () => {
-		const tasks = [makeTask("implement feature module")];
+		const tasks = [createTask("implement feature module")];
 		const fffBridge = {
 			grep: vi.fn().mockRejectedValue(new Error("bridge unavailable")),
 		};
@@ -182,7 +172,7 @@ describe("enrichContextWithFff", () => {
 	});
 
 	it("passes at most 5 word patterns to grep", async () => {
-		const tasks = [makeTask("implement alpha beta gamma delta epsilon zeta")];
+		const tasks = [createTask("implement alpha beta gamma delta epsilon zeta")];
 		const fffBridge = {
 			grep: vi.fn().mockResolvedValue([]),
 		};

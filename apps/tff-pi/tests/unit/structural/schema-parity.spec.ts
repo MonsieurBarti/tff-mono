@@ -14,7 +14,7 @@ const repoRoot = join(here, "..", "..", "..", "..", "..");
 function extractInterfaceProps(source: string, interfaceName: string): string[] {
 	const pattern = new RegExp(`export\\s+interface\\s+${interfaceName}\\s*\\{([^}]+)\\}`, "s");
 	const match = pattern.exec(source);
-	if (!match) return [];
+	if (!match || match[1] === undefined) return [];
 	const body = match[1];
 	const props: string[] = [];
 	for (const line of body.split("\n")) {

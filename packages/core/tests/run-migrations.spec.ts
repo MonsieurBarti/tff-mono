@@ -13,9 +13,9 @@ describe("runMigrations", () => {
 		db = new Database(":memory:");
 	});
 
-	it("applies v1 baseline to a fresh database", () => {
+	it("applies v1+v2 baseline to a fresh database", () => {
 		runMigrations(db);
-		expect(getCurrentVersion(db)).toBe(1);
+		expect(getCurrentVersion(db)).toBe(2);
 
 		const tables = db
 			.prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
@@ -87,16 +87,25 @@ describe("runMigrations", () => {
 		expect(colNames).not.toContain("log_cursor_row");
 	});
 
+	it("adds difficulty column to task table in v2", () => {
+		runMigrations(db);
+		const cols = db.prepare("SELECT name FROM pragma_table_info('task') ORDER BY cid").all() as {
+			name: string;
+		}[];
+		const colNames = cols.map((c) => c.name);
+		expect(colNames).toContain("difficulty");
+	});
+
 	it("is idempotent", () => {
 		runMigrations(db);
 		runMigrations(db);
-		expect(getCurrentVersion(db)).toBe(1);
+		expect(getCurrentVersion(db)).toBe(2);
 	});
 
 	it("accepts an explicit migrations directory", () => {
 		const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "../src/db/migrations");
 		runMigrations(db, migrationsDir);
-		expect(getCurrentVersion(db)).toBe(1);
+		expect(getCurrentVersion(db)).toBe(2);
 	});
 
 	it("rejects invalid migration filenames", () => {
@@ -117,7 +126,7 @@ describe("runMigrations", () => {
 		// Simulate a newer database version by inserting a fake future version
 		db.prepare("INSERT INTO schema_version (version) VALUES (99)").run();
 		expect(() => runMigrations(db)).toThrow(
-			"VERSION_MISMATCH: Database schema version 99 is newer than code version 1.",
+			"VERSION_MISMATCH: Database schema version 99 is newer than code version 2.",
 		);
 	});
 

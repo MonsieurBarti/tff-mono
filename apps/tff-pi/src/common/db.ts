@@ -190,10 +190,10 @@ function rowToTask(row: TaskRow): Task {
 		description: row.description ?? "",
 		status: row.status as TaskStatus,
 		wave: row.wave ?? null,
-		difficulty: row.difficulty ?? null,
+		difficulty: row.difficulty,
 		claimedAt: row.claimed_at != null ? String(row.claimed_at) : null,
-		claimedBy: row.claimed_by ?? null,
-		closedReason: row.closed_reason ?? null,
+		claimedBy: row.claimed_by,
+		closedReason: row.closed_reason,
 		createdAt: String(row.created_at),
 		updatedAt: String(row.updated_at),
 	};
@@ -434,6 +434,12 @@ export function insertTask(
 		difficulty?: number;
 	},
 ): string {
+	if (
+		params.difficulty != null &&
+		(!Number.isInteger(params.difficulty) || params.difficulty < 0)
+	) {
+		throw new Error("difficulty must be a non-negative integer");
+	}
 	const id = params.id ?? randomUUID();
 	db.prepare(
 		"INSERT INTO task (id, slice_id, number, title, description, wave, difficulty, claimed_at, closed_reason, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",

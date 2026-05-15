@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
+import { makeSlice } from "../../helpers.js";
 import { applyMigrations, openDatabase } from "../../../src/common/db.js";
 import { buildPreparationBrief } from "../../../src/common/preparation.js";
 
@@ -33,16 +33,7 @@ describe("preparation", () => {
 		const brief = buildPreparationBrief(
 			root,
 			db,
-			{
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Setup Auth",
-				status: "discussing",
-				tier: null,
-				prUrl: null,
-				createdAt: new Date().toISOString(),
-			},
+			makeSlice({ title: "Setup Auth", status: "discussing", createdAt: new Date().toISOString() }),
 			1,
 		);
 
@@ -63,16 +54,7 @@ describe("preparation", () => {
 		const brief = buildPreparationBrief(
 			root,
 			db,
-			{
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Setup Auth",
-				status: "discussing",
-				tier: null,
-				prUrl: null,
-				createdAt: "",
-			},
+			makeSlice({ title: "Setup Auth", status: "discussing", createdAt: "", updatedAt: "" }),
 			1,
 		);
 
@@ -87,16 +69,7 @@ describe("preparation", () => {
 		const brief = buildPreparationBrief(
 			root,
 			db,
-			{
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Setup Auth",
-				status: "discussing",
-				tier: null,
-				prUrl: null,
-				createdAt: "",
-			},
+			makeSlice({ title: "Setup Auth", status: "discussing", createdAt: "", updatedAt: "" }),
 			1,
 		);
 
@@ -112,16 +85,7 @@ describe("preparation", () => {
 		const brief = buildPreparationBrief(
 			root,
 			db,
-			{
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Setup Auth",
-				status: "discussing",
-				tier: null,
-				prUrl: null,
-				createdAt: "",
-			},
+			makeSlice({ title: "Setup Auth", status: "discussing", createdAt: "", updatedAt: "" }),
 			1,
 		);
 
@@ -142,16 +106,7 @@ describe("preparation", () => {
 		const brief = buildPreparationBrief(
 			root,
 			db,
-			{
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Setup Auth",
-				status: "discussing",
-				tier: null,
-				prUrl: null,
-				createdAt: "",
-			},
+			makeSlice({ title: "Setup Auth", status: "discussing", createdAt: "", updatedAt: "" }),
 			1,
 		);
 

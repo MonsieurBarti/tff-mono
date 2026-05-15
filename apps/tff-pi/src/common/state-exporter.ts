@@ -121,7 +121,7 @@ function toMilestone(r: MilestoneRow): Milestone {
 		name: r.name,
 		status: status as Milestone["status"],
 		branch: r.branch,
-		closeReason: r.close_reason ?? null,
+		closeReason: r.close_reason,
 		createdAt: String(r.created_at),
 		updatedAt: String(r.updated_at),
 		archivedAt: r.archived_at != null ? String(r.archived_at) : null,
@@ -134,7 +134,7 @@ function toSlice(r: SliceRow): Slice {
 	return {
 		id: r.id,
 		milestoneId: r.milestone_id,
-		kind: r.kind ?? "milestone",
+		kind: r.kind,
 		number: r.number,
 		title: r.title,
 		status: r.status as Slice["status"],

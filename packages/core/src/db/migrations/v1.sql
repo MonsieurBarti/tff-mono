@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS task (
   description TEXT,
   status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'closed')),
   wave INTEGER,
-  difficulty INTEGER,
   claimed_at INTEGER,
   claimed_by TEXT,
   closed_reason TEXT,

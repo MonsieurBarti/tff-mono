@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it } from "vitest";
 import { milestoneLabel, sliceLabel } from "@tff/core";
 import {
@@ -10,12 +9,9 @@ import {
 	sanitizeForPrompt,
 	taskLabel,
 	type Dependency,
-	type Milestone,
 	type PhaseRunStatus,
-	type Project,
-	type Slice,
-	type Task,
 } from "../../../src/common/dto.js";
+import { makeProject, makeMilestone, makeSlice, makeTask } from "../../helpers.js";
 
 describe("types", () => {
 	describe("SliceStatus", () => {
@@ -96,51 +92,26 @@ describe("types", () => {
 
 	describe("entity shapes", () => {
 		it("Project has required fields", () => {
-			const p: Project = {
-				id: "p1",
-				name: "Test",
-				vision: "A test project",
-				createdAt: "2026-04-10T00:00:00Z",
-			};
+			const p = makeProject();
 			expect(p.name).toBe("Test");
+			expect(p.updatedAt).toBeDefined();
 		});
 		it("Milestone has required fields", () => {
-			const m: Milestone = {
-				id: "m1",
-				projectId: "p1",
-				number: 1,
-				name: "Foundation",
-				status: "created",
-				branch: "milestone/M01",
-				createdAt: "2026-04-10T00:00:00Z",
-			};
+			const m = makeMilestone();
 			expect(m.status).toBe("created");
+			expect(m.updatedAt).toBeDefined();
 		});
 		it("Slice has required fields", () => {
-			const s: Slice = {
-				id: "s1",
-				milestoneId: "m1",
-				number: 1,
-				title: "Auth",
-				status: "created",
-				tier: null,
-				prUrl: null,
-				createdAt: "2026-04-10T00:00:00Z",
-			};
+			const s = makeSlice();
 			expect(s.tier).toBeNull();
+			expect(s.kind).toBe("milestone");
+			expect(s.baseBranch).toBe("main");
 		});
 		it("Task has required fields", () => {
-			const t: Task = {
-				id: "t1",
-				sliceId: "s1",
-				number: 1,
-				title: "User entity",
-				status: "open",
-				wave: null,
-				claimedBy: null,
-				createdAt: "2026-04-10T00:00:00Z",
-			};
+			const t = makeTask();
 			expect(t.wave).toBeNull();
+			expect(t.description).toBe("");
+			expect(t.updatedAt).toBeDefined();
 		});
 		it("Dependency has required fields", () => {
 			const d: Dependency = { fromTaskId: "t2", toTaskId: "t1" };
