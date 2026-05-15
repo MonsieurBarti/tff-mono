@@ -1,7 +1,14 @@
 import { existsSync, lstatSync, readFileSync, unlinkSync } from "node:fs";
 import { basename, join } from "node:path";
 import type Database from "better-sqlite3";
-import { deleteArtifact, readArtifact, tffPath, writeArtifact } from "../common/artifacts.js";
+import {
+	deleteArtifact,
+	readArtifact,
+	resolveTffPath,
+	writeArtifact,
+	milestoneLabel,
+	sliceLabel,
+} from "@tff/core";
 import { milestoneBranchName } from "../common/branch-naming.js";
 import { createCheckpoint } from "../common/checkpoint.js";
 import { commitCommand } from "../common/commit.js";
@@ -23,7 +30,6 @@ import {
 	prepareDispatch,
 	registerPhaseFinalizer,
 } from "../common/subagent-dispatcher.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import { sanitizeForPrompt, taskLabel, type Task } from "../common/dto.js";
 import { getWorktreePath } from "../common/worktree.js";
 
@@ -35,7 +41,7 @@ const VERDICT_RE = /^VERDICT:\s*(approved|denied)\s*$/gm;
 export const EXECUTE_RELATED_FILES_FILE = "execute-related-files.txt";
 
 function executeRelatedFilesPath(root: string): string {
-	return tffPath(root, EXECUTE_RELATED_FILES_FILE);
+	return resolveTffPath(root, EXECUTE_RELATED_FILES_FILE);
 }
 
 export function writeExecuteRelatedFiles(root: string, content: string): void {

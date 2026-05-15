@@ -2,12 +2,11 @@ import { randomUUID } from "node:crypto";
 import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
-import { initSliceDir } from "../common/artifacts.js";
+import { initSliceDir, sliceLabel } from "@tff/core";
 import { commitCommand } from "../common/commit.js";
 import { type TffContext, getDb } from "../common/context.js";
 import { resolveMilestone } from "../common/db-resolvers.js";
 import { getMilestone, getNextSliceNumber } from "../common/db.js";
-import { sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

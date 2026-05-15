@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { artifactExists, initTffDirectory, writeArtifact } from "../../src/common/artifacts.js";
+import { artifactExists, initTffDirectory, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,
@@ -56,9 +56,13 @@ vi.mock("../../src/common/checkpoint.js", () => ({
 	createCheckpoint: vi.fn(),
 }));
 
-vi.mock("../../src/common/verify-commands.js", () => ({
-	detectVerifyCommands: vi.fn().mockResolvedValue([]),
-}));
+vi.mock("@tff/core", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@tff/core")>();
+	return {
+		...actual,
+		detectVerifyCommands: vi.fn().mockResolvedValue([]),
+	};
+});
 
 vi.mock("../../src/common/mechanical-verifier.js", () => ({
 	runMechanicalVerification: vi.fn(),

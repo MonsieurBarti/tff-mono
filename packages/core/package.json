@@ -18,13 +18,13 @@
 	},
 	"dependencies": {
 		"better-sqlite3": "^12.8.0",
+		"yaml": "^2.8.4",
 		"zod": "^3.25.0"
 	},
 	"devDependencies": {
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/node": "^25.5.0",
 		"typescript": "^5.9.3",
-		"vitest": "^4.1.0",
-		"yaml": "^2.8.4"
+		"vitest": "^4.1.0"
 	}
 }

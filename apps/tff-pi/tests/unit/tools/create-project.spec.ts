@@ -5,7 +5,7 @@ import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { handleInit } from "../../../src/commands/init.js";
-import { readArtifact } from "../../../src/common/artifacts.js";
+import { readArtifact } from "@tff/core";
 import { compressIfEnabled } from "../../../src/common/compress.js";
 import { applyMigrations, getProject, openDatabase } from "../../../src/common/db.js";
 import { handleCreateProject } from "../../../src/tools/create-project.js";

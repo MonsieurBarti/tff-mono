@@ -1,7 +1,6 @@
 import type Database from "better-sqlite3";
-import { readArtifact } from "./artifacts.js";
+import { readArtifact, PIPELINE_PHASE_ORDER, milestoneLabel, sliceLabel } from "@tff/core";
 import { getMilestone, getSlice } from "./db.js";
-import { PIPELINE_PHASE_ORDER, milestoneLabel, sliceLabel } from "@tff/core";
 import {
 	SIDE_CHANNEL_PHASES,
 	SLICE_STATUSES,

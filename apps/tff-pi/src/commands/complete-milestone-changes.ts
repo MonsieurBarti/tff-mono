@@ -1,10 +1,9 @@
 import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { writeArtifact } from "../common/artifacts.js";
+import { writeArtifact, milestoneLabel } from "@tff/core";
 import { type TffContext, requireProject } from "../common/context.js";
 import { resolveMilestone } from "../common/db-resolvers.js";
 import { getMilestone } from "../common/db.js";
-import { milestoneLabel } from "@tff/core";
 
 export interface CompleteMilestoneChangesResult {
 	success: boolean;

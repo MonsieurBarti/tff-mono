@@ -1,7 +1,6 @@
-import { readArtifact } from "./artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { compressIfEnabled } from "./compress.js";
 import type { Settings } from "./settings.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import type { Milestone, Project, Slice } from "./dto.js";
 import { sanitizeForPrompt } from "./dto.js";
 import { getWorktreePath, worktreeExists } from "./worktree.js";

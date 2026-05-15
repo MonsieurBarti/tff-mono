@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readArtifact, tffPath } from "./artifacts.js";
+import { readArtifact, resolveTffPath } from "@tff/core";
 
 const BUILTIN_TEMPLATE_PATH = join(
 	fileURLToPath(new URL(".", import.meta.url)),
@@ -58,5 +58,5 @@ export function renderPrTemplate(template: string, values: PrTemplateValues): st
 }
 
 export function prTemplateOverridePath(root: string): string {
-	return tffPath(root, "templates", "pr-body.md");
+	return resolveTffPath(root, "templates", "pr-body.md");
 }

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Settings } from "../../../src/common/settings.js";
 import { DEFAULT_SETTINGS } from "../../../src/common/settings.js";
-import { detectVerifyCommands } from "../../../src/common/verify-commands.js";
+import { detectVerifyCommands } from "@tff/core";
 
 describe("verify-commands", () => {
 	let root: string;

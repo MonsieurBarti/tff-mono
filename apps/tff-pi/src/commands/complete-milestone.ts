@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { readArtifact } from "../common/artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { commitCommand } from "../common/commit.js";
 import { type TffContext, requireProject } from "../common/context.js";
 import { resolveMilestone } from "../common/db-resolvers.js";
@@ -11,7 +11,6 @@ import { getPrTools } from "../common/gh-client.js";
 import { parsePrUrl } from "../common/gh-helpers.js";
 import { getDefaultBranch, gitEnv } from "../common/git.js";
 import type { Settings } from "../common/settings.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface CompleteMilestoneResult {
 	success: boolean;

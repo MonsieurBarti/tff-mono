@@ -3,12 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	initMilestoneDir,
-	initSliceDir,
-	initTffDirectory,
-	readArtifact,
-} from "../../../src/common/artifacts.js";
+import { initMilestoneDir, initSliceDir, initTffDirectory, readArtifact } from "@tff/core";
 import { compressIfEnabled } from "../../../src/common/compress.js";
 import {
 	applyMigrations,

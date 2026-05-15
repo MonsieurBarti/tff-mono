@@ -18,8 +18,8 @@ vi.mock("../../../src/common/git.js", async (importOriginal) => {
 	};
 });
 
-vi.mock("../../../src/common/artifacts.js", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../../../src/common/artifacts.js")>();
+vi.mock("@tff/core", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@tff/core")>();
 	return {
 		...actual,
 		initMilestoneDir: vi.fn(),

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { tffPath } from "./common/artifacts.js";
+import { resolveTffPath } from "@tff/core";
 import { refreshCompressionLevel } from "./common/compress.js";
 import { buildContextBlock } from "./common/context-injection.js";
 import type { TffContext } from "./common/context.js";
@@ -230,7 +230,7 @@ export function registerLifecycleHooks(pi: ExtensionAPI, ctx: TffContext): void 
 		// Refresh ultra-compress active level from user's state store
 		await refreshCompressionLevel(root);
 
-		const dbPath = tffPath(root, "state.db");
+		const dbPath = resolveTffPath(root, "state.db");
 		if (existsSync(join(root, ".tff")) && existsSync(dbPath)) {
 			try {
 				ctx.db = openDatabase(dbPath);

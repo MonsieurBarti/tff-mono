@@ -1,4 +1,10 @@
-import { readArtifact, writeArtifact } from "../common/artifacts.js";
+import {
+	readArtifact,
+	writeArtifact,
+	milestoneLabel,
+	sliceLabel,
+	detectVerifyCommands,
+} from "@tff/core";
 import { milestoneBranchName } from "../common/branch-naming.js";
 import { createCheckpoint } from "../common/checkpoint.js";
 import { compressIfEnabled } from "../common/compress.js";
@@ -13,8 +19,6 @@ import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { prepareDispatch } from "../common/subagent-dispatcher.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
-import { detectVerifyCommands } from "../common/verify-commands.js";
 import { getWorktreePath } from "../common/worktree.js";
 import { predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";
 

@@ -1,5 +1,10 @@
-import { SLICE_TRANSITIONS, MILESTONE_TRANSITIONS, HUMAN_GATES } from "@tff/core";
-import type { SliceStatus, MilestoneStatus } from "@tff/core";
+import {
+	SLICE_TRANSITIONS,
+	MILESTONE_TRANSITIONS,
+	HUMAN_GATES,
+	type SliceStatus,
+	type MilestoneStatus,
+} from "@tff/core";
 import type { Tier } from "./dto.js";
 
 export function canTransitionSlice(from: SliceStatus, to: SliceStatus): boolean {

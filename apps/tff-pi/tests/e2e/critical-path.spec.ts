@@ -7,7 +7,7 @@ import { handleCompleteMilestone } from "../../src/commands/complete-milestone.j
 import { handleInit } from "../../src/commands/init.js";
 import { createMilestone } from "../../src/commands/new-milestone.js";
 import { handleNew } from "../../src/commands/new.js";
-import { initTffDirectory, readArtifact, writeArtifact } from "../../src/common/artifacts.js";
+import { initTffDirectory, readArtifact, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,

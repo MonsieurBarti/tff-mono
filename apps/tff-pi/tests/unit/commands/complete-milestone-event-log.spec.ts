@@ -41,8 +41,8 @@ vi.mock("../../../src/common/gh-client.js", () => ({
 }));
 
 // Stub artifact reads so all required artifacts exist
-vi.mock("../../../src/common/artifacts.js", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../../../src/common/artifacts.js")>();
+vi.mock("@tff/core", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@tff/core")>();
 	return {
 		...actual,
 		readArtifact: vi.fn().mockReturnValue("content"),

@@ -1,9 +1,8 @@
 import type Database from "better-sqlite3";
-import { readArtifact } from "./artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { getLastCheckpoint, listCheckpoints } from "./checkpoint.js";
 import { getMilestone, getMilestones, getProject, getSlice, getSlices } from "./db.js";
 import { readPerSliceLog } from "./per-slice-log.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import type { Slice, SliceStatus } from "./dto.js";
 import { getWorktreePath, worktreeExists } from "./worktree.js";
 

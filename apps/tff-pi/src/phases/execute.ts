@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { readArtifact } from "../common/artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { milestoneBranchName } from "../common/branch-naming.js";
 import { commitCommand } from "../common/commit.js";
 import { getLatestPhaseRun, getMilestone, getTasksByWave, resetTasksToOpen } from "../common/db.js";
@@ -9,7 +9,6 @@ import { closePredecessorIfReady } from "../common/phase-completion.js";
 import { ensurePhaseTransition } from "../common/phase-entry.js";
 import type { PhaseContext, PhaseModule, PhasePrepareResult } from "../common/phase.js";
 import { type DispatchConfig, prepareDispatch } from "../common/subagent-dispatcher.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import { sanitizeForPrompt, taskLabel, type Task } from "../common/dto.js";
 import { getWorktreePath } from "../common/worktree.js";
 import { enrichContextWithFff, predecessorPhase, verifyPhaseArtifacts } from "../orchestrator.js";

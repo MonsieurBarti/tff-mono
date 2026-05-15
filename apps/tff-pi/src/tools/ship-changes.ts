@@ -1,14 +1,13 @@
 import { type ExtensionAPI, defineTool } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import type Database from "better-sqlite3";
-import { writeArtifact } from "../common/artifacts.js";
+import { writeArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { commitCommand } from "../common/commit.js";
 import { type TffContext, getDb } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
 import { fetchReviewFeedback } from "../common/review-feedback.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 
 export interface ToolResult {
 	content: Array<{ type: "text"; text: string }>;

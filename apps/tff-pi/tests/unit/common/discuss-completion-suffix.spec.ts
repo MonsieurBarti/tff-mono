@@ -4,12 +4,7 @@ import { join } from "node:path";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	initMilestoneDir,
-	initSliceDir,
-	initTffDirectory,
-	writeArtifact,
-} from "../../../src/common/artifacts.js";
+import { initMilestoneDir, initSliceDir, initTffDirectory, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,

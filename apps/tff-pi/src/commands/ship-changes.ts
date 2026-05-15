@@ -1,12 +1,11 @@
 import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
 import type Database from "better-sqlite3";
-import { writeArtifact } from "../common/artifacts.js";
+import { writeArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { type TffContext, requireProject } from "../common/context.js";
 import { resolveSlice } from "../common/db-resolvers.js";
 import { getMilestone, getSlice } from "../common/db.js";
 import { makeBaseEvent } from "../common/events.js";
 import { fetchReviewFeedback } from "../common/review-feedback.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import { findActiveSlice } from "../orchestrator.js";
 
 export interface ShipChangesResult {

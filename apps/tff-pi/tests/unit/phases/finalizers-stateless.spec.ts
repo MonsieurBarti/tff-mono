@@ -18,7 +18,7 @@ vi.mock("../../../src/common/git.js", () => ({
 vi.mock("../../../src/common/branch-naming.js", () => ({
 	milestoneBranchName: vi.fn().mockReturnValue("milestone/abcdef01"),
 }));
-import { initTffDirectory, writeArtifact } from "../../../src/common/artifacts.js";
+import { initTffDirectory, writeArtifact } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,

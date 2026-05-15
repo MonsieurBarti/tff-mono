@@ -1,9 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type Database from "better-sqlite3";
-import { readArtifact } from "./artifacts.js";
+import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
 import { getSlices } from "./db.js";
-import { milestoneLabel, sliceLabel } from "@tff/core";
 import type { Slice } from "./dto.js";
 
 export interface PreparationBrief {

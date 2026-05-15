@@ -10,7 +10,7 @@ import {
 	checkLogProjectionDrift,
 	handleDoctor,
 } from "../../../src/commands/doctor.js";
-import { initMilestoneDir, initSliceDir, initTffDirectory } from "../../../src/common/artifacts.js";
+import { initMilestoneDir, initSliceDir, initTffDirectory } from "@tff/core";
 import {
 	applyMigrations,
 	getMilestones,
