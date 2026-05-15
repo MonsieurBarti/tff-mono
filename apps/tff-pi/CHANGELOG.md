@@ -22,6 +22,53 @@
 
 - `updateSliceStatus()` — status is no longer a directly-written column.
 
+## [1.1.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-pi-v0.1.9...tff-pi-v1.1.0) (2026-05-15)
+
+
+### Features
+
+* **#50, #52:** unify tff-pi state directory + PI log cursor storage ([f927448](https://github.com/MonsieurBarti/tff-mono/commit/f9274489f81de1c3448d07662cafa387b551fa53))
+* **#50:** unify tff-pi state directory from .pi/.tff/ to .tff/ ([8f9072e](https://github.com/MonsieurBarti/tff-mono/commit/8f9072ecdc97fd23a876a63a48dad668b210846c))
+* **#51:** converge agents to tff-* naming with core fallback ([bb889ad](https://github.com/MonsieurBarti/tff-mono/commit/bb889ad4a2fa9d78d5c87f7877c2b94e6c20b8d8))
+* **#51:** converge agents to tff-* naming with core fallback ([56bc0d4](https://github.com/MonsieurBarti/tff-mono/commit/56bc0d468254d460b4b98a0ed49951d61cf74711))
+* **#52:** pi-specific log cursor storage in .tff/.pi-log-cursor.json ([5567c6d](https://github.com/MonsieurBarti/tff-mono/commit/5567c6d5843858a79ea892b65f1d2ad130e2daa5))
+* agent convergence — tff-pi agents moved to packages/core ([1845284](https://github.com/MonsieurBarti/tff-mono/commit/1845284078903b9c567c9ac9469bae622fc22c6c))
+* **M01:** monorepo bootstrap ([e878f87](https://github.com/MonsieurBarti/tff-mono/commit/e878f877e662da5db84d8eeaa11af48c841920c0))
+* **M02:** Shared core foundation ([610d884](https://github.com/MonsieurBarti/tff-mono/commit/610d88405bb2e5861b0f590c4e17953c20b03431))
+* **M03:** tff-cc on shared core + ~/.tff/ migration ([#25](https://github.com/MonsieurBarti/tff-mono/issues/25)) ([9c54b56](https://github.com/MonsieurBarti/tff-mono/commit/9c54b56bfcc810ce730da1220f2423af9c4ded54))
+* **S01:** shared schema baseline and migration runner ([610d884](https://github.com/MonsieurBarti/tff-mono/commit/610d88405bb2e5861b0f590c4e17953c20b03431))
+* **S03:** import tff-pi as apps/tff-pi on pnpm ([#3](https://github.com/MonsieurBarti/tff-mono/issues/3)) ([190c2ee](https://github.com/MonsieurBarti/tff-mono/commit/190c2ee0ddd5f8232a95359582b48f9eaa3c2d80))
+* **tff-pi:** add /tff settings set command ([9521677](https://github.com/MonsieurBarti/tff-mono/commit/95216777c5125cfd34db6a3b62a5f24f6267e05c))
+* **tff-pi:** add /tff settings set command ([c208a60](https://github.com/MonsieurBarti/tff-mono/commit/c208a607dc13367083d04813eee1e49f6542b5de)), closes [#68](https://github.com/MonsieurBarti/tff-mono/issues/68)
+* **tff-pi:** add to release pipeline and rewrite readme ([94f7df2](https://github.com/MonsieurBarti/tff-mono/commit/94f7df29fe70567bb1dfe560ce27f464621fbeaf))
+* **tff-pi:** align task schema with core — add difficulty column + rename deps ([aa6ba49](https://github.com/MonsieurBarti/tff-mono/commit/aa6ba49f5b015cb39feb29c4db3b8aadf15fa0db)), closes [#69](https://github.com/MonsieurBarti/tff-mono/issues/69)
+* **tff-pi:** command surface polish ([8748aad](https://github.com/MonsieurBarti/tff-mono/commit/8748aadec65b0de3cd8074f03a268187f14bb276))
+* **tff-pi:** command surface polish ([#66](https://github.com/MonsieurBarti/tff-mono/issues/66), [#71](https://github.com/MonsieurBarti/tff-mono/issues/71), [#72](https://github.com/MonsieurBarti/tff-mono/issues/72), [#73](https://github.com/MonsieurBarti/tff-mono/issues/73)) ([4d89577](https://github.com/MonsieurBarti/tff-mono/commit/4d8957797caf12989fe2147c3221d76cd3d44ee2))
+* **tff-pi:** release pipeline + product README ([#74](https://github.com/MonsieurBarti/tff-mono/issues/74), [#75](https://github.com/MonsieurBarti/tff-mono/issues/75)) ([514d0d6](https://github.com/MonsieurBarti/tff-mono/commit/514d0d608f8cb711d749fc8af23ea85d49903646))
+* unblock ci, align schemas, rename deps, add parity monitoring ([9c5c4fa](https://github.com/MonsieurBarti/tff-mono/commit/9c5c4fac645f937dc270757e0024333befad75b9))
+
+
+### Bug Fixes
+
+* address agentic-simplify review findings ([db3bf5d](https://github.com/MonsieurBarti/tff-mono/commit/db3bf5de9c6dbe5a463237ec2181ec524cb610ef))
+* **review:** address ultrareview findings for [#55](https://github.com/MonsieurBarti/tff-mono/issues/55) ([706b80f](https://github.com/MonsieurBarti/tff-mono/commit/706b80fc09e41c696f0bf1eccd42c7371153377b))
+* **security:** eliminate shell injection in mechanical verifier ([1ceeb0d](https://github.com/MonsieurBarti/tff-mono/commit/1ceeb0d7558c49fce906c2b79db7ab28c9b1cbbf))
+* **security:** typecheck fixes for mechanical verifier ([f0b8618](https://github.com/MonsieurBarti/tff-mono/commit/f0b8618a61699b4bf08381e68139132058216b73))
+* **tff-pi:** address review findings — migrations, factories, validation, parity ([7700e15](https://github.com/MonsieurBarti/tff-mono/commit/7700e15d6692f0dc32cfcc6092cdff7a19648b56))
+* **tff-pi:** address review issues on command surface polish ([400f3f3](https://github.com/MonsieurBarti/tff-mono/commit/400f3f32864ba634e8c24b2537587e8dbc9beb93))
+* **tff-pi:** align dtos with core entity contracts ([387ead3](https://github.com/MonsieurBarti/tff-mono/commit/387ead3af40ea41f147b98ee92edda85a7621800)), closes [#76](https://github.com/MonsieurBarti/tff-mono/issues/76)
+* **tff-pi:** replace stringenum with type.union to fix typebox compat ([78af090](https://github.com/MonsieurBarti/tff-mono/commit/78af090f51619f7dc44a5593bfe07be98bd77787))
+* **tff-pi:** resolve peer deps and clean package manifest ([83aa21c](https://github.com/MonsieurBarti/tff-mono/commit/83aa21cc01e4f679c080a7951d92cb1dfefd52a1)), closes [#67](https://github.com/MonsieurBarti/tff-mono/issues/67)
+* **tff-pi:** switch vitest pool to forks to prevent mock leakage ([c24d142](https://github.com/MonsieurBarti/tff-mono/commit/c24d142a8308f8139b4d54f0352e9b6438a07cd9)), closes [#70](https://github.com/MonsieurBarti/tff-mono/issues/70)
+* **ultrareview:** p0 blockers and all 21 findings from feat/51-agent-convergence review ([4e646d5](https://github.com/MonsieurBarti/tff-mono/commit/4e646d508a1ff99c1a5c2d8df839cd5ac1a15ddd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @tff/core bumped to 1.1.0
+
 ## [0.1.9](https://github.com/MonsieurBarti/tff-pi/compare/tff-pi-v0.1.8...tff-pi-v0.1.9) (2026-05-01)
 
 ### Features

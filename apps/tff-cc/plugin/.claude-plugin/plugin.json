@@ -1,7 +1,7 @@
 {
 	"name": "tff-cc",
 	"description": "Autonomous coding agent orchestrator with SQLite-backed state, plannotator integration, and wave-based parallel execution",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"author": {
 		"name": "MonsieurBarti"
 	},
