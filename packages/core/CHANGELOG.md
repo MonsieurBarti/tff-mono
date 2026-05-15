@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/MonsieurBarti/tff-mono/compare/tff-core-v1.1.2...tff-core-v1.1.3) (2026-05-15)
+
+
+### Miscellaneous Chores
+
+* **tff-core:** Synchronize tff versions
+
 ## [1.1.2](https://github.com/MonsieurBarti/tff-mono/compare/tff-core-v1.1.1...tff-core-v1.1.2) (2026-05-15)
 
 
