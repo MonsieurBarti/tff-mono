@@ -22,6 +22,20 @@
 
 - `updateSliceStatus()` — status is no longer a directly-written column.
 
+## [1.1.1](https://github.com/MonsieurBarti/tff-mono/compare/tff-pi-v1.1.0...tff-pi-v1.1.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* trigger release-please for npm publish ([5ac7efe](https://github.com/MonsieurBarti/tff-mono/commit/5ac7efe2020b01e947b2484f01b708a3b78c3fa2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @tff/core bumped to 1.1.1
+
 ## [1.1.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-pi-v0.1.9...tff-pi-v1.1.0) (2026-05-15)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/MonsieurBarti/tff-mono/compare/tff-core-v1.1.0...tff-core-v1.1.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* trigger release-please for npm publish ([5ac7efe](https://github.com/MonsieurBarti/tff-mono/commit/5ac7efe2020b01e947b2484f01b708a3b78c3fa2))
+
 ## [1.1.0](https://github.com/MonsieurBarti/tff-mono/compare/tff-core-v1.0.1...tff-core-v1.1.0) (2026-05-15)
 
 
