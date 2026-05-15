@@ -53,7 +53,7 @@ describe("PHASE_AGENT converged naming", () => {
 	});
 });
 
-describe("loadAgentResource core fallback", () => {
+describe("loadAgentResource local-first with core fallback", () => {
 	it("returns non-empty content for tff-brainstormer", () => {
 		const content = loadAgentResource("tff-brainstormer");
 		expect(content.length).toBeGreaterThan(0);

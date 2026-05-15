@@ -26,6 +26,7 @@ import { runReview } from "./review.js";
 import { runSettings } from "./settings.js";
 import { runSettingsSet } from "./settings-set.js";
 import { runShipChanges } from "./ship-changes.js";
+import { runShipFix } from "./ship-fix.js";
 import { runShipMerged } from "./ship-merged.js";
 import { runShip } from "./ship.js";
 import { runStateRename } from "./state-rename.js";
@@ -79,6 +80,7 @@ COMMANDS.set("review", runReview);
 COMMANDS.set("ship", runShip);
 COMMANDS.set("ship-merged", runShipMerged);
 COMMANDS.set("ship-changes", runShipChanges);
+COMMANDS.set("ship-fix", runShipFix);
 const runNextDeprecated: CommandHandler = async (pi, ctx, _uiCtx, _args) => {
 	if (!ctx.db || !ctx.projectRoot) {
 		pi.sendUserMessage("/tff next is removed in M11. Start a slice with /tff discuss M##-S##.");
@@ -108,7 +110,9 @@ const runStateSub: CommandHandler = async (pi, ctx, uiCtx, args) => {
 	const sub = args[0];
 	const rest = args.slice(1);
 	if (sub === "rename") return runStateRename(pi, ctx, uiCtx, rest);
-	pi.sendUserMessage(`Unknown /tff state subcommand: ${sub ?? "(none)"}. Try: rename`);
+	pi.sendUserMessage(
+		`Unknown /tff state subcommand: ${sub ?? "(none)"}. Only \`rename\` is currently supported.`,
+	);
 };
 COMMANDS.set("state", runStateSub);
 
@@ -117,6 +121,8 @@ const runBranchSub: CommandHandler = async (pi, ctx, uiCtx, args) => {
 	const sub = args[0];
 	const rest = args.slice(1);
 	if (sub === "rename") return runBranchRename(pi, ctx, uiCtx, rest);
-	pi.sendUserMessage(`Unknown /tff branch subcommand: ${sub ?? "(none)"}. Try: rename`);
+	pi.sendUserMessage(
+		`Unknown /tff branch subcommand: ${sub ?? "(none)"}. Only \`rename\` is currently supported.`,
+	);
 };
 COMMANDS.set("branch", runBranchSub);

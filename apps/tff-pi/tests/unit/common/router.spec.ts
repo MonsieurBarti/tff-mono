@@ -23,6 +23,7 @@ describe("router", () => {
 				"ship",
 				"ship-merged",
 				"ship-changes",
+				"ship-fix",
 				"complete-milestone",
 				"complete-milestone-merged",
 				"complete-milestone-changes",
