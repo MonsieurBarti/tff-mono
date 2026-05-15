@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
-import { readArtifact, milestoneLabel, sliceLabel } from "@tff/core";
+import { readArtifact, milestoneLabel, sliceLabel, type SliceStatus } from "@tff/core";
 import {
 	getActiveMilestone,
 	getActiveSlice,
@@ -10,7 +10,6 @@ import {
 	getSlice,
 	getTasksByWave,
 } from "./common/db.js";
-import type { SliceStatus } from "@tff/core";
 import type { Phase, Slice, Task, Tier } from "./common/dto.js";
 
 export type { Phase };

@@ -19,8 +19,7 @@ import { logWarning } from "../common/logger.js";
 import { validateCommandPreconditions } from "../common/preconditions.js";
 import { UnknownCommandError, projectCommand } from "../common/projection.js";
 import { isStateBranchEnabledForRoot } from "../common/state-branch-toggle.js";
-import { sliceLabel } from "@tff/core";
-import type { SliceStatus } from "@tff/core";
+import { sliceLabel, type SliceStatus } from "@tff/core";
 
 /**
  * Milliseconds after which a phase_run still in 'started' state is considered

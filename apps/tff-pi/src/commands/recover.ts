@@ -13,8 +13,7 @@ import {
 	scanForStuckSlices,
 } from "../common/recovery.js";
 import { releaseLock } from "../common/session-lock.js";
-import { sliceLabel } from "@tff/core";
-import type { SliceStatus } from "@tff/core";
+import { sliceLabel, type SliceStatus } from "@tff/core";
 import { getWorktreePath, worktreeExists } from "../common/worktree.js";
 
 type RecoveryAction = RecoveryClassification | "dismiss";
